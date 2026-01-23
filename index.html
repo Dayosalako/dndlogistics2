@@ -326,6 +326,59 @@
   </div>
 </section>
 
+  <section id="feedback" class="py-16 md:py-24 bg-white border-t border-gray-100">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-blue-900">Complaints & Feedback</h2>
+      <p class="text-gray-600">Your experience matters. Let us know how we can improve.</p>
+    </div>
+
+    <div class="bg-blue-50 p-8 md:p-12 rounded-[2rem] shadow-xl border border-blue-100 relative" data-aos="zoom-in">
+      <form id="feedbackForm" action="https://formspree.io/f/xojeejoq"method="POST" class="space-y-6">
+        <div class="grid md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Your Name</label>
+            <input type="text" name="name" required placeholder= "e.g Martins Sal" class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Phone</label>
+            <input type="text" name="contact" required placeholder= "e.g 07032000020" class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500">
+          </div>
+        </div>
+        <div>
+            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Email</label>
+            <input type="text" name="contact" required placeholder= "e.g offa@gmail.com" class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500">
+          </div>
+        </div>
+        
+        <div>
+          <label class="text-xs font-bold text-gray-500 uppercase ml-1">Nature of Feedback</label>
+          <select name="type" class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500">
+            <option value="General Feedback">General Feedback</option>
+            <option value="Complaint">Complaint</option>
+            <option value="Service Inquiry">Service Inquiry</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-gray-500 uppercase ml-1">Message</label>
+          <textarea name="message" rows="4" required placeholder="Tell us more..." class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500"></textarea>
+        </div>
+        <button type="submit" id="feedbackSubmitBtn" class="w-full bg-blue-900 hover:bg-orange-600 text-white font-black py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1">
+          SUBMIT FEEDBACK
+        </button>
+      </form>
+    <div id="feedbackSuccess" class="hidden flex flex-col items-center justify-center text-center py-10">
+          <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mb-6">✓</div>
+          <h3 class="text-2xl font-bold text-blue-900 mb-2">Thank You!</h3>
+          <p class="text-gray-600 mb-8">Your message has been received. Our team will review it shortly.</p>
+          <button onclick="resetFeedbackForm()" class="bg-blue-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-500 transition shadow-lg">
+            Submit Another Feedback
+          </button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer id="contact" class="bg-gray-950 text-white pt-24 pb-12 border-t border-gray-900">
   <div class="max-w-7xl mx-auto px-6">
     <div class="grid md:grid-cols-4 gap-12 mb-16">
@@ -338,7 +391,7 @@
       <div>
         <h4 class="text-orange-500 font-black uppercase text-xs tracking-widest mb-6 underline underline-offset-4 decoration-orange-500/30">Contact Us</h4>
         <p class="mb-4 font-bold tracking-tight text-sm">📞 +234 904 555 1003<br>📞 +234 814 614 3628</p>
-        <p class="text-gray-400 font-medium text-sm">📧 info@dndgloballogistics.com</p>
+        <p class="text-gray-400 font-medium text-sm">📧 info@dndlogisticsltd.com.ng</p>
       </div>
 
       <div>
@@ -347,6 +400,8 @@
             <p><b class="text-white block">HQ:</b> Plot No DH11, Sunflower Estate, Karsana North, Abuja</p>
             <p><b class="text-white block">Maiduguri:</b> House No 4, Old Molia Quarters, Polo</p>
             <p><b class="text-white block">Sokoto:</b> No 1, Old Runway, Bafarawa Estate</p>
+          <p><b class="text-white block">Zamfara:</b> No 36 Janyau Ta Galas, Gusau</p>
+            <p><b class="text-white block">Kebbi:</b> No 5, Behind OandO bypass, Birnin Kebbi</p>
         </div>
       </div>
 
@@ -494,4 +549,5 @@
 </script>
 </body>
 </html>
+
 
