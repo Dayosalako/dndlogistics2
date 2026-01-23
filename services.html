@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Special Services | DND Global Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <style>
+    .spinner { border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<nav class="fixed w-full z-[1000] py-4 bg-white shadow-md top-0">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+    <a href="index.html" class="flex items-center">
+        <span class="font-black text-xl text-blue-900 uppercase">DND Global</span>
+    </a>
+    <div id="nigeria-clock" class="font-mono text-[10px] font-bold text-blue-900 bg-gray-100 px-4 py-2 rounded-full border">
+      Loading Nigeria Time...
+    </div>
+    <a href="index.html" class="text-blue-900 font-bold hover:text-orange-500">← Back Home</a>
+  </div>
+</nav>
+
+<div class="pt-32 pb-16 text-center" data-aos="fade-down">
+    <h1 class="text-4xl md:text-6xl font-black text-blue-900 mb-4">Our Special Services</h1>
+    <p class="text-gray-600">Car Hire & Partnership Opportunities</p>
+</div>
+
+<div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 mb-24">
+  
+  <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative">
+  <h2 class="text-2xl font-bold text-blue-900 mb-6">🚗 Car Hire Service</h2>
+  
+  <form id="carHireForm" action="https://script.google.com/macros/s/AKfycbwbLY-MIeYwngVFaaAX8qbdqqi6_BPCB1CTb_5GjsZlAO3bNAejEXa7o04WBNNbZbJVUw/exec" method="POST" class="space-y-4">
+    <input type="text" name="FullName" placeholder="Full Name" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+    <input type="tel" name="Phone" placeholder="Phone Number" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+    
+    <select name="CarType" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+        <option value="Sedan">Sedan (Small Car)</option>
+        <option value="SUV">SUV (Jeep)</option>
+        <option value="Delivery Van">Delivery Van</option>
+        <option value="Truck">Truck (Haulage)</option>
+    </select>
+    
+    <input type="text" name="Duration" placeholder="Duration (e.g. 3 Days)" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+    <textarea name="Location" placeholder="Pickup Address" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500"></textarea>
+    
+    <button type="submit" id="carBtn" class="w-full bg-blue-900 hover:bg-orange-600 text-white font-bold py-4 rounded-xl transition shadow-lg">Book Car Hire</button>
+  </form>
+
+    <div id="carSuccess" class="hidden text-center py-10">
+        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">✓</div>
+        <h3 class="text-xl font-bold text-blue-900">Booking Received!</h3>
+        <p class="text-gray-500 mb-6">We will call you shortly.</p>
+        <button onclick="resetPageForm('carHireForm', 'carSuccess')" class="bg-blue-900 text-white px-6 py-2 rounded-lg font-bold">Book another car</button>
+    </div>
+  </div>
+
+  <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative" data-aos="fade-left">
+    <h2 class="text-2xl font-bold text-blue-900 mb-6 flex items-center">🤝 Partnership Registration</h2>
+    <form id="partnerForm" action="https://script.google.com/macros/s/AKfycbwbLY-MIeYwngVFaaAX8qbdqqi6_BPCB1CTb_5GjsZlAO3bNAejEXa7o04WBNNbZbJVUw/exec" method="POST" class="space-y-4">
+      <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+      <input type="hidden" name="subject" value="New Partnership Application">
+
+      <input type="text" name="Company Name" placeholder="Company/Business Name" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+      <input type="text" name="Contact Person" placeholder="Contact Person Name" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+      <input type="email" name="Email" placeholder="Email Address" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+      
+      <select name="Service Type" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+          <option>Logistics Partner</option>
+          <option>Vendor/Supplier</option>
+          <option>Agent</option>
+      </select>
+      
+      <textarea name="Message" placeholder="Briefly tell us about your business" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500"></textarea>
+      <button type="submit" class="w-full bg-orange-500 hover:bg-blue-900 text-white font-bold py-4 rounded-xl transition shadow-lg">Submit Registration</button>
+    </form>
+
+    <div id="partnerSuccess" class="hidden text-center py-10">
+        <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">🎉</div>
+        <h3 class="text-xl font-bold text-blue-900">Application Sent!</h3>
+        <p class="text-gray-500 mb-6">Our team will review your application.</p>
+        <button onclick="resetPageForm('partnerForm', 'partnerSuccess')" class="bg-orange-500 text-white px-6 py-2 rounded-lg font-bold">Submit another</button>
+    </div>
+  </div>
+</div>
+
+<footer id="contact" class="bg-gray-950 text-white pt-24 pb-12 border-t border-gray-900">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid md:grid-cols-4 gap-12 mb-16">
+      <div class="col-span-1 md:col-span-1">
+        <h3 class="text-2xl font-black mb-6 uppercase">DND <span class="text-orange-500">Global</span></h3>
+        <p class="text-gray-400 leading-relaxed font-medium text-sm">Your trusted partner for logistics and haulage services across Nigeria. Registered and reliable.</p>
+      </div>
+      
+      <div>
+        <h4 class="text-orange-500 font-black uppercase text-xs tracking-widest mb-6 underline underline-offset-4 decoration-orange-500/30">Contact Us</h4>
+        <p class="mb-4 font-bold tracking-tight text-sm">📞 +234 904 555 1003<br>📞 +234 814 614 3628</p>
+        <p class="text-gray-400 font-medium text-sm">📧 info@dndgloballogistics.com</p>
+      </div>
+
+      <div>
+        <h4 class="text-orange-500 font-black uppercase text-xs tracking-widest mb-6 underline underline-offset-4 decoration-orange-500/30">Our Offices</h4>
+        <div class="space-y-4 text-xs text-gray-400 font-medium leading-relaxed">
+            <p><b class="text-white block">HQ:</b> Plot No DH11, Sunflower Estate, Karsana North, Abuja</p>
+            <p><b class="text-white block">Maiduguri:</b> House No 4, Old Molia Quarters, Polo</p>
+            <p><b class="text-white block">Sokoto:</b> No 1, Old Runway, Bafarawa Estate</p>
+            <p><b class="text-white block">Zamfara:</b> No 36 Janyau Ta Galas, Gusau</p>
+            <p><b class="text-white block">Kebbi:</b> No 5, Behind OandO bypass, Birnin Kebbi</p>
+        </div>
+      </div>
+    </footer>
+      
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 900 });
+
+  // Live Nigeria Clock
+  function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleString('en-NG', { timeZone: 'Africa/Lagos', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if(document.getElementById('nigeria-clock')) {
+       document.getElementById('nigeria-clock').innerText = timeString;
+    }
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // UNIVERSAL SUBMISSION FUNCTION
+  function handleFormSubmit(formId, successId) {
+    const form = document.getElementById(formId);
+    const successDiv = document.getElementById(successId);
+    const btn = form.querySelector('button');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="spinner"></span> Sending...`;
+      btn.disabled = true;
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        mode: 'no-cors' // This bypasses browser security for Google Scripts
+      })
+      .then(() => {
+        // Success
+        form.classList.add('hidden');
+        successDiv.classList.remove('hidden');
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Connection Error. Please try again.");
+      })
+      .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      });
+    });
+  }
+
+  // Initialize both forms
+  handleFormSubmit('carHireForm', 'carSuccess');
+  handleFormSubmit('partnerForm', 'partnerSuccess');
+
+  // Function to reset forms
+  function resetPageForm(formId, successId) {
+    document.getElementById(formId).reset();
+    document.getElementById(formId).classList.remove('hidden');
+    document.getElementById(successId).classList.add('hidden');
+  }
+</script>
+</body>
+</html>
