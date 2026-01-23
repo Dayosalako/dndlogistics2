@@ -71,6 +71,10 @@
         <img src="assets/logo.png" onerror="this.style.display='none'" alt="DND" class="h-10">
         <span class="ml-2 font-black text-xl text-blue-900 uppercase tracking-tighter group-hover:text-orange-500 transition">DND Global</span>
     </a>
+    <div id="desktop-clock" class="hidden lg:block font-mono text-[10px] font-bold text-blue-900 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
+      Loading Nigeria Time...
+    </div>
+    
     <div class="hidden md:flex gap-8 font-semibold text-gray-700">
       <a href="#services" class="hover:text-orange-500 transition">Services</a>
       <a href="#about" class="hover:text-orange-500 transition">About</a>
@@ -447,7 +451,19 @@
     setTimeout(() => { document.getElementById('promo-modal').classList.add('active'); }, 5000);
   }
   function closeModal() { document.getElementById('promo-modal').classList.remove('active'); }
-
+// LIVE CLOCK FUNCTION
+  function updateClock() {
+    const now = new Date();
+    const timeString = now.toLocaleString('en-NG', {
+      timeZone: 'Africa/Lagos',
+      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+    });
+    const dc = document.getElementById('desktop-clock');
+    const mc = document.getElementById('mobile-clock');
+    if (dc) dc.innerText = timeString;
+    if (mc) mc.innerText = timeString;
+  }
   // MOBILE MENU
   const menuBtn = document.getElementById('menu-btn');
   const closeBtn = document.getElementById('close-btn');
@@ -485,7 +501,7 @@
                     <h3 class="text-2xl font-black text-blue-900 mb-4">${match[5] || "Processing"}</h3>
                     <div class="w-full bg-gray-100 h-2 rounded-full mb-6 flex"><div class="bg-orange-500 h-full rounded-full animate-pulse" style="width: 65%"></div></div>
                     <div class="grid grid-cols-2 gap-4 border-t pt-4">
-                        <div><p class="text-[9px] uppercase font-bold text-gray-400">Origin</p><p class="text-sm font-bold text-blue-900">${match[1] || "N/A"}</p></div>
+                        <div><p class="text-[9px] uppercase font-bold text-gray-400">Origin</p><p class="text-sm font-bold text-blue-900">${match[2] || "N/A"}</p></div>
                         <div><p class="text-[9px] uppercase font-bold text-gray-400">Destination</p><p class="text-sm font-bold text-blue-900">${match[6] || "N/A"}</p></div>
                     </div>
                 </div>`;
@@ -546,8 +562,24 @@
     fb.classList.remove('hidden');
     setTimeout(() => fb.classList.add('hidden'), 2000);
   }
+  // FEEDBACK LOGIC
+  const feedbackForm = document.getElementById('feedbackForm');
+  const feedbackSuccess = document.getElementById('feedbackSuccess');
+  const fbBtn = document.getElementById('feedbackSubmitBtn');
+  feedbackForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    fbBtn.innerHTML = `<span class="spinner"></span> Sending...`;
+    fbBtn.disabled = true;
+    try {
+      const res = await fetch(feedbackForm.action, { method: 'POST', body: new FormData(feedbackForm), headers: { 'Accept': 'application/json' } });
+      if (res.ok) { feedbackForm.classList.add('hidden'); feedbackSuccess.classList.remove('hidden'); }
+    } catch (e) { alert("Error sending feedback."); }
+    finally { fbBtn.innerHTML = "SUBMIT FEEDBACK"; fbBtn.disabled = false; }
+  });
+  function resetFeedbackForm() { feedbackForm.reset(); feedbackForm.classList.remove('hidden'); feedbackSuccess.classList.add('hidden'); }
 </script>
 </body>
 </html>
+
 
 
