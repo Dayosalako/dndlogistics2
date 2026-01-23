@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DND Global Logistics Ltd | Smart. Fast. Safe.</title>
 
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <div id="liveDateTime" class="text-xs font-bold text-gray-400 text-center mt-4"></div>
 
   <style>
     .swiper-pagination-bullet-active { background: #f97316 !important; }
@@ -28,16 +30,25 @@
       vertical-align: middle;
     }
 
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
     nav { 
       background-color: white !important; 
       border-bottom: 1px solid #e5e7eb; 
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
     }
                                             
-    body { margin: 0 !important; padding: 0 !important; }
+  body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+    /* Better spacing for mobile tracking status */
     #trackingStatus { width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; }
   </style>
 </head>
@@ -60,19 +71,14 @@
         <img src="assets/logo.png" onerror="this.style.display='none'" alt="DND" class="h-10">
         <span class="ml-2 font-black text-xl text-blue-900 uppercase tracking-tighter group-hover:text-orange-500 transition">DND Global</span>
     </a>
-
-    <div id="desktop-clock" class="hidden lg:block font-mono text-[10px] font-bold text-blue-900 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
-      Loading Nigeria Time...
-    </div>
-
     <div class="hidden md:flex gap-8 font-semibold text-gray-700">
       <a href="#services" class="hover:text-orange-500 transition">Services</a>
       <a href="#about" class="hover:text-orange-500 transition">About</a>
       <a href="#pricing" class="hover:text-orange-500 transition">Pricing</a>
       <a href="#booking" class="hover:text-orange-500 transition">Request Pickup</a>
-      <a href="#feedback" class="hover:text-orange-500 transition">Feedback</a>
       <a href="#contact" class="hover:text-orange-500 transition">Contact</a>
       <a href="services.html" class="hover:text-orange-500 transition">Car Hire & Partners</a>
+           
     </div>
     <button id="menu-btn" class="md:hidden text-gray-700 focus:outline-none">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -86,18 +92,14 @@
   <a href="#about" class="mobile-link hover:text-orange-500">About Us</a>
   <a href="#pricing" class="mobile-link hover:text-orange-500">Estimator</a>
   <a href="#booking" class="mobile-link hover:text-orange-500">Request Pickup</a>
-  <a href="#feedback" class="mobile-link hover:text-orange-500">Feedback</a>
   <a href="#contact" class="mobile-link hover:text-orange-500">Contact</a>
   <a href="services.html" class="mobile-link hover:text-orange-500">Car Hire & Partners</a>
-
-  <div id="mobile-clock" class="mt-auto text-center font-mono text-[10px] text-gray-500 border-t pt-4">
-    Loading Time...
-  </div>
 </div>
 
 <header class="relative bg-cover bg-center text-white min-h-[90vh] flex items-center" style="background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000');">
   <div class="absolute inset-0 bg-blue-900/85 mix-blend-multiply"></div>
-  <div data-aos="fade-down">             
+  <div class="relative max-w-7xl mx-auto px-6 py-24 text-center w-full">
+    <div data-aos="fade-down">
         <span class="inline-block py-1 px-3 rounded-full bg-orange-500/20 border border-orange-500 text-orange-400 text-xs font-bold uppercase tracking-widest mb-4">Global Logistics Partner</span>
         <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tight leading-tight">Smart. Fast. Safe.</h1>
     </div>
@@ -134,7 +136,12 @@
 <section id="about" class="bg-blue-50 py-16 md:py-24">
   <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
     <div data-aos="fade-right">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-blue-900">About DND Global Logistics Ltd</h2>
+      <div class="flex items-center gap-3 mb-4">
+    <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider border border-blue-200">RC: 9133502</span>
+    <span class="flex items-center text-green-600 text-[10px] font-bold uppercase"><span class="mr-1">●</span> Verified Company</span>
+</div>
+<h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-blue-900">About DND Global Logistics Ltd</h2>
+      
       <p class="text-gray-700 text-base md:text-lg leading-relaxed mb-6">
         DND Global Logistics Ltd RC Number 9133502 is a registered Nigerian logistics company committed to efficient, safe, and reliable transportation solutions.
       </p>
@@ -182,41 +189,115 @@
     </div>
   </div>
 </section>
+<section class="bg-blue-900 py-20 md:py-32 text-white overflow-hidden relative">
+  <div class="absolute top-0 left-0 w-64 h-64 bg-orange-500/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+  <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
 
-<section class="bg-blue-900 py-16 md:py-24 text-white overflow-hidden">
-  <div class="max-w-5xl mx-auto px-6">
-    <h2 class="text-2xl md:text-3xl font-extrabold text-center mb-16" data-aos="fade-up">What Our Clients Say</h2>
-    <div class="swiper mySwiper">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide px-4 md:px-12 text-center">
-          <p class="text-lg md:text-xl italic mb-6 font-light leading-relaxed">"Their speed is unmatched. I sent a package from Lagos to Kano and it arrived perfectly within 48 hours."</p>
-          <div class="flex items-center justify-center gap-4 mt-4">
-            <img src="https://i.pravatar.cc/100?img=3" class="w-12 h-12 rounded-full border-2 border-orange-500">
-            <div class="text-left">
-              <h4 class="font-bold text-orange-400">Ahmed Lawal</h4>
-              <p class="text-xs text-gray-300">Business Owner</p>
-              <div class="text-orange-400 text-sm">★★★★★</div>
-            </div>
-          </div>
-        </div>
-        <div class="swiper-slide px-4 md:px-12 text-center">
-          <p class="text-lg md:text-xl italic mb-6 font-light leading-relaxed">"Reliable haulage. We used them for factory relocation and all our equipment stayed secure."</p>
-          <div class="flex items-center justify-center gap-4 mt-4">
-            <img src="https://i.pravatar.cc/100?img=7" class="w-12 h-12 rounded-full border-2 border-orange-500">
-            <div class="text-left">
-              <h4 class="font-bold text-orange-400">Sade Oke</h4>
-              <p class="text-xs text-gray-300">CEO SADKE FABRICS</p>
-              <div class="text-orange-400 text-sm">★★★★★</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="swiper-pagination pt-6"></div>
-      <div class="swiper-button-next text-orange-500"></div>
-      <div class="swiper-button-prev text-orange-500"></div>
+<section class="py-12 bg-white border-y border-gray-100 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 mb-8 text-center">
+    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Trusted by Industry Leaders</p>
+  </div>
+  <div class="flex space-x-12 animate-scroll hover:[animation-play-state:paused]">
+    <div class="flex space-x-16 items-center min-w-full justify-around grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition duration-500">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-8 w-auto" alt="Partner">
+    </div>
+    <div class="flex space-x-16 items-center min-w-full justify-around grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition duration-500">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-8 w-auto" alt="Partner">
     </div>
   </div>
 </section>
+
+<style>
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-scroll {
+    display: flex;
+    width: max-content;
+    animation: scroll 30s linear infinite;
+  }
+</style>
+  
+  <div class="max-w-5xl mx-auto px-6 relative z-10">
+    <div class="text-center mb-16" data-aos="fade-up">
+        <span class="text-orange-500 font-bold uppercase tracking-widest text-xs">Testimonials</span>
+        <h2 class="text-3xl md:text-5xl font-black mt-3">What Our Clients Say</h2>
+        <div class="w-16 h-1 bg-orange-500 mx-auto mt-4 rounded-full"></div>
+    </div>
+
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+
+        <div class="swiper-slide px-4 md:px-20 text-center">
+            <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
+            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
+                "Their speed is unmatched. I sent a high-value package from Lagos to Kano and it arrived perfectly within 48 hours. The tracking system kept me at peace throughout."
+            </p>
+            <div class="flex flex-col items-center">
+                <img src="https://i.pravatar.cc/150?u=ahmed" class="w-16 h-16 rounded-full border-4 border-blue-800 shadow-xl mb-4 object-cover">
+                <h4 class="font-bold text-white text-lg">Ahmed Lawal</h4>
+                <p class="text-orange-400 text-xs font-bold uppercase tracking-tighter">Verified Business Owner</p>
+                <div class="flex text-orange-400 mt-2 text-sm">★★★★★</div>
+            </div>
+        </div>
+
+        <div class="swiper-slide px-4 md:px-20 text-center">
+            <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
+            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
+                "Reliable haulage for industrial needs. We used DND for our factory relocation. Every piece of heavy equipment was handled with extreme care and arrived on schedule."
+            </p>
+            <div class="flex flex-col items-center">
+                <img src="https://i.pravatar.cc/150?u=sade" class="w-16 h-16 rounded-full border-4 border-blue-800 shadow-xl mb-4 object-cover">
+                <h4 class="font-bold text-white text-lg">Sade Oke</h4>
+                <p class="text-orange-400 text-xs font-bold uppercase tracking-tighter">CEO, Sadke Fabrics</p>
+                <div class="flex text-orange-400 mt-2 text-sm">★★★★★</div>
+            </div>
+        </div>
+
+        <div class="swiper-slide px-4 md:px-20 text-center">
+            <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
+            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
+                "DND Global has transformed our last-mile delivery. Our customers in rural areas now receive their orders faster than ever. Highly recommended for e-commerce!"
+            </p>
+            <div class="flex flex-col items-center">
+                <img src="https://i.pravatar.cc/150?u=emeka" class="w-16 h-16 rounded-full border-4 border-blue-800 shadow-xl mb-4 object-cover">
+                <h4 class="font-bold text-white text-lg">Emeka Okafor</h4>
+                <p class="text-orange-400 text-xs font-bold uppercase tracking-tighter">Logistics Manager, J-Store</p>
+                <div class="flex text-orange-400 mt-2 text-sm">★★★★★</div>
+            </div>
+        </div>
+
+        <div class="swiper-slide px-4 md:px-20 text-center">
+            <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
+            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
+                "The most transparent logistics company I've worked with in Nigeria. No hidden charges, and their customer service is available 24/7 to answer queries."
+            </p>
+            <div class="flex flex-col items-center">
+                <img src="https://i.pravatar.cc/150?u=fatima" class="w-16 h-16 rounded-full border-4 border-blue-800 shadow-xl mb-4 object-cover">
+                <h4 class="font-bold text-white text-lg">Fatima Yusuf</h4>
+                <p class="text-orange-400 text-xs font-bold uppercase tracking-tighter">Independent Distributor</p>
+                <div class="flex text-orange-400 mt-2 text-sm">★★★★★</div>
+            </div>
+        </div>
+
+      </div>
+      
+      <div class="swiper-pagination !-bottom-2"></div>
+      <div class="swiper-button-next !text-orange-500 after:!text-2xl hidden md:flex"></div>
+      <div class="swiper-button-prev !text-orange-500 after:!text-2xl hidden md:flex"></div>
+    </div>
+  </div>
+</section>                    
+  
 
 <section id="booking" class="bg-gray-100 py-16 md:py-24">
   <div class="max-w-7xl mx-auto px-6">
@@ -241,18 +322,18 @@
               <label class="text-xs font-bold text-gray-500 uppercase ml-1">Pickup From</label>
               <input name="pickup_location" type="text" placeholder="Full Address" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
             </div>
-            <div>
-              <label class="text-xs font-bold text-gray-500 uppercase ml-1">Sender's Full Name</label>
-              <input name="sender_name" type="text" placeholder="e.g., John Doe" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
-            </div>  
+             <div>
+            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Full Name</label>
+            <input name="item_description" type="text" placeholder="e.g., Sender's Name" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
+          </div>  
             <div>
               <label class="text-xs font-bold text-gray-500 uppercase ml-1">Deliver To</label>
               <input name="delivery_location" type="text" placeholder="Full Address" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
             </div>
           </div>
           <div>
-            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Receiver's Full Name</label>
-            <input name="receiver_name" type="text" placeholder="e.g., Jane Smith" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
+            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Full Name</label>
+            <input name="item_description" type="text" placeholder="e.g., Receiver's Name" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
           </div>
           <div>
             <label class="text-xs font-bold text-gray-500 uppercase ml-1">Item Details</label>
@@ -288,53 +369,6 @@
   </div>
 </section>
 
-<section id="feedback" class="py-16 md:py-24 bg-white border-t border-gray-100">
-  <div class="max-w-4xl mx-auto px-6">
-    <div class="text-center mb-12" data-aos="fade-up">
-      <h2 class="text-3xl md:text-4xl font-extrabold mb-4 text-blue-900">Complaints & Feedback</h2>
-      <p class="text-gray-600">Your experience matters. Let us know how we can improve.</p>
-    </div>
-
-    <div class="bg-blue-50 p-8 md:p-12 rounded-[2rem] shadow-xl border border-blue-100 relative" data-aos="zoom-in">
-      <form id="feedbackForm" action="https://formspree.io/f/xojeejoq" method="POST" class="space-y-6">
-        <div class="grid md:grid-cols-2 gap-6">
-          <div>
-            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Your Name</label>
-            <input type="text" name="name" required placeholder="Your Name" class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500">
-          </div>
-          <div>
-            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Email / Phone</label>
-            <input type="text" name="contact" required placeholder="08056473337" class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500">
-          </div>
-        </div>
-        <div>
-          <label class="text-xs font-bold text-gray-500 uppercase ml-1">Nature of Feedback</label>
-          <select name="type" class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500">
-            <option value="General Feedback">General Feedback</option>
-            <option value="Complaint">Complaint</option>
-            <option value="Service Inquiry">Service Inquiry</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-bold text-gray-500 uppercase ml-1">Message</label>
-          <textarea name="message" rows="4" required placeholder="Tell us more..." class="w-full p-4 bg-white border border-gray-200 rounded-xl outline-none focus:border-orange-500"></textarea>
-        </div>
-        <button type="submit" id="feedbackSubmitBtn" class="w-full bg-blue-900 hover:bg-orange-600 text-white font-black py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1">
-          SUBMIT FEEDBACK
-        </button>
-      </form>
-
-      <div id="feedbackSuccess" class="hidden flex flex-col items-center justify-center text-center py-10">
-          <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mb-6">✓</div>
-          <h3 class="text-2xl font-bold text-blue-900 mb-2">Thank You!</h3>
-          <p class="text-gray-600 mb-8">Your message has been received. Our team will review it shortly.</p>
-          <button onclick="resetFeedbackForm()" class="bg-blue-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-500 transition shadow-lg">
-            Submit Another Feedback
-          </button>
-      </div>
-    </div>
-  </div>
-</section>
 <footer id="contact" class="bg-gray-950 text-white pt-24 pb-12 border-t border-gray-900">
   <div class="max-w-7xl mx-auto px-6">
     <div class="grid md:grid-cols-4 gap-12 mb-16">
@@ -370,17 +404,26 @@
         </ul>
       </div>
     </div>
-    
+      <div id="liveDateTime" class="text-xs font-bold text-gray-400 text-center mt-4"></div>
     <div class="border-t border-gray-900 pt-12 flex flex-col md:flex-row justify-between items-center text-center gap-4">
         <p class="text-gray-600 text-xs font-bold uppercase tracking-widest">© 2026 DND Global Logistics Ltd.</p>
         <p class="text-gray-700 text-[10px] italic">Designed & Managed by Zion Netcom Solutions Limited.</p>
     </div>
   </div>
 </footer>
+<div class="fixed bottom-6 right-6 flex flex-col gap-4 z-50">
+    <a href="tel:+2348146143628" class="md:hidden bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition hover:scale-110">
+        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+    </a>
 
-<a href="https://wa.me/+2348146143628" class="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl z-50 flex items-center justify-center text-2xl transition hover:scale-110">
-    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.309 1.656zm6.29-4.143c1.589.943 3.161 1.44 4.862 1.441 5.016 0 9.1-4.083 9.102-9.1 0-2.426-.945-4.707-2.661-6.423-1.716-1.716-3.998-2.662-6.424-2.662-5.018 0-9.102 4.084-9.103 9.1 0 1.884.57 3.393 1.577 5.137l-.993 3.626 3.74-.981z"/></svg>
-</a>
+    <a href="https://wa.me/2348146143628?text=Hello%20DND%20Global%20Logistics,%20I%20am%20interested%20in%20your%20services." 
+       target="_blank"
+       class="bg-green-500 hover:bg-green-600 text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl transition hover:scale-110">
+        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.309 1.656zm6.29-4.143c1.589.943 3.161 1.44 4.862 1.441 5.016 0 9.1-4.083 9.102-9.1 0-2.426-.945-4.707-2.661-6.423-1.716-1.716-3.998-2.662-6.424-2.662-5.018 0-9.102 4.084-9.103 9.1 0 1.884.57 3.393 1.577 5.137l-.993 3.626 3.74-.981z"/>
+        </svg>
+    </a>
+</div>
 
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -388,28 +431,13 @@
 <script>
   AOS.init({ duration: 900, once: true });
   
+  // MODAL TRIGGER
   window.onload = function() {
     setTimeout(() => { document.getElementById('promo-modal').classList.add('active'); }, 5000);
-    updateClock();
-    setInterval(updateClock, 1000);
   }
-
   function closeModal() { document.getElementById('promo-modal').classList.remove('active'); }
 
-  // LIVE CLOCK FUNCTION
-  function updateClock() {
-    const now = new Date();
-    const timeString = now.toLocaleString('en-NG', {
-      timeZone: 'Africa/Lagos',
-      weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-    });
-    const dc = document.getElementById('desktop-clock');
-    const mc = document.getElementById('mobile-clock');
-    if (dc) dc.innerText = timeString;
-    if (mc) mc.innerText = timeString;
-  }
-
+  // MOBILE MENU
   const menuBtn = document.getElementById('menu-btn');
   const closeBtn = document.getElementById('close-btn');
   const mobileMenu = document.getElementById('mobile-menu');
@@ -418,29 +446,35 @@
   document.querySelectorAll('.mobile-link').forEach(link => {
     link.onclick = () => mobileMenu.classList.remove('mobile-menu-open');
   });
-
+  
+  // TRACKING LOGIC
   async function trackPackage() {
     const input = document.getElementById('trackingInput').value.trim().toUpperCase();
     const statusDiv = document.getElementById('trackingStatus');
     if(!input) { statusDiv.innerHTML = "<p class='mt-4 text-red-400'>❌ Enter ID</p>"; return; }
     statusDiv.innerHTML = "<p class='mt-4 text-orange-400 animate-pulse'>🔍 Searching for Item...</p>";
+    
     const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCe6GWY3Pi1RkIxhgUWqagp6ci2wp0ZR981RXKCc8b4Kq7c7FnViOUToY8M_E2j08W2oyeNfORUMSL/pub?output=csv";
     try {
         const response = await fetch(sheetURL);
         const csvData = await response.text();
         const rows = csvData.split('\n').map(row => row.split(',').map(cell => cell.replace(/"/g, '').trim()));
         const match = rows.find(row => row[0].toUpperCase() === input);
+
         if (match) {
             statusDiv.innerHTML = `
                 <div class="bg-white/10 p-4 rounded-xl border border-orange-500/30 mt-6 max-w-lg mx-auto">
                     <p class="text-xs text-gray-300 uppercase font-bold tracking-widest">Tracking Information</p>
-                    <p class="text-2xl text-orange-500 font-black my-2">${match[5] || "Processing wait"}</p>
+                    <p class="text-2xl text-orange-500 font-black my-2">${match[5] || "Processing please wait"}</p>
                     <p class="text-[10px] md:text-xs text-blue-200">${match[1]} ➔ ${match[6]}</p>
                 </div>`;
-        } else { statusDiv.innerHTML = `<p class="mt-4 text-red-400">❌ ID "${input}" not found.</p>`; }
-    } catch (e) { statusDiv.innerHTML = "<p class='mt-4 text-red-400'>⚠️ Connection Error.</p>"; }
+        } else {
+            statusDiv.innerHTML = `<p class="mt-4 text-red-400">❌ ID "${input}"Item not found.</p>`;
+        }
+    } catch (e) { statusDiv.innerHTML = "<p class='mt-4 text-red-400'>⚠️ Error connecting.</p>"; }
   }
 
+  // COST ESTIMATOR
   function calculatePrice() {
     const d = document.getElementById("distance").value;
     const w = document.getElementById("weight").value;
@@ -448,19 +482,40 @@
     if(!d || !w) { res.innerText = "Input missing fields"; return; }
     res.innerText = "₦ " + ((d * 150) + (w * 350)).toLocaleString();
   }
-  function resetCalculator() {
-    document.getElementById("distance").value = "";
-    document.getElementById("weight").value = "";
-    document.getElementById("priceResult").innerHTML = "";
-  }
+function resetCalculator() {
+  document.getElementById("distance").value = "";
+  document.getElementById("weight").value = "";
+  document.getElementById("priceResult").innerHTML = "";
+}
 
-  new Swiper(".mySwiper", { 
-    autoplay: { delay: 4500 }, 
-    pagination: { el: ".swiper-pagination" }, 
-    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
-    loop: true 
-  });
+  // LIVE DATE & TIME
+function updateDateTime() {
+  const now = new Date();
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  };
+  document.getElementById("liveDateTime").innerHTML = now.toLocaleString("en-NG", options);
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
 
+  // SWIPER
+  new Swiper(".mySwiper", {
+  autoplay: { delay: 4500 },
+  pagination: { el: ".swiper-pagination" },
+  navigation: {
+    nextEl: ".swiper-button-next",
+    prevEl: ".swiper-button-prev"
+  },
+  loop: true
+});
+
+  // FORM HANDLING
   const form = document.getElementById('pickupForm');
   const result = document.getElementById('formResponse');
   const submitBtn = document.getElementById('submitBtn');
@@ -477,9 +532,20 @@
     document.getElementById("submissionTime").value = new Date().toLocaleString("en-NG", { timeZone: "Africa/Lagos" });
     submitBtn.innerHTML = `<span class="spinner"></span> Sending...`;
     submitBtn.disabled = true;
+
     fetch(form.action, { method: 'POST', body: new FormData(form) })
-    .then(r => { if (r.ok) { form.classList.add('hidden'); result.classList.remove('hidden'); document.getElementById('displayID').innerText = newID; } })
-    .finally(() => { submitBtn.innerHTML = "Send Pickup Request"; submitBtn.disabled = false; });
+    .then(response => {
+      if (response.ok) {
+        form.classList.add('hidden');
+        result.classList.remove('hidden');
+        document.getElementById('displayID').innerText = newID;
+      } else { alert("Submission Error."); }
+    })
+    .catch(() => alert("Connection Error."))
+    .finally(() => {
+      submitBtn.innerHTML = "Send Pickup Request";
+      submitBtn.disabled = false;
+    });
   });
 
   function resetForm() { form.reset(); form.classList.remove('hidden'); result.classList.add('hidden'); }
@@ -489,25 +555,34 @@
     fb.classList.remove('hidden');
     setTimeout(() => fb.classList.add('hidden'), 2000);
   }
-
-  // FEEDBACK LOGIC
-  const feedbackForm = document.getElementById('feedbackForm');
-  const feedbackSuccess = document.getElementById('feedbackSuccess');
-  const fbBtn = document.getElementById('feedbackSubmitBtn');
-  feedbackForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    fbBtn.innerHTML = `<span class="spinner"></span> Sending...`;
-    fbBtn.disabled = true;
-    try {
-      const res = await fetch(feedbackForm.action, { method: 'POST', body: new FormData(feedbackForm), headers: { 'Accept': 'application/json' } });
-      if (res.ok) { feedbackForm.classList.add('hidden'); feedbackSuccess.classList.remove('hidden'); }
-    } catch (e) { alert("Error sending feedback."); }
-    finally { fbBtn.innerHTML = "SUBMIT FEEDBACK"; fbBtn.disabled = false; }
-  });
-  function resetFeedbackForm() { feedbackForm.reset(); feedbackForm.classList.remove('hidden'); feedbackSuccess.classList.add('hidden'); }
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
