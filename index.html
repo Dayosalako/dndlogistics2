@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DND Global Logistics Ltd | Smart. Fast. Safe.</title>
 
-
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-  <div id="liveDateTime" class="text-xs font-bold text-gray-400 text-center mt-4"></div>
 
   <style>
     .swiper-pagination-bullet-active { background: #f97316 !important; }
@@ -30,26 +28,28 @@
       vertical-align: middle;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     nav { 
       background-color: white !important; 
       border-bottom: 1px solid #e5e7eb; 
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
     }
                                             
-  body {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-    /* Better spacing for mobile tracking status */
+    body { margin: 0 !important; padding: 0 !important; }
     #trackingStatus { width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    /* Partner Slider Animation */
+    @keyframes scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    .animate-scroll {
+      display: flex;
+      width: max-content;
+      animation: scroll 30s linear infinite;
+    }
   </style>
 </head>
 
@@ -78,7 +78,6 @@
       <a href="#booking" class="hover:text-orange-500 transition">Request Pickup</a>
       <a href="#contact" class="hover:text-orange-500 transition">Contact</a>
       <a href="services.html" class="hover:text-orange-500 transition">Car Hire & Partners</a>
-           
     </div>
     <button id="menu-btn" class="md:hidden text-gray-700 focus:outline-none">
         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
@@ -101,11 +100,11 @@
   <div class="relative max-w-7xl mx-auto px-6 py-24 text-center w-full">
     <div data-aos="fade-down">
         <span class="inline-block py-1 px-3 rounded-full bg-orange-500/20 border border-orange-500 text-orange-400 text-xs font-bold uppercase tracking-widest mb-4">Global Logistics Partner</span>
-        <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tight leading-tight">Smart. Fast. Safe.</h1>
+        <h1 class="text-4xl md:text-8xl font-black mb-6 tracking-tight leading-tight">Smart. Fast. Safe.</h1>
     </div>
-    <p class="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto mb-12 font-light" data-aos="fade-up" data-aos-delay="100">Premium logistics and haulage solutions connecting Nigeria to the world.</p>
+    <p class="text-lg md:text-2xl text-blue-100 max-w-2xl mx-auto mb-12 font-light" data-aos="fade-up" data-aos-delay="100">Premium logistics and haulage solutions connecting Nigeria to the world.</p>
      <div class="max-w-3xl mx-auto bg-white p-2 md:p-3 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-2" data-aos="zoom-in" data-aos-delay="400">
-      <input id="trackingInput" type="text" placeholder="Enter Tracking ID (e.g. DND-5520)" class="flex-1 p-4 text-gray-800 rounded-xl focus:outline-none bg-gray-50 border border-gray-100 uppercase">
+      <input id="trackingInput" type="text" placeholder="Enter Tracking ID (e.g. DND-5520)" class="flex-1 p-4 text-gray-800 rounded-xl focus:outline-none bg-gray-50 border border-gray-100 uppercase text-base">
       <button onclick="trackPackage()" class="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-xl font-bold transition-all shadow-lg transform hover:scale-105">Track Now</button>
     </div>
     <div id="trackingStatus"></div>
@@ -137,11 +136,10 @@
   <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 md:gap-16 items-center">
     <div data-aos="fade-right">
       <div class="flex items-center gap-3 mb-4">
-    <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider border border-blue-200">RC: 9133502</span>
-    <span class="flex items-center text-green-600 text-[10px] font-bold uppercase"><span class="mr-1">●</span> Verified Company</span>
-</div>
-<h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-blue-900">About DND Global Logistics Ltd</h2>
-      
+        <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider border border-blue-200">RC: 9133502</span>
+        <span class="flex items-center text-green-600 text-[10px] font-bold uppercase"><span class="mr-1">●</span> Verified Company</span>
+      </div>
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6 text-blue-900">About DND Global Logistics Ltd</h2>
       <p class="text-gray-700 text-base md:text-lg leading-relaxed mb-6">
         DND Global Logistics Ltd RC Number 9133502 is a registered Nigerian logistics company committed to efficient, safe, and reliable transportation solutions.
       </p>
@@ -176,22 +174,19 @@
       <div class="grid md:grid-cols-2 gap-6 mb-8">
         <div>
           <label class="font-bold block mb-3 text-blue-900 uppercase text-xs tracking-widest">Distance (KM)</label>
-          <input id="distance" type="number" placeholder="50" class="w-full p-4 border-2 border-gray-100 bg-gray-50 rounded-2xl focus:border-orange-500 outline-none transition">
+          <input id="distance" type="number" placeholder="50" class="w-full p-4 border-2 border-gray-100 bg-gray-50 rounded-2xl focus:border-orange-500 outline-none transition text-base">
         </div>
         <div>
           <label class="font-bold block mb-3 text-blue-900 uppercase text-xs tracking-widest">Weight (KG)</label>
-          <input id="weight" type="number" placeholder="10" class="w-full p-4 border-2 border-gray-100 bg-gray-50 rounded-2xl focus:border-orange-500 outline-none transition">
+          <input id="weight" type="number" placeholder="10" class="w-full p-4 border-2 border-gray-100 bg-gray-50 rounded-2xl focus:border-orange-500 outline-none transition text-base">
         </div>
       </div>
       <button onclick="calculatePrice()" class="w-full bg-blue-900 hover:bg-black text-white font-black py-4 md:py-5 rounded-2xl shadow-xl transition-all transform hover:-translate-y-1">GENERATE ESTIMATE</button>
-        <button onclick="resetCalculator()" class="block mx-auto px-5 py-4 rounded-2xl text-gray-250 font-bold hover:bg-gray-100 transition-all">Reset</button>
+        <button onclick="resetCalculator()" class="block mx-auto px-5 py-4 rounded-2xl text-gray-400 font-bold hover:bg-gray-100 transition-all">Reset</button>
       <p id="priceResult" class="text-center text-xl md:text-3xl font-black text-orange-500 mt-8"></p>
     </div>
   </div>
 </section>
-<section class="bg-blue-900 py-20 md:py-32 text-white overflow-hidden relative">
-  <div class="absolute top-0 left-0 w-64 h-64 bg-orange-500/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-  <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
 
 <section class="py-12 bg-white border-y border-gray-100 overflow-hidden">
   <div class="max-w-7xl mx-auto px-6 mb-8 text-center">
@@ -199,33 +194,25 @@
   </div>
   <div class="flex space-x-12 animate-scroll hover:[animation-play-state:paused]">
     <div class="flex space-x-16 items-center min-w-full justify-around grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition duration-500">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-6 md:h-8 w-auto" alt="Partner">
     </div>
     <div class="flex space-x-16 items-center min-w-full justify-around grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition duration-500">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-8 w-auto" alt="Partner">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-6 md:h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-6 md:h-8 w-auto" alt="Partner">
     </div>
   </div>
 </section>
 
-<style>
-  @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
-  }
-  .animate-scroll {
-    display: flex;
-    width: max-content;
-    animation: scroll 30s linear infinite;
-  }
-</style>
+<section class="bg-blue-900 py-20 md:py-32 text-white overflow-hidden relative">
+  <div class="absolute top-0 left-0 w-64 h-64 bg-orange-500/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
+  <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
   
   <div class="max-w-5xl mx-auto px-6 relative z-10">
     <div class="text-center mb-16" data-aos="fade-up">
@@ -236,10 +223,9 @@
 
     <div class="swiper mySwiper">
       <div class="swiper-wrapper">
-
         <div class="swiper-slide px-4 md:px-20 text-center">
             <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
-            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
+            <p class="text-base md:text-2xl font-light leading-relaxed mb-10">
                 "Their speed is unmatched. I sent a high-value package from Lagos to Kano and it arrived perfectly within 48 hours. The tracking system kept me at peace throughout."
             </p>
             <div class="flex flex-col items-center">
@@ -252,7 +238,7 @@
 
         <div class="swiper-slide px-4 md:px-20 text-center">
             <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
-            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
+            <p class="text-base md:text-2xl font-light leading-relaxed mb-10">
                 "Reliable haulage for industrial needs. We used DND for our factory relocation. Every piece of heavy equipment was handled with extreme care and arrived on schedule."
             </p>
             <div class="flex flex-col items-center">
@@ -262,35 +248,7 @@
                 <div class="flex text-orange-400 mt-2 text-sm">★★★★★</div>
             </div>
         </div>
-
-        <div class="swiper-slide px-4 md:px-20 text-center">
-            <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
-            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
-                "DND Global has transformed our last-mile delivery. Our customers in rural areas now receive their orders faster than ever. Highly recommended for e-commerce!"
-            </p>
-            <div class="flex flex-col items-center">
-                <img src="https://i.pravatar.cc/150?u=emeka" class="w-16 h-16 rounded-full border-4 border-blue-800 shadow-xl mb-4 object-cover">
-                <h4 class="font-bold text-white text-lg">Emeka Okafor</h4>
-                <p class="text-orange-400 text-xs font-bold uppercase tracking-tighter">Logistics Manager, J-Store</p>
-                <div class="flex text-orange-400 mt-2 text-sm">★★★★★</div>
-            </div>
-        </div>
-
-        <div class="swiper-slide px-4 md:px-20 text-center">
-            <div class="text-orange-500 text-4xl mb-6 opacity-50">"</div>
-            <p class="text-lg md:text-2xl font-light leading-relaxed mb-10">
-                "The most transparent logistics company I've worked with in Nigeria. No hidden charges, and their customer service is available 24/7 to answer queries."
-            </p>
-            <div class="flex flex-col items-center">
-                <img src="https://i.pravatar.cc/150?u=fatima" class="w-16 h-16 rounded-full border-4 border-blue-800 shadow-xl mb-4 object-cover">
-                <h4 class="font-bold text-white text-lg">Fatima Yusuf</h4>
-                <p class="text-orange-400 text-xs font-bold uppercase tracking-tighter">Independent Distributor</p>
-                <div class="flex text-orange-400 mt-2 text-sm">★★★★★</div>
-            </div>
-        </div>
-
       </div>
-      
       <div class="swiper-pagination !-bottom-2"></div>
       <div class="swiper-button-next !text-orange-500 after:!text-2xl hidden md:flex"></div>
       <div class="swiper-button-prev !text-orange-500 after:!text-2xl hidden md:flex"></div>
@@ -298,7 +256,6 @@
   </div>
 </section>                    
   
-
 <section id="booking" class="bg-gray-100 py-16 md:py-24">
   <div class="max-w-7xl mx-auto px-6">
     <div class="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
@@ -320,28 +277,28 @@
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="text-xs font-bold text-gray-500 uppercase ml-1">Pickup From</label>
-              <input name="pickup_location" type="text" placeholder="Full Address" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
+              <input name="pickup_location" type="text" placeholder="Full Address" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500 text-base">
             </div>
-             <div>
-            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Full Name</label>
-            <input name="item_description" type="text" placeholder="e.g., Sender's Name" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
-          </div>  
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase ml-1">Sender Name</label>
+              <input name="sender_name" type="text" placeholder="Full Name" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500 text-base">
+            </div>  
             <div>
               <label class="text-xs font-bold text-gray-500 uppercase ml-1">Deliver To</label>
-              <input name="delivery_location" type="text" placeholder="Full Address" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
+              <input name="delivery_location" type="text" placeholder="Full Address" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500 text-base">
             </div>
-          </div>
-          <div>
-            <label class="text-xs font-bold text-gray-500 uppercase ml-1">Full Name</label>
-            <input name="item_description" type="text" placeholder="e.g., Receiver's Name" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
+            <div>
+              <label class="text-xs font-bold text-gray-500 uppercase ml-1">Receiver Name</label>
+              <input name="receiver_name" type="text" placeholder="Full Name" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500 text-base">
+            </div>
           </div>
           <div>
             <label class="text-xs font-bold text-gray-500 uppercase ml-1">Item Details</label>
-            <input name="item_description" type="text" placeholder="e.g., 5kg Box" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
+            <input name="item_description" type="text" placeholder="e.g., 5kg Box" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500 text-base">
           </div>
           <div>
             <label class="text-xs font-bold text-gray-500 uppercase ml-1">Phone Number</label>
-            <input name="phone" type="tel" placeholder="080 1234 5678" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500">
+            <input name="phone" type="tel" placeholder="080 1234 5678" required class="w-full p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:border-orange-500 text-base">
           </div>  
           <button type="submit" id="submitBtn" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 rounded-xl shadow-lg transition-all transform hover:scale-[1.01]">
             Send Pickup Request
@@ -375,6 +332,7 @@
       <div class="col-span-1 md:col-span-1">
         <h3 class="text-2xl font-black mb-6 uppercase">DND <span class="text-orange-500">Global</span></h3>
         <p class="text-gray-400 leading-relaxed font-medium text-sm">Your trusted partner for logistics and haulage services across Nigeria. Registered and reliable.</p>
+        <div id="liveDateTime" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-6"></div>
       </div>
       
       <div>
@@ -389,8 +347,6 @@
             <p><b class="text-white block">HQ:</b> Plot No DH11, Sunflower Estate, Karsana North, Abuja</p>
             <p><b class="text-white block">Maiduguri:</b> House No 4, Old Molia Quarters, Polo</p>
             <p><b class="text-white block">Sokoto:</b> No 1, Old Runway, Bafarawa Estate</p>
-            <p><b class="text-white block">Zamfara:</b> No 36 Janyau Ta Galas, Gusau</p>
-            <p><b class="text-white block">Kebbi:</b> No 5, Behind OandO bypass, Birnin Kebbi</p>
         </div>
       </div>
 
@@ -404,13 +360,14 @@
         </ul>
       </div>
     </div>
-      <div id="liveDateTime" class="text-xs font-bold text-gray-400 text-center mt-4"></div>
+    
     <div class="border-t border-gray-900 pt-12 flex flex-col md:flex-row justify-between items-center text-center gap-4">
         <p class="text-gray-600 text-xs font-bold uppercase tracking-widest">© 2026 DND Global Logistics Ltd.</p>
         <p class="text-gray-700 text-[10px] italic">Designed & Managed by Zion Netcom Solutions Limited.</p>
     </div>
   </div>
 </footer>
+
 <div class="fixed bottom-6 right-6 flex flex-col gap-4 z-50">
     <a href="tel:+2348146143628" class="md:hidden bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition hover:scale-110">
         <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
@@ -431,7 +388,6 @@
 <script>
   AOS.init({ duration: 900, once: true });
   
-  // MODAL TRIGGER
   window.onload = function() {
     setTimeout(() => { document.getElementById('promo-modal').classList.add('active'); }, 5000);
   }
@@ -447,12 +403,12 @@
     link.onclick = () => mobileMenu.classList.remove('mobile-menu-open');
   });
   
-  // TRACKING LOGIC
+  // TRACKING LOGIC (With High-Tech Display update)
   async function trackPackage() {
     const input = document.getElementById('trackingInput').value.trim().toUpperCase();
     const statusDiv = document.getElementById('trackingStatus');
     if(!input) { statusDiv.innerHTML = "<p class='mt-4 text-red-400'>❌ Enter ID</p>"; return; }
-    statusDiv.innerHTML = "<p class='mt-4 text-orange-400 animate-pulse'>🔍 Searching for Item...</p>";
+    statusDiv.innerHTML = "<p class='mt-4 text-orange-400 animate-pulse'>🔍 Searching...</p>";
     
     const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCe6GWY3Pi1RkIxhgUWqagp6ci2wp0ZR981RXKCc8b4Kq7c7FnViOUToY8M_E2j08W2oyeNfORUMSL/pub?output=csv";
     try {
@@ -463,18 +419,25 @@
 
         if (match) {
             statusDiv.innerHTML = `
-                <div class="bg-white/10 p-4 rounded-xl border border-orange-500/30 mt-6 max-w-lg mx-auto">
-                    <p class="text-xs text-gray-300 uppercase font-bold tracking-widest">Tracking Information</p>
-                    <p class="text-2xl text-orange-500 font-black my-2">${match[5] || "Processing please wait"}</p>
-                    <p class="text-[10px] md:text-xs text-blue-200">${match[1]} ➔ ${match[6]}</p>
+                <div class="bg-white p-6 rounded-3xl border-2 border-orange-500 shadow-2xl mt-8 max-w-lg mx-auto text-left relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-3">
+                        <span class="flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-gray-400 uppercase font-black tracking-widest mb-1">Status Report for ${input}</p>
+                    <h3 class="text-2xl font-black text-blue-900 mb-4">${match[5] || "Processing"}</h3>
+                    <div class="w-full bg-gray-100 h-2 rounded-full mb-6 flex"><div class="bg-orange-500 h-full rounded-full animate-pulse" style="width: 65%"></div></div>
+                    <div class="grid grid-cols-2 gap-4 border-t pt-4">
+                        <div><p class="text-[9px] uppercase font-bold text-gray-400">Origin</p><p class="text-sm font-bold text-blue-900">${match[1] || "N/A"}</p></div>
+                        <div><p class="text-[9px] uppercase font-bold text-gray-400">Destination</p><p class="text-sm font-bold text-blue-900">${match[6] || "N/A"}</p></div>
+                    </div>
                 </div>`;
-        } else {
-            statusDiv.innerHTML = `<p class="mt-4 text-red-400">❌ ID "${input}"Item not found.</p>`;
-        }
-    } catch (e) { statusDiv.innerHTML = "<p class='mt-4 text-red-400'>⚠️ Error connecting.</p>"; }
+        } else { statusDiv.innerHTML = `<p class="mt-4 text-red-400">❌ ID "${input}" not found.</p>`; }
+    } catch (e) { statusDiv.innerHTML = "<p class='mt-4 text-red-400'>⚠️ Error.</p>"; }
   }
 
-  // COST ESTIMATOR
   function calculatePrice() {
     const d = document.getElementById("distance").value;
     const w = document.getElementById("weight").value;
@@ -482,48 +445,27 @@
     if(!d || !w) { res.innerText = "Input missing fields"; return; }
     res.innerText = "₦ " + ((d * 150) + (w * 350)).toLocaleString();
   }
-function resetCalculator() {
-  document.getElementById("distance").value = "";
-  document.getElementById("weight").value = "";
-  document.getElementById("priceResult").innerHTML = "";
-}
+  function resetCalculator() {
+    document.getElementById("distance").value = "";
+    document.getElementById("weight").value = "";
+    document.getElementById("priceResult").innerHTML = "";
+  }
 
-  // LIVE DATE & TIME
-function updateDateTime() {
-  const now = new Date();
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  };
-  document.getElementById("liveDateTime").innerHTML = now.toLocaleString("en-NG", options);
-}
-setInterval(updateDateTime, 1000);
-updateDateTime();
+  function updateDateTime() {
+    const now = new Date();
+    document.getElementById("liveDateTime").innerHTML = now.toLocaleString("en-NG", { dateStyle: 'full', timeStyle: 'short' });
+  }
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
 
-  // SWIPER
-  new Swiper(".mySwiper", {
-  autoplay: { delay: 4500 },
-  pagination: { el: ".swiper-pagination" },
-  navigation: {
-    nextEl: ".swiper-button-next",
-    prevEl: ".swiper-button-prev"
-  },
-  loop: true
-});
+  new Swiper(".mySwiper", { autoplay: { delay: 4500 }, pagination: { el: ".swiper-pagination" }, loop: true });
 
-  // FORM HANDLING
   const form = document.getElementById('pickupForm');
   const result = document.getElementById('formResponse');
   const submitBtn = document.getElementById('submitBtn');
   const hiddenTrackingInput = document.getElementById('hiddenTrackingId');
 
-  function generateTrackingID() {
-    return `DND-${Math.floor(1000 + Math.random() * 9000)}-${"ABCDEFGHJKLMNPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 24))}`;
-  }
+  function generateTrackingID() { return `DND-${Math.floor(1000 + Math.random() * 9000)}-${"ABCDEFGHJKLMNPQRSTUVWXYZ".charAt(Math.floor(Math.random() * 24))}`; }
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -535,17 +477,11 @@ updateDateTime();
 
     fetch(form.action, { method: 'POST', body: new FormData(form) })
     .then(response => {
-      if (response.ok) {
-        form.classList.add('hidden');
-        result.classList.remove('hidden');
-        document.getElementById('displayID').innerText = newID;
-      } else { alert("Submission Error."); }
+      if (response.ok) { form.classList.add('hidden'); result.classList.remove('hidden'); document.getElementById('displayID').innerText = newID; }
+      else { alert("Error."); }
     })
     .catch(() => alert("Connection Error."))
-    .finally(() => {
-      submitBtn.innerHTML = "Send Pickup Request";
-      submitBtn.disabled = false;
-    });
+    .finally(() => { submitBtn.innerHTML = "Send Pickup Request"; submitBtn.disabled = false; });
   });
 
   function resetForm() { form.reset(); form.classList.remove('hidden'); result.classList.add('hidden'); }
@@ -558,32 +494,3 @@ updateDateTime();
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
