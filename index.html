@@ -368,7 +368,39 @@
     </div>
   </div>
 </section>
+<section class="py-12 bg-white border-y border-gray-100 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 mb-8 text-center">
+    <p class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Trusted by Industry Leaders</p>
+  </div>
+  <div class="flex space-x-12 animate-scroll hover:[animation-play-state:paused]">
+    <div class="flex space-x-16 items-center min-w-full justify-around grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition duration-500">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-8 w-auto" alt="Partner">
+    </div>
+    <div class="flex space-x-16 items-center min-w-full justify-around grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition duration-500">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b3/DHL_Express_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-8 w-auto" alt="Partner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" class="h-8 w-auto" alt="Partner">
+    </div>
+  </div>
+</section>
 
+<style>
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-scroll {
+    display: flex;
+    width: max-content;
+    animation: scroll 30s linear infinite;
+  }
+</style>
 <footer id="contact" class="bg-gray-950 text-white pt-24 pb-12 border-t border-gray-900">
   <div class="max-w-7xl mx-auto px-6">
     <div class="grid md:grid-cols-4 gap-12 mb-16">
@@ -452,13 +484,8 @@
     const input = document.getElementById('trackingInput').value.trim().toUpperCase();
     const statusDiv = document.getElementById('trackingStatus');
     if(!input) { statusDiv.innerHTML = "<p class='mt-4 text-red-400'>❌ Enter ID</p>"; return; }
-   if(!input) { statusDiv.innerHTML = "<p class='mt-4 text-red-400 p-3 bg-red-50 rounded-lg'>❌ Please enter a tracking ID</p>"; 
-      return; 
-    }
+    statusDiv.innerHTML = "<p class='mt-4 text-orange-400 animate-pulse'>🔍 Searching for Item...</p>";
     
-    statusDiv.innerHTML = "<p class='mt-4 text-orange-400 animate-pulse p-3 bg-orange-50 rounded-lg'>🔍 Searching for Item...</p>";
-    
-        }
     const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCe6GWY3Pi1RkIxhgUWqagp6ci2wp0ZR981RXKCc8b4Kq7c7FnViOUToY8M_E2j08W2oyeNfORUMSL/pub?output=csv";
     try {
         const response = await fetch(sheetURL);
@@ -563,8 +590,6 @@ updateDateTime();
 </script>
 </body>
 </html>
-
-
 
 
 
