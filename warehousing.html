@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Warehousing | DND Global Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<nav class="fixed w-full z-[1000] py-4 bg-white shadow-md top-0">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+    <a href="index.html" class="flex items-center">
+        <span class="font-black text-xl text-blue-900 uppercase">DND Global</span>
+    </a>
+    <div id="nigeria-clock" class="font-mono text-[10px] font-bold text-blue-900 bg-gray-100 px-4 py-2 rounded-full border">Loading...</div>
+    <a href="index.html" class="text-blue-900 font-bold hover:text-orange-500 transition">← Back Home</a>
+  </div>
+</nav>
+
+<div class="pt-32 pb-20 bg-orange-500 text-white text-center px-6">
+    <h1 class="text-4xl md:text-6xl font-black mb-4" data-aos="fade-down">Warehousing & Storage</h1>
+    <p class="text-orange-50 max-w-2xl mx-auto">Modern, secure, and organized storage for your valuable inventory.</p>
+</div>
+
+<section class="py-20 px-6 max-w-5xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="rounded-3xl overflow-hidden shadow-xl" data-aos="zoom-in">
+            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800" alt="Warehouse facility">
+        </div>
+        <div data-aos="fade-left">
+            <h2 class="text-3xl font-bold text-blue-900 mb-4">Inventory Management</h2>
+            <p class="text-gray-600 leading-relaxed mb-6">
+                Our warehouse facilities provide more than just space. We offer a full suite of inventory management services to ensure your supply chain never breaks.
+            </p>
+            <ul class="space-y-3 font-medium text-blue-900">
+                <li>📦 Short and Long-term Storage</li>
+                <li>📦 24/7 CCTV Monitoring</li>
+                <li>📦 Cross-Docking & Distribution</li>
+                <li>📦 Climate Controlled Options</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-blue-900 text-white pt-16 pb-8 px-6">
+    <div class="max-w-7xl mx-auto text-center">
+        <h2 class="text-3xl font-black mb-4 uppercase">DND Global Logistics Ltd</h2>
+        <div class="border-t border-blue-800 pt-8">
+            <p class="text-sm text-blue-300">© 2025 DND Global Logistics Ltd. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 800, once: true });
+  function updateClock() {
+    const options = { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    document.getElementById('nigeria-clock').innerHTML = `LAGOS: ${new Intl.DateTimeFormat('en-US', options).format(new Date())}`;
+  }
+  setInterval(updateClock, 1000); updateClock();
+</script>
+</body>
+</html>

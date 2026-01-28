@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Special Services | DND Global Logistics</title>
+  <title>Our Services | DND Global Logistics</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <style>
     .spinner { border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top: 3px solid #fff; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .service-overlay { background: linear-gradient(to bottom, rgba(30, 58, 138, 0.8), rgba(30, 58, 138, 0.9)); }
   </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800">
@@ -18,212 +19,135 @@
     <a href="index.html" class="flex items-center">
         <span class="font-black text-xl text-blue-900 uppercase">DND Global</span>
     </a>
-    <div id="nigeria-clock" class="font-mono text-[10px] font-bold text-blue-900 bg-gray-100 px-4 py-2 rounded-full border">
-      Loading Nigeria Time...
-    </div>
-    <a href="index.html" class="text-blue-900 font-bold hover:text-orange-500">← Back Home</a>
+    <div id="nigeria-clock" class="font-mono text-[10px] font-bold text-blue-900 bg-gray-100 px-4 py-2 rounded-full border">Loading...</div>
+    <a href="index.html" class="text-blue-900 font-bold hover:text-orange-500 transition">← Back Home</a>
   </div>
 </nav>
 
-<div class="pt-32 pb-16 text-center" data-aos="fade-down">
-    <h1 class="text-4xl md:text-6xl font-black text-blue-900 mb-4">Our Special Services</h1>
-    <p class="text-gray-600">Car Hire & Partnership Opportunities</p>
+<div class="pt-32 pb-20 bg-blue-900 text-white text-center px-6">
+    <h1 class="text-4xl md:text-6xl font-black mb-4" data-aos="fade-down">Our Core Services</h1>
+    <p class="text-blue-100 max-w-2xl mx-auto" data-aos="fade-up">Professional logistics solutions designed to move your business forward with speed and safety.</p>
 </div>
 
-<div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 mb-24">
-  
-  <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative">
-  <h2 class="text-2xl font-bold text-blue-900 mb-6">🚗 Car Hire Service</h2>
-  
-  <form id="carHireForm" action="https://script.google.com/macros/s/AKfycbwbLY-MIeYwngVFaaAX8qbdqqi6_BPCB1CTb_5GjsZlAO3bNAejEXa7o04WBNNbZbJVUw/exec" method="POST" class="space-y-4">
-    <input type="text" name="FullName" placeholder="Full Name" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-    <input type="tel" name="Phone" placeholder="Phone Number" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-    
-    <select name="CarType" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-        <option value="Sedan">Sedan (Small Car)</option>
-        <option value="SUV">SUV (Jeep)</option>
-        <option value="Delivery Van">Delivery Van</option>
-        <option value="Truck">Truck (Haulage)</option>
-    </select>
-    
-    <input type="text" name="Duration" placeholder="Duration (e.g. 3 Days)" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-    <textarea name="Location" placeholder="Pickup Address" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500"></textarea>
-    
-    <button type="submit" id="carBtn" class="w-full bg-blue-900 hover:bg-orange-600 text-white font-bold py-4 rounded-xl transition shadow-lg">Book Car Hire</button>
-  </form>
-
-    <div id="carSuccess" class="hidden text-center py-10">
-        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">✓</div>
-        <h3 class="text-xl font-bold text-blue-900">Booking Received!</h3>
-        <p class="text-gray-500 mb-6">We will call you shortly.</p>
-        <button onclick="resetPageForm('carHireForm', 'carSuccess')" class="bg-blue-900 text-white px-6 py-2 rounded-lg font-bold">Book another car</button>
-    </div>
-  </div>
-
-  <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 relative" data-aos="fade-left">
-    <h2 class="text-2xl font-bold text-blue-900 mb-6 flex items-center">🤝 Partnership Registration</h2>
-    <form id="partnerForm" action="https://script.google.com/macros/s/AKfycbwbLY-MIeYwngVFaaAX8qbdqqi6_BPCB1CTb_5GjsZlAO3bNAejEXa7o04WBNNbZbJVUw/exec" method="POST" class="space-y-4">
-      <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
-      <input type="hidden" name="subject" value="New Partnership Application">
-
-      <input type="text" name="Company Name" placeholder="Company/Business Name" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-      <input type="text" name="Contact Person" placeholder="Contact Person Name" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-      <input type="email" name="Email" placeholder="Email Address" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-      
-      <select name="Service Type" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
-          <option>Logistics Partner</option>
-          <option>Vendor/Supplier</option>
-          <option>Agent</option>
-      </select>
-      
-      <textarea name="Message" placeholder="Briefly tell us about your business" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500"></textarea>
-      <button type="submit" class="w-full bg-orange-500 hover:bg-blue-900 text-white font-bold py-4 rounded-xl transition shadow-lg">Submit Registration</button>
-    </form>
-
-    <div id="partnerSuccess" class="hidden text-center py-10">
-        <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-4xl mb-6 mx-auto">🎉</div>
-        <h3 class="text-xl font-bold text-blue-900">Application Sent!</h3>
-        <p class="text-gray-500 mb-6">Our team will review your application.</p>
-        <button onclick="resetPageForm('partnerForm', 'partnerSuccess')" class="bg-orange-500 text-white px-6 py-2 rounded-lg font-bold">Submit another</button>
-    </div>
-  </div>
-</div>
-<footer id="contact" class="bg-gray-950 text-white pt-24 pb-12 border-t border-gray-900 mt-20">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="grid md:grid-cols-4 gap-12 mb-16">
-      <div class="col-span-1 md:col-span-1">
-        <h3 class="text-2xl font-black mb-6 uppercase">DND <span class="text-orange-500">Global</span></h3>
-        <p class="text-gray-400 leading-relaxed font-medium text-sm">Your trusted partner for logistics and haulage services across Nigeria. Registered and reliable.</p>
-      </div>
-      
-      <div>
-        <h4 class="text-orange-500 font-black uppercase text-xs tracking-widest mb-6 underline underline-offset-4 decoration-orange-500/30">Contact Us</h4>
-        <p class="mb-4 font-bold tracking-tight text-sm">📞 +234 904 555 1003<br>📞 +234 814 614 3628</p>
-        <p class="text-gray-400 font-medium text-sm">📧 info@dndgloballogistics.com</p>
-      </div>
-
-      <div>
-        <h4 class="text-orange-500 font-black uppercase text-xs tracking-widest mb-6 underline underline-offset-4 decoration-orange-500/30">Our Offices</h4>
-        <div class="space-y-4 text-xs text-gray-400 font-medium leading-relaxed">
-            <p><b class="text-white block">HQ:</b> Plot No DH11, Sunflower Estate, Karsana North, Abuja</p>
-            <p><b class="text-white block">Maiduguri:</b> House No 4, Old Molia Quarters, Polo</p>
-            <p><b class="text-white block">Sokoto:</b> No 1, Old Runway, Bafarawa Estate</p>
-          <p><b class="text-white block">Zamfara:</b> No 36 Janyau Ta Galas, Gusau</p>
-            <p><b class="text-white block">Kebbi:</b> No 5, Behind OandO bypass, Birnin Kebbi</p>
-        </div>
-      </div>
-
-      <div>
-        <h4 class="text-orange-500 font-black uppercase text-xs tracking-widest mb-6 underline underline-offset-4 decoration-orange-500/30">Quick Menu</h4>
-        <ul class="space-y-4 text-gray-400 font-bold text-sm">
-            <li><a href="index.html#services" class="hover:text-white transition">Home Services</a></li>
-            <li><a href="index.html#about" class="hover:text-white transition">About Us</a></li>
-            <li><a href="services.html" class="hover:text-white transition">Car Hire</a></li>
-            <li><a href="index.html#booking" class="hover:text-white transition">Book Pickup</a></li>
+<section id="haulage" class="py-20 px-6 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center border-b">
+    <div data-aos="fade-right">
+        <span class="text-orange-500 font-bold uppercase tracking-widest text-sm">Primary Service</span>
+        <h2 class="text-3xl font-black text-blue-900 mt-2 mb-6">Haulage & Distribution</h2>
+        <p class="text-gray-600 mb-6 leading-relaxed">We provide efficient inland transportation of goods across Nigeria. Our fleet is equipped to handle everything from small parcels to massive industrial equipment, ensuring your cargo arrives on schedule.</p>
+        <ul class="space-y-3 text-gray-700">
+            <li class="flex items-center">✅ Full Truck Load (FTL) Services</li>
+            <li class="flex items-center">✅ Real-time Shipment Tracking</li>
+            <li class="flex items-center">✅ Inter-state Goods Delivery</li>
         </ul>
-      </div>
     </div>
-    
-    <div class="border-t border-gray-900 mt-16 pt-8 pb-4">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-        
-        <div class="flex flex-col md:flex-row items-center gap-2 md:gap-6">
-            <p class="text-gray-500 text-[11px] font-bold uppercase tracking-[0.15em]">
-                © 2026 DND Global Logistics Ltd.
-            </p>
-            <div class="hidden md:block w-px h-3 bg-gray-800"></div>
-            <div class="flex gap-4">
-                <a href="#" class="text-gray-600 hover:text-orange-500 text-[10px] font-medium transition uppercase tracking-wider">Privacy Policy</a>
-                <a href="#" class="text-gray-600 hover:text-orange-500 text-[10px] font-medium transition uppercase tracking-wider">Terms of Service</a>
+    <div class="rounded-3xl overflow-hidden shadow-2xl" data-aos="zoom-in">
+        <img src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=800" alt="Trucking Service">
+    </div>
+</section>
+
+<section id="warehousing" class="py-20 px-6 max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center border-b">
+    <div class="order-2 md:order-1 rounded-3xl overflow-hidden shadow-2xl" data-aos="zoom-in">
+        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800" alt="Warehouse Service">
+    </div>
+    <div class="order-1 md:order-2" data-aos="fade-left">
+        <span class="text-orange-500 font-bold uppercase tracking-widest text-sm">Safe Storage</span>
+        <h2 class="text-3xl font-black text-blue-900 mt-2 mb-6">Secure Warehousing</h2>
+        <p class="text-gray-600 mb-6 leading-relaxed">Our state-of-the-art storage facilities provide the perfect environment for your inventory. With 24/7 security and advanced inventory management, we keep your assets safe.</p>
+        <ul class="space-y-3 text-gray-700">
+            <li class="flex items-center">✅ Short & Long Term Storage</li>
+            <li class="flex items-center">✅ Inventory Management</li>
+            <li class="flex items-center">✅ Distribution Cross-docking</li>
+        </ul>
+    </div>
+</section>
+
+<section id="car-hire-section" class="py-20 bg-gray-100">
+    <div class="max-w-3xl mx-auto px-6">
+        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-gray-100" data-aos="fade-up">
+            <h2 class="text-2xl font-bold text-blue-900 mb-2">🚗 Vehicle Hire</h2>
+            <p class="text-gray-500 mb-8">Select a vehicle for your personal or business movement.</p>
+            
+            <form id="carHireForm" action="https://script.google.com/macros/s/AKfycbwbLY-MIeYwngVFaaAX8qbdqqi6_BPCB1CTb_5GjsZlAO3bNAejEXa7o04WBNNbZbJVUw/exec" method="POST" class="space-y-4">
+                <input type="hidden" name="EntryType" value="Car Hire">
+                <input type="text" name="FullName" placeholder="Your Name" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+                <input type="tel" name="Phone" placeholder="Phone Number" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+                <select name="CarType" class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+                    <option value="Sedan">Sedan (Small Car)</option>
+                    <option value="SUV">SUV (Jeep)</option>
+                    <option value="Truck">Logistics Truck</option>
+                </select>
+                <input type="text" name="Duration" placeholder="Duration (e.g. 2 Days)" required class="w-full p-4 bg-gray-50 border rounded-xl outline-none focus:border-orange-500">
+                <button type="submit" class="w-full bg-blue-900 hover:bg-orange-600 text-white font-bold py-4 rounded-xl transition">Request Car Hire</button>
+            </form>
+
+            <div id="carSuccess" class="hidden text-center py-10">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mb-4 mx-auto">✓</div>
+                <h3 class="text-xl font-bold text-blue-900">Request Sent!</h3>
+                <p class="text-gray-500">We will contact you shortly.</p>
             </div>
         </div>
-
-        <div class="flex items-center gap-2 px-4 py-2 bg-gray-900/50 rounded-full border border-gray-800/50 group hover:border-orange-500/30 transition-all duration-300">
-            <span class="text-gray-600 text-[9px] uppercase font-bold tracking-tighter">Powered by</span>
-            <span class="text-gray-400 group-hover:text-white text-[10px] font-black tracking-tight transition-colors">
-                ZION <span class="text-orange-500">NETCOM</span>
-            </span>
-        </div>
-
     </div>
-</div>
-  </div>
+</section>
+
+<section id="partnership-section" class="py-20">
+    <div class="max-w-3xl mx-auto px-6">
+        <div class="bg-blue-900 p-8 md:p-12 rounded-3xl shadow-xl text-white" data-aos="fade-up">
+            <h2 class="text-2xl font-bold mb-2">🤝 Become a Partner</h2>
+            <p class="text-blue-200 mb-8">Register your vehicle to start earning with DND Logistics.</p>
+            
+            <form id="partnerForm" action="https://script.google.com/macros/s/AKfycbwbLY-MIeYwngVFaaAX8qbdqqi6_BPCB1CTb_5GjsZlAO3bNAejEXa7o04WBNNbZbJVUw/exec" method="POST" class="space-y-4 text-gray-800">
+                <input type="hidden" name="EntryType" value="Partner">
+                <input type="text" name="Contact Person" placeholder="Full Name" required class="w-full p-4 bg-white border rounded-xl outline-none">
+                <input type="tel" name="Phone" placeholder="Phone Number" required class="w-full p-4 bg-white border rounded-xl outline-none">
+                <select name="Service Type" class="w-full p-4 bg-white border rounded-xl outline-none">
+                    <option>Logistics Partner (Vehicle Owner)</option>
+                    <option>Driver Only</option>
+                </select>
+                <button type="submit" class="w-full bg-orange-500 hover:bg-white hover:text-orange-500 text-white font-bold py-4 rounded-xl transition">Submit Partnership Registration</button>
+            </form>
+
+            <div id="partnerSuccess" class="hidden text-center py-10">
+                <h3 class="text-xl font-bold">Registration Received!</h3>
+                <p class="text-blue-200">Welcome to the family. We'll reach out soon.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-gray-900 text-white py-12 px-6 text-center">
+    <p>&copy; 2024 DND Global Logistics Ltd. All rights reserved.</p>
 </footer>
 
-<div class="fixed bottom-6 right-6 flex flex-col gap-4 z-50">
-    <a href="tel:+2348146143628" class="md:hidden bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition hover:scale-110">
-        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-    </a>
-
-    <a href="https://wa.me/2348146143628?text=Hello%20DND%20Global%20Logistics,%20I%20am%20interested%20in%20your%20services." 
-       target="_blank"
-       class="bg-green-500 hover:bg-green-600 text-white w-14 h-14 md:w-16 md:h-16 rounded-full shadow-2xl flex items-center justify-center text-2xl transition hover:scale-110">
-        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.309 1.656zm6.29-4.143c1.589.943 3.161 1.44 4.862 1.441 5.016 0 9.1-4.083 9.102-9.1 0-2.426-.945-4.707-2.661-6.423-1.716-1.716-3.998-2.662-6.424-2.662-5.018 0-9.102 4.084-9.103 9.1 0 1.884.57 3.393 1.577 5.137l-.993 3.626 3.74-.981z"/>
-        </svg>
-    </a>
-</div>
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
-  AOS.init({ duration: 900 });
+  AOS.init({ duration: 800, once: true });
 
-  // Live Nigeria Clock
+  // Clock Logic
   function updateClock() {
-    const now = new Date();
-    const timeString = now.toLocaleString('en-NG', { timeZone: 'Africa/Lagos', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    if(document.getElementById('nigeria-clock')) {
-       document.getElementById('nigeria-clock').innerText = timeString;
-    }
+    const options = { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    const lagosTime = new Intl.DateTimeFormat('en-US', options).format(new Date());
+    document.getElementById('nigeria-clock').innerHTML = `LAGOS: ${lagosTime}`;
   }
   setInterval(updateClock, 1000);
   updateClock();
 
-  // UNIVERSAL SUBMISSION FUNCTION
+  // Submission Logic
   function handleFormSubmit(formId, successId) {
     const form = document.getElementById(formId);
     const successDiv = document.getElementById(successId);
-    const btn = form.querySelector('button');
-
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      const originalText = btn.innerHTML;
+      const btn = form.querySelector('button');
       btn.innerHTML = `<span class="spinner"></span> Sending...`;
-      btn.disabled = true;
-
-      fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        mode: 'no-cors' // This bypasses browser security for Google Scripts
-      })
+      fetch(form.action, { method: 'POST', body: new FormData(form), mode: 'no-cors' })
       .then(() => {
-        // Success
         form.classList.add('hidden');
         successDiv.classList.remove('hidden');
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Connection Error. Please try again.");
-      })
-      .finally(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
       });
     });
   }
-
-  // Initialize both forms
   handleFormSubmit('carHireForm', 'carSuccess');
   handleFormSubmit('partnerForm', 'partnerSuccess');
-
-  // Function to reset forms
-  function resetPageForm(formId, successId) {
-    document.getElementById(formId).reset();
-    document.getElementById(formId).classList.remove('hidden');
-    document.getElementById(successId).classList.add('hidden');
-  }
 </script>
 </body>
-
 </html>
-
-

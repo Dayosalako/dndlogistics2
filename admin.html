@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DND HQ | Master Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { background: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
+        .sidebar-btn { transition: all 0.3s ease; border-left: 4px solid transparent; }
+        .sidebar-btn.active { background: #1e3a8a; color: white; border-left: 4px solid #f97316; }
+        .data-card { background: white; border: 1px solid #e2e8f0; border-radius: 1.5rem; transition: transform 0.2s; }
+        .data-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .tracker-section { border-bottom: 2px solid #e2e8f0; margin-bottom: 2rem; padding-bottom: 1rem; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <aside class="w-72 bg-white border-r border-slate-200 p-6 flex flex-col hidden lg:flex">
+        <div class="mb-10">
+            <h1 class="text-2xl font-black italic tracking-tighter text-blue-900">DND <span class="text-orange-500">GLOBAL</span></h1>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Admin Command Center</p>
+        </div>
+        
+        <nav class="space-y-2 flex-1">
+            <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" id="btn-Database" class="sidebar-btn w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50">
+                <i class="fas fa-box-open w-5"></i> Item Logistics
+            </button>
+            <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-CarHire" class="sidebar-btn active w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50">
+                <i class="fas fa-car-side w-5"></i> Executive Hire
+            </button>
+            <button onclick="switchTab('Partnership', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-Partnership" class="sidebar-btn w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50">
+                <i class="fas fa-handshake w-5"></i> Partnerships
+            </button>
+        </nav>
+
+        <div class="mt-auto p-4 bg-slate-50 rounded-2xl">
+            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">System Clock</p>
+            <p id="liveClock" class="text-lg font-mono font-bold text-blue-900">00:00:00</p>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <header class="bg-white border-b border-slate-200 p-8 flex justify-between items-center">
+            <div>
+                <h2 id="viewTitle" class="text-2xl font-black text-blue-900 uppercase">Executive Hire Dashboard</h2>
+                <div class="flex gap-4 mt-2">
+                    <a id="link-item-sheet" href="https://docs.google.com/spreadsheets/d/1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I/edit" target="_blank" class="text-[10px] font-black text-orange-600 hover:underline uppercase tracking-tighter">
+                        <i class="fas fa-file-excel mr-1"></i> Item Sheet
+                    </a>
+                    <a id="link-car-sheet" href="https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/edit" target="_blank" class="text-[10px] font-black text-blue-600 hover:underline uppercase tracking-tighter">
+                        <i class="fas fa-file-excel mr-1"></i> Car Hire Sheet
+                    </a>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Quick filter ID or Name..." class="bg-slate-100 border-none rounded-xl px-6 py-3 text-sm outline-none w-72 focus:ring-2 ring-orange-500">
+                <button onclick="syncData()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg shadow-orange-200">
+                    <i id="sync-icon" class="fas fa-sync-alt mr-2"></i> REFRESH DATA
+                </button>
+            </div>
+        </header>
+
+        <div class="p-8 pb-0 overflow-y-auto">
+            <div class="tracker-section">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-4">Live Tracker Selection</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" class="bg-white p-4 rounded-2xl border border-slate-200 cursor-pointer hover:border-orange-500 transition">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Module 01</p>
+                        <p class="font-black text-blue-900">ITEM TRACKER</p>
+                    </div>
+                    <div onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white p-4 rounded-2xl border border-slate-200 cursor-pointer hover:border-orange-500 transition">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Module 02</p>
+                        <p class="font-black text-blue-900">HIRE TRACKER</p>
+                    </div>
+                    <div onclick="switchTab('Partnership', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white p-4 rounded-2xl border border-slate-200 cursor-pointer hover:border-orange-500 transition">
+                        <p class="text-[9px] font-bold text-slate-400 uppercase">Module 03</p>
+                        <p class="font-black text-blue-900">PARTNER LOGS</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mb-8">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr id="tableHeader" class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100 text-sm font-semibold">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
+        let currentTab = 'CarHire';
+        let allData = [];
+
+        async function syncData() {
+            const icon = document.getElementById('sync-icon');
+            icon.classList.add('fa-spin');
+            
+            const url = `https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`;
+            
+            try {
+                const res = await fetch(url);
+                const text = await res.text();
+                const json = JSON.parse(text.substring(47).slice(0, -2));
+                allData = json.table.rows;
+                renderTable();
+            } catch (e) {
+                console.error("Sync Error:", e);
+                alert("Failed to connect to Google Sheets. Check permissions.");
+            } finally {
+                icon.classList.remove('fa-spin');
+            }
+        }
+
+        function switchTab(tab, id) {
+            currentTab = tab;
+            currentSheetID = id;
+            
+            // Update UI
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${tab}`).classList.add('active');
+            document.getElementById('viewTitle').innerText = tab === 'Database' ? 'Item Logistics Dashboard' : (tab === 'Partnership' ? 'Partnership Network' : 'Executive Hire Dashboard');
+            
+            syncData();
+        }
+
+        function renderTable() {
+            const header = document.getElementById('tableHeader');
+            const body = document.getElementById('tableBody');
+            body.innerHTML = '';
+
+            if (currentTab === 'Database') {
+                header.innerHTML = `<th class="p-6">Tracking ID</th><th class="p-6">Sender</th><th class="p-6">Status</th><th class="p-6">Pickup</th><th class="p-6">Destination</th><th class="p-6 text-right">Actions</th>`;
+            } else if (currentTab === 'CarHire') {
+                header.innerHTML = `<th class="p-6">Booking ID</th><th class="p-6">Customer</th><th class="p-6">Phone</th><th class="p-6">Vehicle</th><th class="p-6">Days</th><th class="p-6 text-right">Actions</th>`;
+            } else {
+                header.innerHTML = `<th class="p-6">Date</th><th class="p-6">Company</th><th class="p-6">Contact</th><th class="p-6">Service</th><th class="p-6 text-right">Actions</th>`;
+            }
+
+            allData.reverse().forEach((row) => {
+                const c = row.c;
+                if (!c || !c[0]) return;
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition cursor-default";
+
+                if (currentTab === 'Database') {
+                    tr.innerHTML = `
+                        <td class="p-6 font-black text-blue-900">${c[0].v}</td>
+                        <td class="p-6">${c[3].v}</td>
+                        <td class="p-6"><span class="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-[10px] uppercase font-black">${c[1].v}</span></td>
+                        <td class="p-6 text-slate-500">${c[7] ? c[7].v : '---'}</td>
+                        <td class="p-6 text-slate-500">${c[8] ? c[8].v : '---'}</td>
+                        <td class="p-6 text-right"><button onclick="generatePDF('${c[0].v}', '${c[3].v}', 'Logistics')" class="text-blue-900 hover:text-orange-500"><i class="fas fa-file-pdf"></i></button></td>
+                    `;
+                } else if (currentTab === 'CarHire') {
+                    tr.innerHTML = `
+                        <td class="p-6 font-black text-blue-900">${c[1].v}</td>
+                        <td class="p-6">${c[2].v}</td>
+                        <td class="p-6 text-slate-400 font-mono">${c[3].v}</td>
+                        <td class="p-6"><span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-[10px] uppercase font-black">${c[4].v}</span></td>
+                        <td class="p-6">${c[5].v} Days</td>
+                        <td class="p-6 text-right"><button onclick="generatePDF('${c[1].v}', '${c[2].v}', 'CarHire')" class="text-blue-900 hover:text-orange-500"><i class="fas fa-file-pdf"></i></button></td>
+                    `;
+                }
+                body.appendChild(tr);
+            });
+        }
+
+        function generatePDF(id, name, type) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(22).text("DND GLOBAL LOGISTICS", 20, 30);
+            doc.setFontSize(12).text(`${type} Official Certificate`, 20, 40);
+            doc.line(20, 45, 190, 45);
+            doc.setFontSize(10).text(`ID Reference: ${id}`, 20, 60);
+            doc.text(`Registered Name: ${name}`, 20, 70);
+            doc.text(`Issue Date: ${new Date().toLocaleDateString()}`, 20, 80);
+            doc.text("--------------------------------------------------", 20, 95);
+            doc.text("Scan this ID at any DND Hub for verification.", 20, 110);
+            doc.save(`DND_ID_${id}.pdf`);
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toUpperCase();
+            const rows = document.getElementById('tableBody').getElementsByTagName('tr');
+            for (let row of rows) {
+                row.style.display = row.innerText.toUpperCase().includes(input) ? "" : "none";
+            }
+        }
+
+        function updateClock() {
+            document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('en-GB');
+        }
+        setInterval(updateClock, 1000);
+
+        // Initial Load
+        switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0');
+    </script>
+</body>
+</html>

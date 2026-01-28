@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book a Pickup | DND Global Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <style>
+    /* Loading Spinner */
+    .spinner { border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top: 3px solid #fff; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    /* Clean UI: Hide number input arrows */
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    /* Updated for full browser compatibility */
+input[type=number] { 
+  -moz-appearance: textfield; /* Firefox */
+  appearance: textfield;      /* Standard property */
+}
+
+    /* Waybill Print CSS: Only shows the waybill when printing */
+    @media print {
+      body * { visibility: hidden; }
+      #printableWaybill, #printableWaybill * { visibility: visible; }
+      #printableWaybill { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+
+<nav class="fixed w-full z-[1000] py-4 bg-white shadow-md top-0 border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+    <a href="index.html" class="flex items-center group">
+        <span class="font-black text-xl text-blue-900 uppercase tracking-tighter">DND <span class="text-orange-500">Global</span></span>
+    </a>
+    <div id="nigeria-clock" class="hidden md:block font-mono text-[10px] font-bold text-blue-900 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
+      Loading Nigeria Time...
+    </div>
+    <a href="index.html" class="text-sm font-bold text-gray-600 hover:text-orange-500 transition">← Back to Home</a>
+  </div>
+</nav>
+
+<div id="prohibitedModal" class="fixed inset-0 z-[2000] bg-black/80 hidden items-center justify-center p-4 backdrop-blur-sm">
+  <div class="bg-white rounded-[2.5rem] max-w-lg w-full max-h-[80vh] overflow-y-auto p-8 relative shadow-2xl">
+    <button onclick="toggleProhibited()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-900 text-3xl font-light">&times;</button>
+    <div class="text-center mb-6">
+      <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🚫</div>
+      <h2 class="text-2xl font-black text-blue-900 uppercase">Prohibited Items</h2>
+    </div>
+    <div class="space-y-4 text-sm text-gray-600">
+      <ul class="list-disc pl-5 space-y-2">
+        <li><b>Dangerous Goods:</b> Explosives, firearms, or ammunition.</li>
+        <li><b>Flammables:</b> Petrol, lighter fluid, or pressurized aerosol cans.</li>
+        <li><b>Illegal Substances:</b> Narcotics or banned chemicals.</li>
+        <li><b>Currency:</b> Cash, coins, or precious metals.</li>
+        <li><b>Live Animals:</b> Or animal remains.</li>
+      </ul>
+    </div>
+    <button onclick="toggleProhibited()" class="w-full mt-8 bg-blue-900 text-white font-bold py-4 rounded-2xl">I UNDERSTAND</button>
+  </div>
+</div>
+
+<main class="pt-32 pb-20 px-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-12" data-aos="fade-up">
+      <h1 class="text-4xl md:text-5xl font-black text-blue-900 mb-4 tracking-tight">Book Your Pickup</h1>
+      <p class="text-gray-600">Enter shipment details below to generate your tracking ID.</p>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 relative overflow-hidden" data-aos="zoom-in">
+      
+      <form action="https://api.sheetmonkey.io/form/gkWgE78VxKLMUMAmfPyMBZ" method="POST" id="pickupForm" class="p-8 md:p-12 space-y-6">
+        <input type="hidden" name="tracking_id" id="hiddenTrackingId">
+        <input type="hidden" name="status" value="Processing">
+        <input type="hidden" name="submission_time" id="submissionTime">
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <h3 class="text-orange-500 font-black uppercase text-xs tracking-widest border-b border-orange-100 pb-2">Sender Details</h3>
+            <input name="sender_name" type="text" required placeholder="Full Name" oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'');" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition">
+            <input name="sender_phone" type="number" required placeholder="Phone (Numbers Only)" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition">
+            <div class="relative">
+              <textarea id="pickup_location" name="pickup_location" required rows="2" placeholder="Pickup Address" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition"></textarea>
+              <button type="button" onclick="getLocation('pickup_location')" class="absolute top-9 right-4 text-orange-500 font-bold text-[9px] uppercase hover:underline">📍 Get GPS Location</button>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <h3 class="text-blue-900 font-black uppercase text-xs tracking-widest border-b border-blue-50 pb-2">Receiver Details</h3>
+            <input name="receiver_name" type="text" required placeholder="Full Name" oninput="this.value=this.value.replace(/[^a-zA-Z\s]/g,'');" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition">
+            <input name="receiver_phone" type="number" required placeholder="Phone (Numbers Only)" oninput="this.value=this.value.replace(/[^0-9]/g,'');" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition">
+            <div class="relative">
+              <textarea id="delivery_location" name="delivery_location" required rows="2" placeholder="Delivery Address" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition"></textarea>
+              <button type="button" onclick="getLocation('delivery_location')" class="absolute top-9 right-4 text-blue-900 font-bold text-[9px] uppercase hover:underline">📍 Get GPS Location</button>
+            </div>
+          </div>
+        </div>
+
+        <input name="item_description" type="text" required placeholder="Item Description (e.g., 50kg Rice, Electronics)"  class="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 transition">
+
+        <div class="flex items-start gap-3 mb-4">
+          <input type="checkbox" id="terms_agree" required class="mt-1 w-4 h-4 accent-orange-500 cursor-pointer">
+          <label for="terms_agree" class="text-[11px] text-gray-500 leading-tight">
+            I agree to the <a href="terms.html" class="text-blue-900 font-bold underline">Terms & Conditions</a> and certify this shipment contains no <button type="button" onclick="toggleProhibited()" class="text-red-500 underline font-bold">Prohibited Items</button>.
+          </label>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-blue-900 hover:bg-orange-600 text-white font-black py-5 rounded-2xl shadow-xl transition-all uppercase tracking-widest text-sm">
+          Confirm & Get ID
+        </button>
+      </form>
+
+      <div id="formResponse" class="hidden absolute inset-0 bg-white flex flex-col items-center justify-center text-center p-8 z-[50]">
+        <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm">✓</div>
+        <h3 class="text-3xl font-black text-blue-900">Booking Successful!</h3>
+        
+        <div class="bg-gray-50 border-2 border-dashed border-gray-200 p-8 rounded-[2rem] w-full max-w-sm my-6 relative">
+            <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Your Tracking ID</span>
+            <p id="displayID" class="text-4xl font-black text-orange-500 tracking-tighter mb-4"></p>
+            <button onclick="copyTrackingID()" class="mx-auto flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition">Copy ID</button>
+            <p id="copyFeedback" class="text-[10px] text-green-600 font-bold mt-2 opacity-0 transition-opacity">COPIED!</p>
+        </div>
+
+        <div class="flex flex-col gap-3 w-full max-w-sm">
+            <button onclick="printWaybill()" class="w-full bg-blue-900 text-white font-black py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:bg-orange-600 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Generate Waybill (PDF)
+            </button>
+            <button onclick="window.location.reload()" class="text-blue-900 font-bold underline decoration-orange-500 underline-offset-4 text-sm mt-2">Make Another Booking</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="printableWaybill" class="hidden p-10 bg-white text-black font-sans">
+    <div class="border-4 border-black p-6">
+        <div class="flex justify-between items-start border-b-2 border-black pb-4 mb-6">
+            <div>
+                <h1 class="text-3xl font-black uppercase">DND GLOBAL LOGISTICS</h1>
+                <p class="text-xs font-bold italic">Smart. Fast. Safe. | RC: 9133502</p>
+                <p class="text-[10px] mt-1">HQ: Plot DH11, Sunflower Estate, Karsana North, Abuja</p>
+            </div>
+            <div class="text-right">
+                <h2 class="text-xl font-bold uppercase bg-black text-white px-4 py-1">Official Waybill</h2>
+                <p class="text-sm mt-2 font-mono" id="wb_id"></p>
+                <p class="text-[10px]" id="wb_date"></p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8 mb-8">
+            <div class="border p-4 rounded-lg">
+                <h3 class="font-bold border-b mb-2 uppercase text-xs">Sender</h3>
+                <p class="text-sm font-bold" id="wb_sender_name"></p>
+                <p class="text-xs" id="wb_sender_phone"></p>
+                <p class="text-xs mt-2 italic" id="wb_pickup"></p>
+            </div>
+            <div class="border p-4 rounded-lg">
+                <h3 class="font-bold border-b mb-2 uppercase text-xs">Receiver</h3>
+                <p class="text-sm font-bold" id="wb_receiver_name"></p>
+                <p class="text-xs" id="wb_receiver_phone"></p>
+                <p class="text-xs mt-2 italic" id="wb_delivery"></p>
+            </div>
+        </div>
+
+        <div class="border p-4 mb-8">
+            <h3 class="font-bold border-b mb-2 uppercase text-xs">Shipment Information</h3>
+            <p class="text-sm"><span class="font-bold">Item:</span> <span id="wb_item"></span></p>
+            <p class="text-sm"><span class="font-bold">Status:</span> PROCESSING</p>
+        </div>
+
+        <div class="flex justify-between items-center mt-12 pt-8 border-t border-dashed border-gray-400">
+            <div class="text-center">
+                <div class="w-32 h-px bg-black mb-1 mx-auto"></div>
+                <p class="text-[9px] uppercase font-bold">Authorized Signature</p>
+            </div>
+            <div class="text-center">
+                <div class="w-32 h-px bg-black mb-1 mx-auto"></div>
+                <p class="text-[9px] uppercase font-bold">Customer Signature</p>
+            </div>
+        </div>
+        
+        <p class="text-[8px] text-center mt-10 text-gray-500 uppercase font-bold tracking-widest">Thank you for choosing DND Global Logistics. Terms & Conditions apply.</p>
+    </div>
+</div>
+
+<footer class="bg-blue-900 text-white pt-20 pb-10 px-6 mt-20">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-16 mb-16">
+            <div class="space-y-6">
+                <h2 class="text-2xl font-black uppercase tracking-tighter">DND <span class="text-orange-500">Global</span></h2>
+                <p class="text-blue-200 text-sm leading-relaxed font-medium italic">"Redefining logistics through speed, safety, and smart technology. Your global partner in seamless transportation."</p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Quick Links</h3>
+                    <ul class="space-y-2 text-sm text-blue-100 font-bold">
+                        <li><a href="index.html" class="hover:text-white transition">Home</a></li>
+                        <li><a href="car-hire.html" class="hover:text-white transition">Car Hire</a></li>
+                        <li><a href="booking.html" class="hover:text-white transition">Book Pickup</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Legal</h3>
+                    <ul class="space-y-2 text-sm text-blue-100 font-bold">
+                        <li>Privacy Policy</li>
+                        <li>Terms of Service</li>
+                        <li>RC: 9133502</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Headquarters</h3>
+                <p class="text-sm text-blue-100 font-bold">Nigeria Office:<br>Abuja, FCT, Nigeria.</p>
+                <p class="text-sm text-blue-100 font-bold">Contact:<br>+234 (0) XXX XXX XXXX</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto pt-8 border-t border-white/10 text-center text-[10px] font-black uppercase tracking-[0.3em] text-blue-400">
+            © 2025 DND GLOBAL LOGISTICS LTD. ALL RIGHTS RESERVED.
+        </div>
+    </footer>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 800, once: true });
+
+  // 1. LIVE NIGERIA CLOCK
+  function updateClock() {
+    const timeString = new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    document.getElementById('nigeria-clock').innerText = "🇳🇬 " + timeString;
+  }
+  setInterval(updateClock, 1000); updateClock();
+
+  // 2. MODAL TOGGLE
+  function toggleProhibited() {
+    const modal = document.getElementById('prohibitedModal');
+    modal.classList.toggle('hidden');
+    modal.classList.toggle('flex');
+  }
+
+  // 3. GPS LOCATION FETCH
+  function getLocation(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (navigator.geolocation) {
+      field.placeholder = "Locating GPS coordinates...";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { 
+            field.value = `📍 GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`; 
+        },
+        () => { alert("Location access denied. Please type your address manually."); }
+      );
+    }
+  }
+
+  // 4. FORM SUBMISSION & ID GENERATION
+  const form = document.getElementById('pickupForm');
+  const result = document.getElementById('formResponse');
+  const submitBtn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Generate Secure Tracking ID
+    const newID = `DND-${Math.floor(1000 + Math.random() * 9000)}-${"ABC".charAt(Math.floor(Math.random() * 3))}`;
+    
+    document.getElementById('hiddenTrackingId').value = newID;
+    document.getElementById("submissionTime").value = new Date().toLocaleString();
+    
+    submitBtn.innerHTML = `<span class="spinner"></span> PROCESSING...`;
+    submitBtn.disabled = true;
+
+    fetch(form.action, { method: 'POST', body: new FormData(form) })
+    .then(response => {
+      if (response.ok) {
+        document.getElementById('displayID').innerText = newID;
+        result.classList.remove('hidden');
+      }
+    })
+    .finally(() => { 
+        submitBtn.innerHTML = "Confirm & Get ID"; 
+        submitBtn.disabled = false; 
+    });
+  });
+
+  // 5. WAYBILL POPULATE & PRINT
+  function printWaybill() {
+    const formData = new FormData(form);
+    document.getElementById('wb_id').innerText = "ID: " + document.getElementById('displayID').innerText;
+    document.getElementById('wb_date').innerText = "Date: " + new Date().toLocaleDateString('en-NG');
+    document.getElementById('wb_sender_name').innerText = formData.get('sender_name');
+    document.getElementById('wb_sender_phone').innerText = formData.get('sender_phone');
+    document.getElementById('wb_pickup').innerText = formData.get('pickup_location');
+    document.getElementById('wb_receiver_name').innerText = formData.get('receiver_name');
+    document.getElementById('wb_receiver_phone').innerText = formData.get('receiver_phone');
+    document.getElementById('wb_delivery').innerText = formData.get('delivery_location');
+    document.getElementById('wb_item').innerText = formData.get('item_description');
+    
+    window.print();
+  }
+
+  // 6. COPY TO CLIPBOARD
+  function copyTrackingID() {
+    const text = document.getElementById('displayID').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const fb = document.getElementById('copyFeedback');
+      fb.style.opacity = "1";
+      setTimeout(() => fb.style.opacity = "0", 2000);
+    });
+  }
+</script>
+</body>
+</html>

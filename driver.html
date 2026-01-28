@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DND | Driver Dispatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #050505; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .neo-glass { background: rgba(15, 15, 15, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .status-pulse { position: relative; }
+        .status-pulse::after { content: ''; position: absolute; width: 100%; height: 100%; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; opacity: 0.5; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(3); opacity: 0; } }
+        .shimmer { background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%); background-size: 200% 100%; animation: shimmer 3s infinite; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    </style>
+</head>
+<body class="text-white h-screen flex flex-col">
+
+    <header class="p-6 flex justify-between items-center border-b border-white/5 bg-black/40">
+        <div>
+            <h1 class="text-xl font-black tracking-tighter italic">DND <span class="text-orange-600">DRIVE</span></h1>
+            <p id="clock" class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]"></p>
+        </div>
+        <div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10">
+            <div id="signal" class="w-2 h-2 rounded-full bg-slate-600"></div>
+            <span id="state-text" class="text-[9px] font-black uppercase">Offline</span>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
+        
+        <div id="radar-box" class="hidden relative w-48 h-48 flex items-center justify-center">
+            <div class="absolute inset-0 border border-blue-500/20 rounded-full animate-ping"></div>
+            <div class="absolute inset-4 border border-blue-500/40 rounded-full animate-pulse"></div>
+            <div class="w-24 h-24 bg-blue-600/20 rounded-full flex items-center justify-center border border-blue-500/50">
+                <i class="fas fa-satellite-dish text-3xl text-blue-400"></i>
+            </div>
+        </div>
+
+        <div class="w-full max-w-sm neo-glass rounded-[3rem] p-8 shadow-2xl shimmer">
+            <div class="mb-8 text-center">
+                <h2 class="text-sm font-black uppercase tracking-widest text-slate-400">Mission Authorization</h2>
+            </div>
+
+            <div class="space-y-4">
+                <div class="relative">
+                    <input id="hireID" type="text" placeholder="REF ID: DND-H26-XXXX" 
+                    class="w-full bg-black/40 border border-white/10 p-5 rounded-2xl text-center font-mono font-bold text-blue-400 placeholder:text-slate-700 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                </div>
+
+                <button id="mainBtn" onclick="handleTrip()" 
+                class="w-full py-6 bg-blue-600 hover:bg-blue-500 rounded-2xl font-black uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(37,99,235,0.3)] transition-all active:scale-95 flex items-center justify-center gap-3">
+                    <i class="fas fa-power-off"></i> <span>Initialize Link</span>
+                </button>
+            </div>
+
+            <div id="telemetry" class="hidden mt-8 grid grid-cols-2 gap-4 pt-8 border-t border-white/10">
+                <div class="text-center">
+                    <p class="text-[9px] font-bold text-slate-500 uppercase">LATITUDE</p>
+                    <p id="lat" class="text-xs font-mono font-bold text-blue-300">0.00000</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-[9px] font-bold text-slate-500 uppercase">LONGITUDE</p>
+                    <p id="lng" class="text-xs font-mono font-bold text-blue-300">0.00000</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkTcAA7g3fEmtaJrPLnQ2YXf06eSefAQu_pVaPkJUsln20rCCDZfC52m_64Gn9in3Nqg/exec"; 
+        let isLive = false;
+        let watchID = null;
+
+        function handleTrip() {
+            const btn = document.getElementById('mainBtn');
+            const id = document.getElementById('hireID').value.trim().toUpperCase();
+            
+            if(!id) return alert("ID REQUIRED");
+
+            if(!isLive) {
+                // START
+                isLive = true;
+                btn.innerHTML = `<i class="fas fa-stop-circle"></i> <span>Terminate Link</span>`;
+                btn.classList.replace('bg-blue-600', 'bg-red-600');
+                document.getElementById('radar-box').classList.remove('hidden');
+                document.getElementById('telemetry').classList.remove('hidden');
+                document.getElementById('signal').classList.replace('bg-slate-600', 'bg-green-500');
+                document.getElementById('signal').classList.add('status-pulse');
+                document.getElementById('state-text').innerText = "Transmitting";
+
+                watchID = navigator.geolocation.watchPosition(pos => {
+                    const { latitude, longitude } = pos.coords;
+                    document.getElementById('lat').innerText = latitude.toFixed(5);
+                    document.getElementById('lng').innerText = longitude.toFixed(5);
+                    fetch(`${SCRIPT_URL}?isDriverUpdate=true&HireID=${id}&lat=${latitude}&lng=${longitude}`, {method: 'POST', mode:'no-cors'});
+                });
+            } else {
+                location.reload(); // Quick reset
+            }
+        }
+
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+    </script>
+</body>
+</html>
