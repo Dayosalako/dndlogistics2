@@ -102,7 +102,30 @@
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         let currentTab = 'CarHire';
         let allData = [];
+// --- PASSWORD PROTECTION ---
+const ACCESS_KEY = "Tommyvesmogan2020."; // Change your password here
 
+(function checkAccess() {
+    const sessionActive = sessionStorage.getItem("dnd_admin_auth");
+
+    if (sessionActive !== "granted") {
+        const passPrompt = prompt("DND GLOBAL COMMAND CENTER\nEnter Authorization Key:");
+        
+        if (passPrompt === ACCESS_KEY) {
+            sessionStorage.setItem("dnd_admin_auth", "granted");
+            alert("Access Granted. Systems Online.");
+        } else {
+            alert("Unauthorized Access Attempt Detected.");
+            window.location.href = "index.html"; // Redirects back to home
+        }
+    }
+})();
+
+function logout() {
+    sessionStorage.removeItem("dnd_admin_auth");
+    window.location.reload();
+}
+// ---------------------------
         async function syncData() {
             const icon = document.getElementById('sync-icon');
             icon.classList.add('fa-spin');
@@ -208,4 +231,5 @@
         switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0');
     </script>
 </body>
+
 </html>
