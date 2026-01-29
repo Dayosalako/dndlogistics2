@@ -10,13 +10,16 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; }
     .content-section h2 { color: #1e3a8a; font-weight: 800; font-size: 1.25rem; margin-top: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; border-left: 4px solid #f97316; padding-left: 1rem; }
-    .content-section p { color: #475569; line-height: 1.8; margin-bottom: 1.25rem; font-size: 0.95rem; }
-    .content-section ul { margin-bottom: 1.5rem; list-style-type: none; padding-left: 0; }
-    .content-section li { margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative; color: #475569; font-size: 0.95rem; }
-    .content-section li::before { content: "→"; position: absolute; left: 0; color: #f97316; font-weight: bold; }
+    .content-section h3 { font-weight: 800; color: #334155; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    .content-section p { color: #475569; line-height: 1.8; margin-bottom: 1.25rem; font-size: 0.95rem; text-align: justify; }
+    .content-section ul { margin-bottom: 1.5rem; list-style-type: disc; padding-left: 1.5rem; color: #475569; }
+    .content-section li { margin-bottom: 0.5rem; font-size: 0.95rem; }
     
     .tab-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
     .legal-card { background: white; border: 1px solid #e2e8f0; border-radius: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+    
+    /* PDF styling for verbatim text */
+    .verbatim-text { white-space: pre-line; }
   </style>
 </head>
 <body class="pt-24 pb-20">
@@ -33,84 +36,202 @@
 
 <header class="max-w-4xl mx-auto px-6 text-center mb-12">
     <h1 class="text-4xl md:text-5xl font-black text-blue-900 uppercase tracking-tighter mb-4">Official <span class="text-orange-500">Legal Center</span></h1>
-    <p class="text-slate-500 font-medium">Please review our governing terms, privacy protocols, and compliance statements.</p>
+    <p class="text-slate-500 font-medium tracking-tight">Verbatim Archive of Terms of Use, Privacy Policy, and Compliance Statements.</p>
 </header>
 
 <main class="max-w-5xl mx-auto px-6">
     <div class="flex flex-wrap gap-2 mb-8 justify-center">
-        <button onclick="showTab('terms')" id="btn-terms" class="tab-btn active px-8 py-3 rounded-full border-2 border-slate-200 text-xs font-black uppercase tracking-widest transition-all">Terms of Use</button>
-        <button onclick="showTab('privacy')" id="btn-privacy" class="tab-btn px-8 py-3 rounded-full border-2 border-slate-200 text-xs font-black uppercase tracking-widest transition-all">Privacy Policy</button>
-        <button onclick="showTab('compliance')" id="btn-compliance" class="tab-btn px-8 py-3 rounded-full border-2 border-slate-200 text-xs font-black uppercase tracking-widest transition-all">Compliance</button>
+        <button onclick="showTab('terms')" id="btn-terms" class="tab-btn active px-6 py-3 rounded-full border-2 border-slate-200 text-[10px] font-black uppercase tracking-widest transition-all">Terms of Use</button>
+        <button onclick="showTab('privacy')" id="btn-privacy" class="tab-btn px-6 py-3 rounded-full border-2 border-slate-200 text-[10px] font-black uppercase tracking-widest transition-all">Privacy Policy</button>
+        <button onclick="showTab('compliance')" id="btn-compliance" class="tab-btn px-6 py-3 rounded-full border-2 border-slate-200 text-[10px] font-black uppercase tracking-widest transition-all">Compliance Statement</button>
     </div>
 
     <div class="legal-card p-8 md:p-16">
         
         <div id="tab-terms" class="content-section">
-            <h2 class="mt-0">1. Introduction</h2>
-            <p>Welcome to DND Global Logistics Limited ("DND"). These Terms and Conditions govern your access to our website, digital platforms, and logistics services including courier, haulage, freight forwarding, warehousing, and vehicle hire.</p>
-            <p>By engaging our services, you acknowledge that you have read, understood, and agreed to be bound by these Terms.</p>
+            <div class="text-center mb-10">
+                <h2 class="inline-block border-none p-0 m-0">TERMS OF USE</h2>
+                <p class="text-[10px] font-bold text-orange-500 tracking-[0.3em] uppercase mt-2">DND LOGISTICS | SMART. SAFE. FAST</p>
+            </div>
 
-            <h2>2. Service Requests & Fees</h2>
-            <p>All service requests are subject to acceptance by DND. We reserve the right to refuse any shipment. Rates provided are based on weight, dimensions, and destination. Any variation in declared details may result in price adjustments.</p>
+            <h2>1. Introduction</h2>
+            <p>Welcome to DND Global Logistics Limited ("DND", "we", "our", or "us"). These Terms and Conditions ("Terms") govern your access to and use of our website, digital platforms, and logistics services, including but not limited to courier services, haulage, freight forwarding, warehousing, vehicle hire, and related logistics solutions (collectively, the "Services").</p>
+            <p>By accessing our website, requesting a pickup, engaging our Services, or otherwise dealing with DND, you ("Customer", "User", or "you") acknowledge that you have read, understood, and agreed to be bound by these Terms. If you do not agree to these Terms, you must refrain from using our website or engaging our Services.</p>
+            <p>These Terms constitute a legally binding agreement between you and DND Global Logistics Limited and apply to all service requests, transactions, and interactions unless expressly varied by a written agreement executed by DND.</p>
 
-            <h2>3. Prohibited Items</h2>
-            <p>Customers are strictly prohibited from shipping:</p>
+            <h2>2. Amendments and Updates to the Terms</h2>
+            <p>DND Global Logistics Limited reserves the right to amend, modify, or update these Terms at any time at its sole discretion. Any such amendments shall take effect upon publication on our website or upon notification to you by electronic or other reasonable means. Where you continue to access our website or use our Services after the effective date of any amendment, such continued use shall constitute your acceptance of the revised Terms. It is your responsibility to review the Terms periodically for updates.</p>
+
+            <h2>3. Service Provision and Scope</h2>
+            <p>DND provides logistics solutions including pick-up and delivery services, transportation of goods via road and other means, freight management, and third-party logistics. The scope of Services provided shall be as specified in individual service requests, waybills, or contracts.</p>
+
+            <h2>4. Service Requests and Bookings</h2>
+            <p>All service requests are subject to acceptance by DND. We reserve the right to refuse the carriage of any shipment at our sole discretion, particularly where such shipment poses a security risk, contains prohibited items, or violates applicable laws. A booking is deemed confirmed only when an official DND waybill or tracking ID has been generated.</p>
+
+            <h2>5. Accurate Information and Customer Responsibility</h2>
+            <p>The Customer shall provide accurate and complete information regarding the nature, weight, dimensions, value, and destination of the goods. DND shall not be liable for delays, losses, or additional costs arising from incorrect or incomplete information provided by the Customer. The Customer warrants that they are the legal owner of the goods or have the requisite authority to engage DND for the carriage of the goods.</p>
+
+            <h2>6. Packaging Requirements</h2>
+            <p>It is the Customer's responsibility to ensure that all goods are adequately and securely packaged to withstand the normal rigours of transportation and handling. DND reserves the right to refuse any shipment that is inadequately packaged. DND shall not be liable for damage resulting from insufficient or defective packaging.</p>
+
+            <h2>7. Prohibited and Restricted Items</h2>
+            <p>Customers are strictly prohibited from tendering for carriage any item classified as "Prohibited Items" under Nigerian Law or DND's internal policies. These include, but are not limited to:</p>
             <ul>
-                <li>Illegal drugs or narcotics</li>
-                <li>Explosives, firearms, or ammunition</li>
-                <li>Perishable goods (unless specially arranged)</li>
-                <li>Live animals</li>
-                <li>Items prohibited by Nigerian Law or NDLEA regulations</li>
+                <li>Illegal drugs, narcotics, and psychotropic substances.</li>
+                <li>Explosives, firearms, ammunition, and hazardous materials.</li>
+                <li>Perishable goods (except by special written agreement).</li>
+                <li>Live animals, human remains, or illegal wildlife products.</li>
+                <li>Currency, bullion, precious stones, or high-value negotiable instruments (unless specially declared and insured).</li>
+                <li>Any other items prohibited by the Nigerian Customs Service, NDLEA, or other regulatory authorities.</li>
             </ul>
+            <p>DND reserves the right to dispose of or hand over to law enforcement any prohibited items found in its possession without liability to the Customer.</p>
 
-            <h2>4. Liability & Insurance</h2>
-            <p>Our liability for loss or damage is limited to the declared value of the shipment at the time of booking, subject to our maximum liability caps. We recommend "Extended Liability" coverage for high-value items.</p>
+            <h2>8. Right to Inspect</h2>
+            <p>DND Global Logistics Limited and regulatory authorities (including but not limited to the Police, NDLEA, and Customs) reserve the right to open and inspect any shipment without prior notice to the Customer to ensure safety, security, and compliance with the law.</p>
 
-            <h2>5. Governing Law</h2>
-            <p>These terms are governed by the laws of the Federal Republic of Nigeria. Disputes shall be subject to the exclusive jurisdiction of Nigerian courts.</p>
+            <h2>9. Fees, Charges, and Payment Terms</h2>
+            <p>Service fees are calculated based on weight, dimensions, distance, and the type of service requested. Rates are subject to change without notice due to fluctuations in operational costs. All payments must be made in full before or upon delivery as specified at the time of booking. DND shall have a general lien on all goods in its possession for all charges and expenses due from the Customer.</p>
+
+            <h2>10. Taxes and Duties</h2>
+            <p>The Customer is responsible for all applicable taxes, customs duties, and regulatory levies associated with the shipment. DND may, at its discretion, pay such duties on behalf of the Customer and shall be entitled to full reimbursement before delivery.</p>
+
+            <h2>11. Delivery and Undelivered Shipments</h2>
+            <p>DND will make reasonable efforts to deliver shipments within the estimated timelines. However, delivery times are not guaranteed. If a shipment cannot be delivered due to incorrect address, absence of the recipient, or refusal to accept, DND will attempt to contact the Customer. Additional storage and re-delivery fees may apply. Shipments unclaimed for over 30 days may be disposed of or sold to recover costs.</p>
+
+            <h2>12. Limitation of Liability</h2>
+            <p>To the maximum extent permitted by law, DND's liability for loss, damage, or delay is limited to the declared value of the goods or a maximum cap set by DND policies, whichever is lower. DND shall not be liable for indirect, incidental, or consequential losses, including loss of profits or business opportunities.</p>
+
+            <h2>13. Force Majeure</h2>
+            <p>DND shall not be liable for any failure to perform its obligations where such failure results from circumstances beyond its reasonable control, including but not limited to acts of God, civil unrest, strikes, fuel shortages, government restrictions, extreme weather, or infrastructure failure.</p>
+
+            <h2>14. Insurance and Extended Liability</h2>
+            <p>DND does not provide automatic all-risk insurance. Customers are strongly encouraged to obtain independent insurance for high-value items. DND may offer "Extended Liability" coverage for an additional fee, subject to specific terms and conditions.</p>
+
+            <h2>15. Claims Process</h2>
+            <p>Any claim for loss or damage must be submitted in writing to DND within fourteen (14) days of the delivery date or the date the delivery was expected. Claims must be accompanied by proof of value and evidence of damage. Failure to submit a claim within this period shall constitute a waiver of the claim.</p>
+
+            <h2>16. Use of Digital Platforms</h2>
+            <p>Users agree to use our website and tracking portals only for lawful purposes. Unauthorized access, hacking, or interference with our digital systems is strictly prohibited and will be prosecuted to the full extent of the law.</p>
+
+            <h2>17. Intellectual Property</h2>
+            <p>All content on DND's platforms, including logos, trademarks, text, and software, is the property of DND Global Logistics Limited and is protected by intellectual property laws. No part of our platforms may be reproduced without prior written consent.</p>
+
+            <h2>18. Data Protection and Privacy</h2>
+            <p>Our collection and use of personal data are governed by our Privacy Policy, which is incorporated into these Terms by reference. By using our Services, you consent to the processing of your data as described therein.</p>
+
+            <h2>19. Termination</h2>
+            <p>DND reserves the right to terminate or suspend access to its Services or digital platforms at any time without notice for conduct that violates these Terms or is harmful to DND's business interests.</p>
+
+            <h2>20. Indemnity</h2>
+            <p>The Customer agrees to indemnify and hold DND Global Logistics Limited and its officers harmless from any claims, losses, or damages arising from the Customer's breach of these Terms or the nature of the goods tendered for carriage.</p>
+
+            <h2>21. Governing Law and Jurisdiction</h2>
+            <p>These Terms shall be governed by and construed in accordance with the laws of the Federal Republic of Nigeria. Any dispute arising out of or in connection with these Terms or the Services shall be subject to the exclusive jurisdiction of the courts of the Federal Republic of Nigeria.</p>
+
+            <h2>22. Severability and Waiver</h2>
+            <p>If any provision of these Terms is held to be invalid, illegal, or unenforceable, such provision shall be severed and the remaining provisions shall remain in full force and effect. No failure or delay by DND in exercising any right shall operate as a waiver of such right.</p>
+
+            <h2>23. Notices and Contact Information</h2>
+            <p>All notices and communications shall be made through DND's designated contact channels. For enquiries, complaints, or legal notices, contact:</p>
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 mt-4 text-xs font-bold space-y-2">
+                <p>Phone: +234 904 555 1003 | +234 816 941 0967</p>
+                <p>Email: dndgloballogistics@gmail.com</p>
+                <p>Address: Plot No. DH11, Sunflower Estate, Karsana North, FCT Abuja (HQ)</p>
+            </div>
         </div>
 
         <div id="tab-privacy" class="content-section hidden">
-            <h2 class="mt-0">Our Data Commitment</h2>
-            <p>DND Global Logistics Limited ("DND") respects your privacy. This policy explains how we collect and use your personal data when you use our services.</p>
+            <h2 class="mt-0">OUR COMPANY PRIVACY POLICY</h2>
+            <p>DND Global Logistics Limited ("DND", "we", "our" or "us") is a logistics and transportation company operating in Nigeria. This privacy policy explains how our organization uses the personal data we collect from you when you use our website or engage our logistics services.</p>
 
-            <h2>1. Data We Collect</h2>
+            <h3>What data do we collect?</h3>
+            <p>DND Global Logistics Limited collects the following data:</p>
             <ul>
-                <li>Personal ID (Name, Email, Phone Number)</li>
-                <li>Delivery Info (Addresses, Recipient Details)</li>
-                <li>Transaction & Payment Records</li>
-                <li>Technical data from website cookies</li>
+                <li>Personal identification information (name, email address, phone number, business name where applicable)</li>
+                <li>Pickup and delivery information including addresses, recipient details, and shipment descriptions</li>
+                <li>Payment and transaction details</li>
+                <li>Any other information voluntarily provided by you in the course of using our services</li>
             </ul>
 
-            <h2>2. How We Use Data</h2>
-            <p>We use your data to process shipments, provide tracking updates, prevent fraud, and comply with legal requirements from authorities like the Nigeria Data Protection Commission (NDPC).</p>
+            <h3>How do we collect your data?</h3>
+            <p>You directly provide DND Global Logistics Limited with most of the data we collect. We collect data and process data when you:</p>
+            <ul>
+                <li>Request a pickup or delivery service</li>
+                <li>Register on our website or submit service forms</li>
+                <li>Communicate with us via email, phone calls, or messaging platforms</li>
+                <li>Use or view our website via your browser's cookies</li>
+            </ul>
 
-            <h2>3. Your Rights</h2>
-            <p>Under the Nigeria Data Protection Act, you have the right to access your data, request corrections, or ask for the deletion of your personal records from our system.</p>
+            <h3>How will we use your data?</h3>
+            <p>DND Global Logistics Limited collects your data so that we can:</p>
+            <ul>
+                <li>Process your service requests and manage your shipments</li>
+                <li>Provide real-time tracking updates and customer support</li>
+                <li>Email or message you with special offers on other services we think you might like</li>
+                <li>Comply with legal and regulatory requirements</li>
+            </ul>
+
+            <h3>How do we store your data?</h3>
+            <p>DND Global Logistics Limited securely stores your data using encrypted digital servers and secure physical filing systems at our headquarters. We keep your personal identification and transaction data for as long as necessary to fulfill the purposes for which it was collected, including legal, accounting, or reporting requirements. Once this period has expired, we will delete or anonymize your data.</p>
+
+            <h3>What are your data protection rights?</h3>
+            <p>DND Global Logistics Limited would like to make sure you are fully aware of all of your data protection rights. Every user is entitled to the following:</p>
+            <ul>
+                <li><b>The right to access</b> – You have the right to request DND Global Logistics Limited for copies of your personal data.</li>
+                <li><b>The right to rectification</b> – You have the right to request that DND Global Logistics Limited correct any information you believe is inaccurate.</li>
+                <li><b>The right to erasure</b> – You have the right to request that DND Global Logistics Limited erase your personal data, under certain conditions.</li>
+                <li><b>The right to restrict processing</b> – You have the right to request that DND Global Logistics Limited restrict the processing of your personal data.</li>
+            </ul>
+
+            <h3>Cookies</h3>
+            <p>Cookies are text files placed on your computer to collect standard Internet log information and visitor behavior information. When you visit our website, we may collect information from you automatically through cookies or similar technology. We use cookies to improve your experience on our website, including keeping you signed in and understanding how you use our website.</p>
+
+            <h3>How to contact us</h3>
+            <p>If you have any questions about DND Global Logistics Limited's privacy policy, the data we hold on you, or you would like to exercise one of your data protection rights, please contact us:</p>
+            <p>Email us at: dndgloballogistics@gmail.com<br>Call us: +234 904 555 1003, +234 816 941 0967</p>
+            
+            <h3>How to contact the appropriate authority</h3>
+            <p>Should you wish to report a complaint or if you feel that DND Global Logistics Limited has not addressed your concern in a satisfactory manner, you may contact the Nigerian Data Protection Commission at dpo@ndpc.gov.ng or info@ndpc.gov.ng.</p>
         </div>
 
         <div id="tab-compliance" class="content-section hidden">
-            <h2 class="mt-0">Regulatory Adherence</h2>
-            <p>DND Global Logistics Limited is fully compliant and adheres to the requirements of the <b>Nigeria Data Protection Act 2023</b> and the <b>General Application and Implementation Directive 2025</b>.</p>
-
-            <div class="bg-blue-900 text-white p-10 rounded-[2rem] mt-10">
-                <i class="fas fa-certificate text-4xl text-orange-500 mb-6"></i>
-                <h3 class="text-2xl font-black uppercase mb-4 tracking-tighter">Verified Compliance</h3>
-                <p class="text-white-100 opacity-80 text-sm leading-relaxed mb-6">
-                    We maintain strict protocols to ensure your cargo and your data are handled according to the highest legal standards in Nigeria.
-                </p>
-                <div class="flex items-center gap-4 border-t border-white/10 pt-6">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Seal_of_the_President_of_Nigeria.svg/250px-Seal_of_the_President_of_Nigeria.svg.png" class="h-12 w-auto" alt="Nigeria Coat of Arms">
-                    <p class="text-[10px] font-bold uppercase tracking-widest leading-tight">Federal Republic of Nigeria<br>Regulatory Standard</p>
+            <div class="text-center mb-10">
+                <i class="fas fa-gavel text-5xl text-blue-900 mb-6"></i>
+                <h2 class="inline-block border-none p-0 m-0">Compliance Statement</h2>
+            </div>
+            
+            <div class="bg-white border-4 border-blue-900 p-10 rounded-[3rem] shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-10">
+                    <i class="fas fa-shield-check text-9xl"></i>
                 </div>
+                
+                <p class="text-xl font-black text-blue-900 leading-relaxed mb-8">
+                    "DND Global Logistics Limited is fully compliant and adheres to the requirement of the Nigeria Data Protection Act 2023 and the Nigeria Data Protection Act 2023 General Application and Implementation Directive 2025."
+                </p>
+                
+                <div class="grid md:grid-cols-2 gap-8 border-t border-slate-100 pt-8">
+                    <div>
+                        <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Statutory Authority</h4>
+                        <p class="text-xs font-bold text-slate-600 uppercase">Nigeria Data Protection Commission (NDPC)</p>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Compliance Year</h4>
+                        <p class="text-xs font-bold text-slate-600">2023 - 2025 (Active Implementation)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 space-y-6">
+                <p>As part of our commitment to regulatory excellence, DND Global Logistics Limited maintains internal audits and data protection officer oversight to ensure that every shipment handled and every byte of data processed aligns with the federal laws of Nigeria.</p>
+                <p>We work closely with the relevant implementation directives to ensure that our operations, especially last-mile delivery and interstate haulage, protect the identity and confidentiality of our clients and partners.</p>
             </div>
         </div>
 
         <div class="mt-16 pt-10 border-t border-slate-100 text-center">
-            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Last Updated: January 2026</p>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6">Verified Digital Record © 2026 DND GLOBAL</p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="mailto:dndgloballogistics@gmail.com" class="bg-blue-900 text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest shadow-xl hover:bg-orange-500 transition-all">Contact Legal Dept</a>
-                <a href="index.html" class="bg-slate-100 text-slate-500 px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Accept & Exit</a>
+                <a href="mailto:dndgloballogistics@gmail.com" class="bg-blue-900 text-white px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-widest shadow-xl hover:bg-orange-500 transition-all">Contact Legal Dept</a>
+                <a href="index.html" class="bg-slate-100 text-slate-500 px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all">Back to Hub</a>
             </div>
         </div>
     </div>
@@ -118,21 +239,13 @@
 
 <script>
     function showTab(tabId) {
-        // Hide all sections
         document.querySelectorAll('.content-section').forEach(section => section.classList.add('hidden'));
-        // Deactivate all buttons
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        
-        // Show selected section
         document.getElementById('tab-' + tabId).classList.remove('hidden');
-        // Activate selected button
         document.getElementById('btn-' + tabId).classList.add('active');
-        
-        // Smooth scroll to top of card
         window.scrollTo({ top: 150, behavior: 'smooth' });
     }
 </script>
 
 </body>
 </html>
-
