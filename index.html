@@ -420,16 +420,24 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-   // MOBILE MENU TOGGLE
-  const menuBtn = document.getElementById('menu-btn');
-  const closeBtn = document.getElementById('close-btn');
-  const mobileMenu = document.getElementById('mobile-menu');
-  menuBtn.onclick = () => mobileMenu.classList.add('mobile-menu-open');
-  closeBtn.onclick = () => mobileMenu.classList.remove('mobile-menu-open');
+   // --- FIXED MOBILE MENU LOGIC ---
+const menuBtn = document.getElementById('menu-btn');
+const closeBtn = document.getElementById('close-btn');
+const mobileMenu = document.getElementById('mobile-menu');
 
+if (menuBtn && mobileMenu) {
+    menuBtn.onclick = () => {
+        // This opens the menu
+        mobileMenu.classList.add('mobile-menu-open');
+        mobileMenu.classList.remove('translate-x-full');
+        document.body.style.overflow = 'hidden'; // Stop background scrolling
+    };
+}
 
-if(closeBtn) {
+if (closeBtn) {
     closeBtn.onclick = () => {
+        // This closes the menu
+        mobileMenu.classList.remove('mobile-menu-open');
         mobileMenu.classList.add('translate-x-full');
         document.body.style.overflow = ''; // Restore scrolling
     };
@@ -438,10 +446,12 @@ if(closeBtn) {
 // Close menu when any link inside it is clicked
 document.querySelectorAll('#mobile-menu a').forEach(link => {
     link.onclick = () => {
+        mobileMenu.classList.remove('mobile-menu-open');
         mobileMenu.classList.add('translate-x-full');
         document.body.style.overflow = '';
     };
-});
+});                    
+  
 
 // --- 5. AOS ANIMATION INIT ---
 AOS.init({ 
@@ -454,6 +464,7 @@ AOS.init({
 
 </body>
 </html>
+
 
 
 
