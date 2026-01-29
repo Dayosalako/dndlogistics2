@@ -7,8 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
         .spinner { border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top: 3px solid #fff; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 12px; }
@@ -22,7 +21,17 @@
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
         .input-premium { transition: all 0.3s ease; border: 2px solid #f1f5f9; }
         .input-premium:focus { border-color: #f97316; background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .btn-loading { pointer-events: none; filter: grayscale(0.5); }
+
+        /* --- WAYBILL PRINT SYSTEM (Matches Booking Page) --- */
+        #printableWaybill { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #printableWaybill, #printableWaybill * { visibility: visible; }
+            #printableWaybill { 
+                position: absolute; left: 0; top: 0; width: 100%; 
+                display: block !important; background: white; padding: 40px;
+            }
+        }
     </style>
 </head>
 <body class="bg-[#F8FAFC] text-slate-900">
@@ -40,263 +49,160 @@
 <section class="hero-bg pt-48 pb-32 px-6 text-white text-center">
     <div class="max-w-4xl mx-auto">
         <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6">Gold Standard <br/><span class="text-orange-500">Executive Hire</span></h1>
-        <p class="text-blue-100 text-lg font-medium max-w-2xl mx-auto mb-10 opacity-90">Experience seamless mobility with live tracking and human-readable location fetching.</p>
+        <p class="text-blue-100 text-lg font-medium max-w-2xl mx-auto mb-10 opacity-90">Experience seamless mobility with official digital waybills and live tracking.</p>
     </div>
 </section>
 
-<section id="reserve" class="py-12 pb-32 px-6">
-    <div class="max-w-5xl mx-auto">
-        <div id="formUI" class="glass-card rounded-[4rem] p-10 md:p-16 shadow-2xl relative overflow-hidden">
+<section class="py-12 pb-32 px-6">
+    <div class="max-w-5xl mx-auto space-y-8">
+        <div class="glass-card rounded-[3rem] p-10 border-2 border-orange-100 shadow-xl">
+            <h3 class="text-xs font-black text-orange-500 uppercase tracking-widest mb-4">Verification Center</h3>
+            <div class="flex flex-col md:flex-row gap-4">
+                <input type="text" id="trackInput" placeholder="Enter Hire Reference ID" class="flex-1 p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
+                <button onclick="trackHire()" id="trackBtn" class="bg-blue-900 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-orange-500 transition-all">Verify Status</button>
+            </div>
+            <div id="trackingResult" class="hidden mt-8 p-6 bg-white border border-slate-100 rounded-3xl shadow-sm">
+                </div>
+        </div>
+
+        <div id="formUI" class="glass-card rounded-[4rem] p-10 md:p-16 shadow-2xl overflow-hidden">
             <h3 class="text-3xl font-black text-blue-900 uppercase text-center mb-12 tracking-tighter">Executive Reservation</h3>
-            
-            <form id="hireForm" action="https://script.google.com/macros/s/AKfycbwkTcAA7g3fEmtaJrPLnQ2YXf06eSefAQu_pVaPkJUsln20rCCDZfC52m_64Gn9in3Nqg/exec" method="POST" class="space-y-6 relative z-10">
-                <input type="hidden" name="UserGPS" id="UserGPS">
-                <input type="hidden" name="HireID" id="hiddenHireID">
-                <input type="hidden" name="token" value="DND_SECURE_TOKEN_2026">
-    
+            <form id="hireForm" class="space-y-6">
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Full Name</label>
-                        <input type="text" name="FullName" placeholder="e.g. Alhaji Musa Ibrahim" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium text-slate-700">
+                        <input type="text" name="FullName" placeholder="e.g. Alhaji Musa Ibrahim" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
                     </div>
                     <div>
                         <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Phone Number</label>
-                        <input type="number" name="Phone" placeholder="e.g. 08031234567" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium text-slate-700">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Email Address</label>
-                        <input type="email" name="email" placeholder="e.g. morganinfo@gmail.com" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium text-slate-700">
+                        <input type="number" name="Phone" placeholder="e.g. 08031234567" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
                     </div>
                 </div>
-                
-
-                <div>
-                    <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Vehicle Category</label>
-                    <select name="CarType" class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium text-slate-700 appearance-none">
-                        <option>Executive Sedan (Toyota Camry)</option>
-                        <option>Luxury SUV (LandCruiser/Prado)</option>
-                        <option>Toyota Hiace (Executive Bus)</option>
-                        <option>Escort Vehicle (Hilux Pickup)</option>
-                    </select>
-                </div>
-
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Duration (Days)</label>
-                        <input type="number" name="Duration" placeholder="e.g. 5" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium text-slate-700">
+                        <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Vehicle Category</label>
+                        <select name="CarType" class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium appearance-none">
+                            <option>Executive Sedan (Toyota Camry)</option>
+                            <option>Luxury SUV (LandCruiser/Prado)</option>
+                            <option>Escort Vehicle (Hilux Pickup)</option>
+                        </select>
                     </div>
-                    <div class="relative">
+                    <div>
                         <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Pickup Location</label>
-                        <input type="text" id="LocationInput" name="Location" placeholder="e.g. Transcorp Hilton, Abuja" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium text-slate-700 pr-14">
-                        <button type="button" onclick="useMyLocation()" class="absolute right-3 top-[38px] text-blue-900 hover:text-orange-500 transition-all p-2" title="Fetch Current Location">
-                            <i id="gpsIcon" class="fas fa-location-arrow"></i>
-                        </button>
+                        <input type="text" id="LocationInput" name="Location" placeholder="e.g. Transcorp Hilton" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
                     </div>
                 </div>
-
-                <button type="submit" id="submitBtn" class="w-full bg-blue-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] shadow-xl hover:bg-orange-500 transition-all active:scale-95">
-                    Confirm Reservation
-                </button>
+                <button type="submit" class="w-full bg-blue-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] hover:bg-orange-500 transition-all">Secure Booking</button>
             </form>
-        </div>
-
-        <div id="successUI" class="hidden text-center glass-card rounded-[4rem] p-16 md:p-20 shadow-2xl">
-            <div class="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-6"><i class="fas fa-check"></i></div>
-            <h2 class="text-3xl font-black text-blue-900 uppercase">Booking Secured</h2>
-            <p class="text-xs text-slate-400 font-bold mt-2 uppercase tracking-widest">ID Copied to Clipboard</p>
-            
-            <div onclick="copyAgain()" class="my-10 p-10 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 inline-block w-full max-w-md cursor-pointer group hover:border-orange-500 transition-all">
-                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Digital Hire Reference</p>
-                <span id="finalID" class="text-3xl font-black text-blue-900 tracking-tighter">---</span>
-            </div>
-            
-            <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <button onclick="printProfessionalWaybill()" class="bg-blue-900 text-white px-10 py-5 rounded-3xl font-black uppercase text-xs shadow-lg hover:bg-orange-600 transition-all">Download Waybill</button>
-                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 px-10 py-5 rounded-3xl font-black uppercase text-xs hover:bg-slate-200 transition-all">New Booking</button>
-            </div>
         </div>
     </div>
 </section>
 
+<div id="printableWaybill">
+    <div class="border-4 border-blue-900 p-10 rounded-[2rem]">
+        <div class="flex justify-between items-center border-b-4 border-blue-900 pb-8 mb-10">
+            <div>
+                <h1 class="text-4xl font-black text-blue-900 italic">DND <span class="text-orange-500">GLOBAL</span></h1>
+                <p class="text-xs font-bold tracking-[0.4em] text-slate-400 uppercase">Official Executive Hire Waybill</p>
+            </div>
+            <div class="text-right">
+                <h2 id="wb_id" class="text-3xl font-black text-blue-900 tracking-tighter">ID: -----</h2>
+                <p id="wb_date" class="text-xs font-extrabold text-slate-500"></p>
+            </div>
+        </div>
 
-<footer class="bg-blue-900 text-white pt-20 pb-10 px-6 mt-20">
-        <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-16 mb-16">
+        <div class="grid grid-cols-2 gap-12 mb-10">
             <div class="space-y-6">
-                <h2 class="text-2xl font-black uppercase tracking-tighter">DND <span class="text-orange-500">Global</span></h2>
-                <p class="text-blue-200 text-sm leading-relaxed font-medium italic">"Redefining logistics through speed, safety, and smart technology. Your global partner in seamless transportation."</p>
-                <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-orange-500 transition"><i class="fab fa-linkedin-in"></i></a>
+                <div class="border-l-8 border-orange-500 pl-6">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Client Details</p>
+                    <p id="wb_name" class="text-xl font-black text-blue-900"></p>
+                    <p id="wb_phone" class="text-sm font-bold text-slate-600"></p>
+                </div>
+                <div class="border-l-8 border-blue-900 pl-6">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pickup Address</p>
+                    <p id="wb_location" class="text-sm font-bold text-slate-800"></p>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-8">
-                <div class="space-y-4">
-                    <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Quick Links</h3>
-                    <ul class="space-y-2 text-sm text-blue-100 font-bold">
-                        <li><a href="index.html" class="hover:text-white transition">Home</a></li>
-                        <li><a href="car-hire.html" class="hover:text-white transition">Car Hire</a></li>
-                        <li><a href="booking.html" class="hover:text-white transition">Book Pickup</a></li>
-                    </ul>
+            <div class="space-y-6">
+                <div class="border-l-8 border-orange-500 pl-6">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Service Category</p>
+                    <p id="wb_service" class="text-xl font-black text-blue-900"></p>
                 </div>
-                <div class="space-y-4">
-                    <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Legal</h3>
-                    <ul class="space-y-2 text-sm text-blue-100 font-bold">
-                        <li>Privacy Policy</li>
-                        <li>Terms of Service</li>
-                        <li>RC: 9133502</li>
-                    </ul>
+                <div class="bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Validation</p>
+                    <p class="text-xs font-black text-blue-900 italic">SYSTEM GENERATED & SECURED</p>
+                    <p class="text-[9px] font-bold text-slate-400 mt-2">RC: 9133502 | Verified via DND Cloud</p>
                 </div>
-            </div>
-            <div class="space-y-4">
-                <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Headquarters</h3>
-                <p class="text-sm text-blue-100 font-bold">Nigeria Office:<br>Abuja, FCT, Nigeria.</p>
-                <p class="text-sm text-blue-100 font-bold">Contact:<br>+234 (0) XXX XXX XXXX</p>
             </div>
         </div>
-        <div class="max-w-7xl mx-auto pt-8 border-t border-white/10 text-center text-[10px] font-black uppercase tracking-[0.3em] text-blue-400">
-            © 2025 DND GLOBAL LOGISTICS LTD. ALL RIGHTS RESERVED.
+
+        <div class="text-center pt-10 border-t border-slate-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Thank you for choosing DND Global Logistics</p>
         </div>
-    </footer>
+    </div>
+</div>
 
 <script>
-    let activeID = "";
+    let activeData = null;
 
-    // 1. REVERSE GEOCODING (Human Addresses)
-    async function useMyLocation() {
-        const icon = document.getElementById('gpsIcon');
-        const input = document.getElementById('LocationInput');
-        icon.className = 'fas fa-spinner fa-spin';
+    // --- TRACKING LOGIC ---
+    async function trackHire() {
+        const idInput = document.getElementById('trackInput').value.trim();
+        const btn = document.getElementById('trackBtn');
+        const resultDiv = document.getElementById('trackingResult');
+        
+        if (!idInput) return alert("Enter Reference ID");
+        
+        btn.innerHTML = `<span class="spinner"></span> Verifying...`;
+        
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=CarHire`;
+            const res = await fetch(url);
+            const text = await res.text();
+            const json = JSON.parse(text.substring(47).slice(0, -2));
+            const match = json.table.rows.find(r => r.c[1] && r.c[1].v.toString().toUpperCase() === idInput.toUpperCase());
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async (p) => {
-                const lat = p.coords.latitude;
-                const lng = p.coords.longitude;
-                document.getElementById('UserGPS').value = `${lat}, ${lng}`;
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-                    const data = await res.json();
-                    input.value = data.display_name || `${lat}, ${lng}`;
-                    icon.className = 'fas fa-check text-green-500';
-                } catch (e) {
-                    input.value = `Location Fixed: ${lat}, ${lng}`;
-                    icon.className = 'fas fa-location-arrow';
-                }
-            }, () => {
-                alert("Location permission denied.");
-                icon.className = 'fas fa-location-arrow';
-            });
+            if (match) {
+                activeData = match.c;
+                resultDiv.classList.remove('hidden');
+                resultDiv.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[10px] font-black text-orange-500 uppercase tracking-widest">Booking Found</p>
+                            <h4 class="text-2xl font-black text-blue-900">${activeData[2].v}</h4>
+                            <p class="text-sm font-bold text-slate-400">${activeData[4].v}</p>
+                        </div>
+                        <button onclick="printWaybill()" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-black text-xs uppercase hover:bg-orange-500 transition-all">
+                            <i class="fas fa-print mr-2"></i> Print Official Waybill
+                        </button>
+                    </div>
+                `;
+            } else {
+                alert("Reference ID not found.");
+            }
+        } catch (e) {
+            alert("Connection error.");
+        } finally {
+            btn.innerHTML = "Verify Status";
         }
     }
 
-    // 2. PROFESSIONAL SUBMISSION LOGIC
-    const form = document.getElementById('hireForm');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        
-      // Inside your form submit listener
-const rand = Math.floor(1000 + Math.random() * 9000);
-activeID = `DND-H26-${rand}`;
-document.getElementById('finalID').innerText = activeID;
+    // --- PRINT LOGIC (Matches Booking.html structure) ---
+    function printWaybill() {
+        if (!activeData) return;
 
-// THIS IS THE FIX:
-document.getElementById('hiddenHireID').value = activeID;
+        // Populate the waybill template
+        document.getElementById('wb_id').innerText = "ID: " + activeData[1].v;
+        document.getElementById('wb_date').innerText = "Date: " + new Date().toLocaleDateString('en-NG');
+        document.getElementById('wb_name').innerText = activeData[2].v;
+        document.getElementById('wb_phone').innerText = "PH: " + activeData[3].v;
+        document.getElementById('wb_service').innerText = activeData[4].v;
+        document.getElementById('wb_location').innerText = activeData[6] ? activeData[6].v : "DND Hub / Pickup point";
 
-// ... Phase 2: Dropping data to Sheet ...
-        setTimeout(() => {
-            btn.innerHTML = `<span class="spinner"></span> REGISTERING Your Request...`;
-            
-           fetch(this.action, { method: 'POST', body: new FormData(this) })
-.then(res => res.text())
-.then(txt => alert("Server Response: " + txt))
-
-                // Success Transition
-                navigator.clipboard.writeText(activeID);
-                document.getElementById('formUI').classList.add('hidden');
-                document.getElementById('successUI').classList.remove('hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            })
-            .catch(() => {
-                btn.innerHTML = "Error! Try Again";
-                btn.classList.remove('btn-loading');
-            });
-        }, 1500); // Small artificial delay for premium "Thinking" feel
-    ;
-
-    // 3. DATABASE TRACKING (Based on your App Script)
-    async function checkHireStatus() {
-    const idInput = document.getElementById('trackID').value.toUpperCase().trim();
-    if (!idInput) return alert("Please enter a Reference ID");
-    
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner !w-4 !h-4"></span> READING...';
-
-    // Link to your specific Google Sheet (using the Visualization API for direct data fetching)
-    const SHEET_ID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
-    const TAB_NAME = 'Vehicle_Allocation';
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${TAB_NAME}`;
-
-    try {
-        const res = await fetch(url);
-        const text = await res.text();
-        
-        // Remove the Google API wrapper to get clean JSON
-        const json = JSON.parse(text.substring(47).slice(0, -2));
-        const rows = json.table.rows;
-
-        // Search for the ID in Column A (index 0)
-        const record = rows.find(row => 
-            row.c[0] && row.c[0].v.toString().toUpperCase() === idInput
-        );
-
-        if (record) {
-            document.getElementById('radarUI').classList.remove('hidden');
-            // Column B (index 1) = Car Name | Column D (index 3) = Driver Name
-            document.getElementById('c_name').innerText = record.c[1] ? record.c[1].v : 'Awaiting Vehicle';
-            document.getElementById('d_name').innerText = record.c[3] ? record.c[3].v : 'Awaiting Driver';
-            
-            document.getElementById('radarUI').scrollIntoView({ behavior: 'smooth' });
-        } else {
-            alert("Reference ID: " + idInput + " not found in the allocation database.");
-        }
-    } catch (e) {
-        console.error("Fetch Error:", e);
-        alert("Database connection error. Please check your internet or Sheet permissions.");
-    } finally {
-        btn.innerHTML = originalText;
-    }
-}
-
-    function printProfessionalWaybill() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFillColor(30, 58, 138); 
-        doc.rect(0, 0, 210, 50, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(24).text("DND GLOBAL LOGISTICS", 15, 25);
-        doc.setFontSize(10).text("EXECUTIVE CAR HIRE OFFICIAL RECEIPT", 15, 35);
-        
-        doc.autoTable({
-            startY: 60,
-            head: [['Category', 'Details']],
-            body: [
-                ['Reference ID', activeID],
-                ['Customer', document.getElementsByName('FullName')[0].value.toUpperCase()],
-                ['Vehicle', document.getElementsByName('CarType')[0].value],
-                ['Pickup Point', document.getElementById('LocationInput').value],
-                ['Date Issued', new Date().toLocaleString()]
-            ],
-            headStyles: { fillColor: [249, 115, 22] }
-        });
-        doc.save(`${activeID}-Receipt.pdf`);
-    }
-
-    function copyAgain() {
-        navigator.clipboard.writeText(activeID);
-        alert("ID Copied");
+        // Trigger native print dialog
+        window.print();
     }
 </script>
+
 </body>
 </html>
