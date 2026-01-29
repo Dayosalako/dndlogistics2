@@ -76,27 +76,17 @@
   </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-y-0 right-0 w-full sm:w-80 bg-Blue-950 shadow-2xl transform translate-x-full md:hidden flex flex-col p-8 z-[2000] transition-transform duration-300 ease-in-out">
-    <div class="flex justify-between items-center mb-10">
-        <span class="font-black text-xl text-white uppercase tracking-tighter">DND <span class="text-orange-500">Global</span></span>
-        <button id="close-btn" class="text-white text-4xl leading-none">&times;</button>
-    </div>
-    
-    <nav class="flex flex-col gap-6 font-bold text-lg text-Orange">
-        <a href="haulage.html" class="mobile-link hover:text-orange-500 border-b border-white/10 pb-4">Haulage</a>
-        <a href="warehousing.html" class="mobile-link hover:text-orange-500 border-b border-white/10 pb-4">Warehousing</a>
-        <a href="car-hire.html" class="mobile-link hover:text-orange-500 border-b border-white/10 pb-4">Car Hire</a>
-        <a href="partnership.html" class="mobile-link hover:text-orange-500 border-b border-white/10 pb-4">Partnership</a>
-        <a href="booking.html" class="bg-orange-500 text-white text-center py-4 rounded-xl font-black uppercase tracking-widest mt-4">Book Now</a>
-    </nav>
-
-    <div class="mt-auto pb-6">
-        <a href="javascript:void(0)" onclick="secureAdminAccess()" class="text-white/30 text-xs font-black uppercase tracking-widest flex items-center">
-            <i class="fas fa-lock mr-2"></i> Staff Portal
-        </a>
-    </div>
+<div id="mobile-menu" class="fixed top-0 right-0 h-full w-72 bg-white shadow-2xl transform translate-x-full md:hidden flex flex-col p-8 gap-6 font-bold text-lg">
+  <button id="close-btn" class="self-end text-3xl">&times;</button>
+  <a href="haulage.html" class="mobile-link hover:text-orange-500">Haulage</a>
+  <a href="warehousing.html" class="mobile-link hover:text-orange-500">Warehousing</a>
+  <a href="car-hire.html" class="mobile-link hover:text-orange-500">Car Hire</a>
+  <a href="partnership.html" class="mobile-link hover:text-orange-500">Partnership</a>
+  <a href="#about" class="mobile-link hover:text-orange-500">About Us</a>
+  <a href="booking.html" class="mobile-link hover:text-orange-500">Request Pickup</a>
+  <a href="#contact" class="mobile-link hover:text-orange-500">Contact</a>
 </div>
-  
+
  <header class="relative bg-cover bg-center text-white min-h-[90vh] flex items-center" style="background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000');">
   <div class="absolute inset-0 bg-blue-900/85 mix-blend-multiply"></div>
   <div class="relative max-w-7xl mx-auto px-6 py-24 text-center w-full">
@@ -430,18 +420,13 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// --- 2. MOBILE MENU LOGIC (STABILIZED) ---
-const menuBtn = document.getElementById('menu-btn');
-const closeBtn = document.getElementById('close-btn');
-const mobileMenu = document.getElementById('mobile-menu');
+   // MOBILE MENU TOGGLE
+  const menuBtn = document.getElementById('menu-btn');
+  const closeBtn = document.getElementById('close-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  menuBtn.onclick = () => mobileMenu.classList.add('mobile-menu-open');
+  closeBtn.onclick = () => mobileMenu.classList.remove('mobile-menu-open');
 
-// Use direct class manipulation to ensure Tailwind 'translate' is overridden
-if(menuBtn && mobileMenu) {
-    menuBtn.onclick = () => {
-        mobileMenu.classList.remove('translate-x-full');
-        document.body.style.overflow = 'hidden'; // Stop background scrolling
-    };
-}
 
 if(closeBtn) {
     closeBtn.onclick = () => {
@@ -469,6 +454,7 @@ AOS.init({
 
 </body>
 </html>
+
 
 
 
