@@ -106,17 +106,7 @@
     </main>
 
     <script>
-        // --- 1. PASSWORD PROTECTION ---
-        const ACCESS_KEY = "DND-2026-GLOBAL"; 
-        (function checkAccess() {
-            if (sessionStorage.getItem("dnd_admin_auth") !== "granted") {
-                if (prompt("Enter Authorization Key:") === ACCESS_KEY) {
-                    sessionStorage.setItem("dnd_admin_auth", "granted");
-                } else {
-                    window.location.href = "index.html";
-                }
-            }
-        })();
+    
 
         function logout() { sessionStorage.removeItem("dnd_admin_auth"); window.location.reload(); }
 
@@ -203,3 +193,4 @@
     </script>
 </body>
 </html>
+
