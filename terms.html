@@ -3,90 +3,135 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms and Conditions | DND Global Logistics</title>
+  <title>Legal Center | DND Global Logistics</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    .content-section h2 { color: #1e3a8a; font-weight: 800; font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: -0.025em; }
-    .content-section p { color: #4b5563; line-height: 1.75; margin-bottom: 1.25rem; }
-    .content-section ul { margin-bottom: 1.5rem; list-style-type: disc; padding-left: 1.5rem; color: #4b5563; }
-    .content-section li { margin-bottom: 0.5rem; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; }
+    .content-section h2 { color: #1e3a8a; font-weight: 800; font-size: 1.25rem; margin-top: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; border-left: 4px solid #f97316; padding-left: 1rem; }
+    .content-section p { color: #475569; line-height: 1.8; margin-bottom: 1.25rem; font-size: 0.95rem; }
+    .content-section ul { margin-bottom: 1.5rem; list-style-type: none; padding-left: 0; }
+    .content-section li { margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative; color: #475569; font-size: 0.95rem; }
+    .content-section li::before { content: "→"; position: absolute; left: 0; color: #f97316; font-weight: bold; }
+    
+    .tab-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
+    .legal-card { background: white; border: 1px solid #e2e8f0; border-radius: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
   </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-800">
+<body class="pt-24 pb-20">
 
-<nav class="fixed w-full z-[1000] py-4 bg-white border-b border-gray-100 shadow-sm">
-  <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-    <a href="index.html" class="flex items-center group">
-        <span class="font-black text-xl text-blue-900 uppercase tracking-tighter">DND <span class="text-orange-500">Global</span></span>
-    </a>
-    <a href="index.html" class="text-sm font-bold text-gray-600 hover:text-orange-500 transition">← Back to Home</a>
-  </div>
+<nav class="fixed w-full top-0 z-[1000] py-5 bg-white/90 backdrop-blur-xl border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <a href="index.html" class="flex flex-col">
+            <span class="font-black text-2xl text-blue-900 uppercase leading-none tracking-tighter">DND <span class="text-orange-500">Global</span></span>
+            <span class="text-[9px] font-bold text-slate-400 tracking-[0.4em] uppercase mt-1">Legal Department</span>
+        </a>
+        <a href="index.html" class="text-xs font-black uppercase text-blue-900 px-6 py-2 bg-slate-100 rounded-full hover:bg-blue-900 hover:text-white transition-all">Back to Hub</a>
+    </div>
 </nav>
 
-<main class="pt-32 pb-20 px-6">
-  <div class="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-gray-100 overflow-hidden">
-    <div class="bg-blue-900 p-10 md:p-16 text-center text-white relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-        <h1 class="text-4xl md:text-5xl font-black mb-4 relative z-10">Terms of Service</h1>
-        <p class="text-blue-200 font-medium relative z-10">Effective Date: January 2026</p>
+<header class="max-w-4xl mx-auto px-6 text-center mb-12">
+    <h1 class="text-4xl md:text-5xl font-black text-blue-900 uppercase tracking-tighter mb-4">Official <span class="text-orange-500">Legal Center</span></h1>
+    <p class="text-slate-500 font-medium">Please review our governing terms, privacy protocols, and compliance statements.</p>
+</header>
+
+<main class="max-w-5xl mx-auto px-6">
+    <div class="flex flex-wrap gap-2 mb-8 justify-center">
+        <button onclick="showTab('terms')" id="btn-terms" class="tab-btn active px-8 py-3 rounded-full border-2 border-slate-200 text-xs font-black uppercase tracking-widest transition-all">Terms of Use</button>
+        <button onclick="showTab('privacy')" id="btn-privacy" class="tab-btn px-8 py-3 rounded-full border-2 border-slate-200 text-xs font-black uppercase tracking-widest transition-all">Privacy Policy</button>
+        <button onclick="showTab('compliance')" id="btn-compliance" class="tab-btn px-8 py-3 rounded-full border-2 border-slate-200 text-xs font-black uppercase tracking-widest transition-all">Compliance</button>
     </div>
 
-    <div class="p-8 md:p-16 content-section">
-      <p class="italic text-gray-500 border-l-4 border-orange-500 pl-4 bg-orange-50 py-4">
-        By engaging the services of DND Global Logistics Ltd (RC: 9133502), the Sender agrees to these Terms and Conditions. These terms are aligned with international logistics standards for safety, liability, and transparency.
-      </p>
+    <div class="legal-card p-8 md:p-16">
+        
+        <div id="tab-terms" class="content-section">
+            <h2 class="mt-0">1. Introduction</h2>
+            <p>Welcome to DND Global Logistics Limited ("DND"). These Terms and Conditions govern your access to our website, digital platforms, and logistics services including courier, haulage, freight forwarding, warehousing, and vehicle hire.</p>
+            <p>By engaging our services, you acknowledge that you have read, understood, and agreed to be bound by these Terms.</p>
 
-      <h2>1. Nature of Services</h2>
-      <p>DND Global Logistics Ltd provides national and international courier, haulage, and freight forwarding services. We act as a professional intermediary between the sender and the final destination, utilizing a network of road, air, and sea transport.</p>
+            <h2>2. Service Requests & Fees</h2>
+            <p>All service requests are subject to acceptance by DND. We reserve the right to refuse any shipment. Rates provided are based on weight, dimensions, and destination. Any variation in declared details may result in price adjustments.</p>
 
-      <h2>2. Prohibited & Restricted Items</h2>
-      <p>The Sender warrants that the shipment does not contain prohibited items. Prohibited items include, but are not limited to:</p>
-      <ul>
-        <li>Illegal drugs, narcotics, and psychotropic substances.</li>
-        <li>Hazardous materials (explosives, flammable liquids, radioactive materials).</li>
-        <li>Currency, bullion, or negotiable instruments.</li>
-        <li>Live animals or human remains.</li>
-        <li>Perishable goods (unless specifically agreed upon for refrigerated haulage).</li>
-      </ul>
+            <h2>3. Prohibited Items</h2>
+            <p>Customers are strictly prohibited from shipping:</p>
+            <ul>
+                <li>Illegal drugs or narcotics</li>
+                <li>Explosives, firearms, or ammunition</li>
+                <li>Perishable goods (unless specially arranged)</li>
+                <li>Live animals</li>
+                <li>Items prohibited by Nigerian Law or NDLEA regulations</li>
+            </ul>
 
-      <h2>3. Packaging & Labeling</h2>
-      <p>It is the Sender's responsibility to ensure that goods are properly packaged to withstand the rigors of transit. DND Global Logistics is not liable for damage resulting from inadequate or improper packaging provided by the sender.</p>
+            <h2>4. Liability & Insurance</h2>
+            <p>Our liability for loss or damage is limited to the declared value of the shipment at the time of booking, subject to our maximum liability caps. We recommend "Extended Liability" coverage for high-value items.</p>
 
-      <h2>4. Customs & International Trade</h2>
-      <p>For cross-border shipments, the Sender is solely responsible for providing accurate documentation and for the payment of all customs duties, taxes, or levies. DND Global Logistics reserves the right to charge for administrative costs related to customs clearance delays caused by incomplete documentation.</p>
+            <h2>5. Governing Law</h2>
+            <p>These terms are governed by the laws of the Federal Republic of Nigeria. Disputes shall be subject to the exclusive jurisdiction of Nigerian courts.</p>
+        </div>
 
-      <h2>5. Limitation of Liability</h2>
-      <p>Our liability is strictly limited to direct loss and damage only. To the extent permitted by Nigerian law and international treaties (e.g., Warsaw Convention), DND Global Logistics is not liable for:</p>
-      <ul>
-          <li><b>Indirect Losses:</b> Loss of profit, income, interest, or future business.</li>
-          <li><b>Force Majeure:</b> Damage caused by natural disasters, war, strikes, or civil unrest.</li>
-          <li><b>Electronic Data:</b> Loss of or damage to magnetic/electronic records.</li>
-      </ul>
+        <div id="tab-privacy" class="content-section hidden">
+            <h2 class="mt-0">Our Data Commitment</h2>
+            <p>DND Global Logistics Limited ("DND") respects your privacy. This policy explains how we collect and use your personal data when you use our services.</p>
 
-      <h2>6. Insurance</h2>
-      <p>Standard shipping does not include full-value insurance. Senders are strongly advised to purchase independent cargo insurance or request an "Extended Liability" coverage from us at an additional premium for high-value items.</p>
+            <h2>1. Data We Collect</h2>
+            <ul>
+                <li>Personal ID (Name, Email, Phone Number)</li>
+                <li>Delivery Info (Addresses, Recipient Details)</li>
+                <li>Transaction & Payment Records</li>
+                <li>Technical data from website cookies</li>
+            </ul>
 
-      <h2>7. Right to Inspect</h2>
-      <p>DND Global Logistics and regulatory authorities (NDLEA, Customs, etc.) have the right to open and inspect any shipment without prior notice to ensure compliance with safety and security regulations.</p>
+            <h2>2. How We Use Data</h2>
+            <p>We use your data to process shipments, provide tracking updates, prevent fraud, and comply with legal requirements from authorities like the Nigeria Data Protection Commission (NDPC).</p>
 
-      <h2>8. Claims Process</h2>
-      <p>Any claim for loss or damage must be submitted in writing within fourteen (14) days from the date of delivery. Failure to report within this timeframe constitutes a waiver of the claim.</p>
+            <h2>3. Your Rights</h2>
+            <p>Under the Nigeria Data Protection Act, you have the right to access your data, request corrections, or ask for the deletion of your personal records from our system.</p>
+        </div>
 
-      <div class="mt-12 pt-8 border-t border-gray-100 text-center">
-          <p class="text-sm font-bold text-blue-900">Questions about our terms?</p>
-          <p class="text-xs text-gray-500 mb-6">Contact our legal department at info@dndlogisticsltd.com.ng</p>
-          <a href="index.html" class="inline-block bg-orange-500 text-white font-black px-8 py-3 rounded-xl shadow-lg hover:bg-blue-900 transition">I UNDERSTAND</a>
-      </div>
+        <div id="tab-compliance" class="content-section hidden">
+            <h2 class="mt-0">Regulatory Adherence</h2>
+            <p>DND Global Logistics Limited is fully compliant and adheres to the requirements of the <b>Nigeria Data Protection Act 2023</b> and the <b>General Application and Implementation Directive 2025</b>.</p>
+
+            <div class="bg-blue-900 text-white p-10 rounded-[2rem] mt-10">
+                <i class="fas fa-certificate text-4xl text-orange-500 mb-6"></i>
+                <h3 class="text-2xl font-black uppercase mb-4 tracking-tighter">Verified Compliance</h3>
+                <p class="text-blue-100 opacity-80 text-sm leading-relaxed mb-6">
+                    We maintain strict protocols to ensure your cargo and your data are handled according to the highest legal standards in Nigeria.
+                </p>
+                <div class="flex items-center gap-4 border-t border-white/10 pt-6">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/74/Coat_of_arms_of_Nigeria.svg" class="h-12 w-auto" alt="Nigeria Coat of Arms">
+                    <p class="text-[10px] font-bold uppercase tracking-widest leading-tight">Federal Republic of Nigeria<br>Regulatory Standard</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-16 pt-10 border-t border-slate-100 text-center">
+            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Last Updated: January 2026</p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="mailto:dndgloballogistics@gmail.com" class="bg-blue-900 text-white px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest shadow-xl hover:bg-orange-500 transition-all">Contact Legal Dept</a>
+                <a href="index.html" class="bg-slate-100 text-slate-500 px-10 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Accept & Exit</a>
+            </div>
+        </div>
     </div>
-  </div>
 </main>
 
-<footer class="bg-gray-950 text-white py-12 text-center border-t border-gray-900">
-    <p class="text-gray-500 text-xs font-bold uppercase tracking-widest">© 2026 DND Global Logistics Ltd. All Rights Reserved.</p>
-</footer>
+<script>
+    function showTab(tabId) {
+        // Hide all sections
+        document.querySelectorAll('.content-section').forEach(section => section.classList.add('hidden'));
+        // Deactivate all buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        // Show selected section
+        document.getElementById('tab-' + tabId).classList.remove('hidden');
+        // Activate selected button
+        document.getElementById('btn-' + tabId).classList.add('active');
+        
+        // Smooth scroll to top of card
+        window.scrollTo({ top: 150, behavior: 'smooth' });
+    }
+</script>
 
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-<script>AOS.init();</script>
 </body>
 </html>
