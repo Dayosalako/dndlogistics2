@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -0.01em; }
         .spinner { border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top: 3px solid #fff; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 12px; }
@@ -22,7 +21,7 @@
         .input-premium { transition: all 0.3s ease; border: 2px solid #f1f5f9; }
         .input-premium:focus { border-color: #f97316; background: white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
 
-        /* --- WAYBILL PRINT SYSTEM (Matches Booking Page) --- */
+        /* --- WAYBILL PRINT SYSTEM (MATCHES BOOKING.HTML) --- */
         #printableWaybill { display: none; }
         @media print {
             body * { visibility: hidden; }
@@ -49,25 +48,30 @@
 <section class="hero-bg pt-48 pb-32 px-6 text-white text-center">
     <div class="max-w-4xl mx-auto">
         <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6">Gold Standard <br/><span class="text-orange-500">Executive Hire</span></h1>
-        <p class="text-blue-100 text-lg font-medium max-w-2xl mx-auto mb-10 opacity-90">Experience seamless mobility with official digital waybills and live tracking.</p>
+        <p class="text-blue-100 text-lg font-medium max-w-2xl mx-auto mb-10 opacity-90">Precision mobility for the elite. Use the calculator below to get instant quotes.</p>
     </div>
 </section>
 
-<section class="py-12 pb-32 px-6">
+<section id="reserve" class="py-12 pb-32 px-6">
     <div class="max-w-5xl mx-auto space-y-8">
+        
         <div class="glass-card rounded-[3rem] p-10 border-2 border-orange-100 shadow-xl">
-            <h3 class="text-xs font-black text-orange-500 uppercase tracking-widest mb-4">Verification Center</h3>
+            <h3 class="text-xs font-black text-orange-500 uppercase tracking-widest mb-4">Tracking & Verification</h3>
             <div class="flex flex-col md:flex-row gap-4">
-                <input type="text" id="trackInput" placeholder="Enter Hire Reference ID" class="flex-1 p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
+                <input type="text" id="trackInput" placeholder="Enter Hire ID (e.g. DND-H26-1234)" class="flex-1 p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
                 <button onclick="trackHire()" id="trackBtn" class="bg-blue-900 text-white px-10 py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-orange-500 transition-all">Verify Status</button>
             </div>
-            <div id="trackingResult" class="hidden mt-8 p-6 bg-white border border-slate-100 rounded-3xl shadow-sm">
+            <div id="trackingResult" class="hidden mt-8 p-8 bg-white rounded-3xl border border-slate-100 shadow-sm animate-pulse">
                 </div>
         </div>
 
-        <div id="formUI" class="glass-card rounded-[4rem] p-10 md:p-16 shadow-2xl overflow-hidden">
+        <div id="formUI" class="glass-card rounded-[4rem] p-10 md:p-16 shadow-2xl relative overflow-hidden">
             <h3 class="text-3xl font-black text-blue-900 uppercase text-center mb-12 tracking-tighter">Executive Reservation</h3>
-            <form id="hireForm" class="space-y-6">
+            
+            <form id="hireForm" class="space-y-6 relative z-10" oninput="calculatePrice()">
+                <input type="hidden" name="HireID" id="hiddenHireID">
+                <input type="hidden" name="token" value="DND_SECURE_TOKEN_2026">
+    
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
                         <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Full Name</label>
@@ -75,131 +79,246 @@
                     </div>
                     <div>
                         <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Phone Number</label>
-                        <input type="number" name="Phone" placeholder="e.g. 08031234567" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
+                        <input type="number" name="Phone" placeholder="08031234567" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
                     </div>
                 </div>
+
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Vehicle Category</label>
-                        <select name="CarType" class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium appearance-none">
-                            <option>Executive Sedan (Toyota Camry)</option>
-                            <option>Luxury SUV (LandCruiser/Prado)</option>
-                            <option>Escort Vehicle (Hilux Pickup)</option>
+                        <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Vehicle Selection</label>
+                        <select id="carSelect" name="CarType" class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium appearance-none">
+                            <option value="sedan" data-price="45000">Executive Sedan (Toyota Camry)</option>
+                            <option value="suv" data-price="85000">Luxury SUV (LandCruiser/Prado)</option>
+                            <option value="bus" data-price="65000">Executive Bus (Toyota Hiace)</option>
+                            <option value="escort" data-price="55000">Escort Vehicle (Hilux Pickup)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Pickup Location</label>
-                        <input type="text" id="LocationInput" name="Location" placeholder="e.g. Transcorp Hilton" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
+                        <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Duration (Days)</label>
+                        <input type="number" id="durationInput" name="Duration" value="1" min="1" required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-blue-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] hover:bg-orange-500 transition-all">Secure Booking</button>
+
+                <div class="relative">
+                    <label class="text-[10px] font-black text-blue-900 uppercase tracking-widest ml-4 mb-2 block">Pickup Address</label>
+                    <input type="text" id="LocationInput" name="Location" placeholder="Fetching Location..." required class="w-full p-5 bg-slate-50 rounded-2xl font-bold outline-none input-premium pr-16">
+                    <button type="button" onclick="fetchUserLocation()" class="absolute right-4 top-[38px] text-blue-900 hover:text-orange-500" title="Get Address">
+                        <i id="gpsIcon" class="fas fa-crosshairs text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-3xl border-2 border-blue-100 flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] font-black text-blue-900 uppercase">Estimated Hire Fee</p>
+                        <p class="text-sm font-bold text-slate-500">Final price confirmed via invoice</p>
+                    </div>
+                    <div class="text-right">
+                        <span id="priceDisplay" class="text-3xl font-black text-blue-900 tracking-tighter">₦0.00</span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-blue-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.3em] hover:bg-orange-500 transition-all">Confirm Reservation</button>
             </form>
+        </div>
+
+        <div id="successUI" class="hidden text-center glass-card rounded-[4rem] p-16 shadow-2xl">
+            <div class="w-24 h-24 bg-green-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-8"><i class="fas fa-check"></i></div>
+            <h2 class="text-4xl font-black text-blue-900 uppercase tracking-tighter leading-none mb-4">Reservation Locked</h2>
+            <div class="my-8 p-10 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200 inline-block w-full max-w-md">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Hire Reference ID</p>
+                <span id="finalID" class="text-4xl font-black text-blue-900 tracking-tighter">---</span>
+            </div>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button onclick="printProfessionalWaybill()" class="bg-blue-900 text-white px-12 py-6 rounded-full font-black uppercase text-xs hover:bg-orange-600 transition-all">Print Waybill</button>
+                <button onclick="location.reload()" class="bg-slate-100 text-slate-500 px-12 py-6 rounded-full font-black uppercase text-xs hover:bg-slate-200">New Booking</button>
+            </div>
         </div>
     </div>
 </section>
+
+<footer class="bg-blue-900 text-white pt-20 pb-10 px-6 mt-20">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-16 mb-16">
+        <div class="space-y-6">
+            <h2 class="text-2xl font-black uppercase tracking-tighter">DND <span class="text-orange-500">Global</span></h2>
+            <p class="text-blue-200 text-sm italic font-medium">"Redefining logistics through speed, safety, and smart technology."</p>
+        </div>
+        <div class="grid grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Quick Links</h3>
+                <ul class="space-y-2 text-sm text-blue-100 font-bold">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="car-hire.html">Car Hire</a></li>
+                </ul>
+            </div>
+            <div class="space-y-4">
+                <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Legal</h3>
+                <p class="text-sm font-bold">RC: 9133502</p>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <h3 class="font-black text-xs uppercase tracking-widest text-orange-500">Headquarters</h3>
+            <p class="text-sm text-blue-100 font-bold">Abuja, FCT, Nigeria.</p>
+        </div>
+    </div>
+    <div class="max-w-7xl mx-auto pt-8 border-t border-white/10 text-center text-[10px] font-black uppercase tracking-widest text-blue-400">
+        © 2026 DND GLOBAL LOGISTICS LTD.
+    </div>
+</footer>
 
 <div id="printableWaybill">
     <div class="border-4 border-blue-900 p-10 rounded-[2rem]">
         <div class="flex justify-between items-center border-b-4 border-blue-900 pb-8 mb-10">
             <div>
-                <h1 class="text-4xl font-black text-blue-900 italic">DND <span class="text-orange-500">GLOBAL</span></h1>
-                <p class="text-xs font-bold tracking-[0.4em] text-slate-400 uppercase">Official Executive Hire Waybill</p>
+                <h1 class="text-4xl font-black text-blue-900 italic leading-none">DND <span class="text-orange-500">GLOBAL</span></h1>
+                <p class="text-[10px] font-black tracking-[0.4em] text-slate-400 uppercase mt-2">Official Executive Waybill</p>
             </div>
             <div class="text-right">
-                <h2 id="wb_id" class="text-3xl font-black text-blue-900 tracking-tighter">ID: -----</h2>
-                <p id="wb_date" class="text-xs font-extrabold text-slate-500"></p>
+                <h2 id="wb_id" class="text-3xl font-black text-blue-900 tracking-tighter leading-none">ID: -----</h2>
+                <p id="wb_date" class="text-[10px] font-black text-slate-500 mt-2 uppercase"></p>
             </div>
         </div>
-
         <div class="grid grid-cols-2 gap-12 mb-10">
-            <div class="space-y-6">
-                <div class="border-l-8 border-orange-500 pl-6">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Client Details</p>
-                    <p id="wb_name" class="text-xl font-black text-blue-900"></p>
-                    <p id="wb_phone" class="text-sm font-bold text-slate-600"></p>
-                </div>
-                <div class="border-l-8 border-blue-900 pl-6">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pickup Address</p>
-                    <p id="wb_location" class="text-sm font-bold text-slate-800"></p>
-                </div>
+            <div class="border-l-8 border-orange-500 pl-6">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Client Details</p>
+                <p id="wb_name" class="text-2xl font-black text-blue-900 uppercase"></p>
+                <p id="wb_phone" class="text-sm font-bold text-slate-500"></p>
             </div>
-            <div class="space-y-6">
-                <div class="border-l-8 border-orange-500 pl-6">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Service Category</p>
-                    <p id="wb_service" class="text-xl font-black text-blue-900"></p>
+            <div class="border-l-8 border-blue-900 pl-6">
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Hire Duration</p>
+                <p id="wb_duration" class="text-2xl font-black text-blue-900 uppercase"></p>
+            </div>
+        </div>
+        <div class="bg-slate-50 p-8 rounded-3xl border-2 border-dashed border-slate-200 mb-10">
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Vehicle Category</p>
+                    <p id="wb_car" class="font-black text-blue-900 uppercase"></p>
                 </div>
-                <div class="bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Validation</p>
-                    <p class="text-xs font-black text-blue-900 italic">SYSTEM GENERATED & SECURED</p>
-                    <p class="text-[9px] font-bold text-slate-400 mt-2">RC: 9133502 | Verified via DND Cloud</p>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Pickup Location</p>
+                    <p id="wb_pickup" class="font-black text-blue-900 uppercase"></p>
                 </div>
             </div>
         </div>
-
-        <div class="text-center pt-10 border-t border-slate-100">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Thank you for choosing DND Global Logistics</p>
+        <div class="text-center">
+            <p class="text-xs font-black text-blue-900 italic">"Verified Digital Authorization. Authenticity secured via DND Global Hub."</p>
+            <p class="text-[9px] font-bold text-slate-400 mt-4 tracking-widest uppercase">RC: 9133502 | Issued 2026</p>
         </div>
     </div>
 </div>
 
 <script>
-    let activeData = null;
+    let activeID = "";
+    let hireData = null;
 
-    // --- TRACKING LOGIC ---
+    // --- 1. HUMAN ADDRESS FETCHING (User Location) ---
+    async function fetchUserLocation() {
+        const icon = document.getElementById('gpsIcon');
+        const input = document.getElementById('LocationInput');
+        icon.className = 'fas fa-spinner fa-spin';
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const { latitude, longitude } = pos.coords;
+                try {
+                    // Translate GPS to real street address
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                    const data = await res.json();
+                    input.value = data.display_name || `${latitude}, ${longitude}`;
+                    icon.className = 'fas fa-check text-green-500';
+                } catch (e) {
+                    input.value = `${latitude}, ${longitude}`;
+                    icon.className = 'fas fa-crosshairs';
+                }
+            }, () => {
+                alert("Please enable location services.");
+                icon.className = 'fas fa-crosshairs';
+            });
+        }
+    }
+
+    // --- 2. HIRE CALCULATOR ---
+    function calculatePrice() {
+        const select = document.getElementById('carSelect');
+        const duration = parseInt(document.getElementById('durationInput').value) || 0;
+        const pricePerDay = parseInt(select.options[select.selectedIndex].getAttribute('data-price'));
+        
+        const total = pricePerDay * duration;
+        document.getElementById('priceDisplay').innerText = `₦${total.toLocaleString()}`;
+    }
+
+    // --- 3. SUBMISSION ---
+    document.getElementById('hireForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        activeID = `DND-H26-${rand}`;
+        
+        btn.innerHTML = `<span class="spinner"></span> SECURING HIRE...`;
+        
+        // Simulating the Sheet Sync
+        setTimeout(() => {
+            document.getElementById('finalID').innerText = activeID;
+            document.getElementById('formUI').classList.add('hidden');
+            document.getElementById('successUI').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 1500);
+    });
+
+    // --- 4. TRACKING (RESTORED) ---
     async function trackHire() {
-        const idInput = document.getElementById('trackInput').value.trim();
-        const btn = document.getElementById('trackBtn');
-        const resultDiv = document.getElementById('trackingResult');
-        
-        if (!idInput) return alert("Enter Reference ID");
-        
-        btn.innerHTML = `<span class="spinner"></span> Verifying...`;
-        
+        const id = document.getElementById('trackInput').value.trim();
+        const resDiv = document.getElementById('trackingResult');
+        if(!id) return alert("Enter ID");
+
+        document.getElementById('trackBtn').innerHTML = `<span class="spinner"></span> FETCHING...`;
+
         try {
             const url = `https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=CarHire`;
             const res = await fetch(url);
             const text = await res.text();
             const json = JSON.parse(text.substring(47).slice(0, -2));
-            const match = json.table.rows.find(r => r.c[1] && r.c[1].v.toString().toUpperCase() === idInput.toUpperCase());
+            const record = json.table.rows.find(r => r.c[1] && r.c[1].v.toString().toUpperCase() === id.toUpperCase());
 
-            if (match) {
-                activeData = match.c;
-                resultDiv.classList.remove('hidden');
-                resultDiv.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-[10px] font-black text-orange-500 uppercase tracking-widest">Booking Found</p>
-                            <h4 class="text-2xl font-black text-blue-900">${activeData[2].v}</h4>
-                            <p class="text-sm font-bold text-slate-400">${activeData[4].v}</p>
+            if(record) {
+                hireData = record.c;
+                resDiv.classList.remove('hidden');
+                resDiv.innerHTML = `
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div class="text-center md:text-left">
+                            <p class="text-[10px] font-black text-orange-500 uppercase">Verification Success</p>
+                            <h4 class="text-3xl font-black text-blue-900">${hireData[2].v}</h4>
+                            <p class="font-bold text-slate-500 uppercase text-xs tracking-widest">${hireData[4].v}</p>
                         </div>
-                        <button onclick="printWaybill()" class="bg-blue-900 text-white px-6 py-3 rounded-xl font-black text-xs uppercase hover:bg-orange-500 transition-all">
-                            <i class="fas fa-print mr-2"></i> Print Official Waybill
-                        </button>
+                        <button onclick="printProfessionalWaybill(true)" class="bg-blue-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase shadow-lg hover:bg-orange-500 transition-all">Print Tracked Waybill</button>
                     </div>
                 `;
-            } else {
-                alert("Reference ID not found.");
-            }
-        } catch (e) {
-            alert("Connection error.");
-        } finally {
-            btn.innerHTML = "Verify Status";
-        }
+            } else { alert("Reference ID not found."); }
+        } catch (e) { alert("Error connecting to database."); }
+        finally { document.getElementById('trackBtn').innerHTML = "Verify Status"; }
     }
 
-    // --- PRINT LOGIC (Matches Booking.html structure) ---
-    function printWaybill() {
-        if (!activeData) return;
+    // --- 5. PRINT ENGINE ---
+    function printProfessionalWaybill(fromTracking = false) {
+        document.getElementById('wb_date').innerText = "Issued: " + new Date().toLocaleString();
+        
+        if(fromTracking && hireData) {
+            document.getElementById('wb_id').innerText = "ID: " + hireData[1].v;
+            document.getElementById('wb_name').innerText = hireData[2].v;
+            document.getElementById('wb_phone').innerText = "Phone: " + hireData[3].v;
+            document.getElementById('wb_car').innerText = hireData[4].v;
+            document.getElementById('wb_duration').innerText = hireData[5].v + " DAYS";
+            document.getElementById('wb_pickup').innerText = hireData[6] ? hireData[6].v : "DND Hub / Field Pickup";
+        } else {
+            const f = document.getElementById('hireForm');
+            document.getElementById('wb_id').innerText = "ID: " + activeID;
+            document.getElementById('wb_name').innerText = f.FullName.value;
+            document.getElementById('wb_phone').innerText = "Phone: " + f.Phone.value;
+            document.getElementById('wb_car').innerText = document.getElementById('carSelect').options[document.getElementById('carSelect').selectedIndex].text;
+            document.getElementById('wb_duration').innerText = f.Duration.value + " DAYS";
+            document.getElementById('wb_pickup').innerText = f.Location.value;
+        }
 
-        // Populate the waybill template
-        document.getElementById('wb_id').innerText = "ID: " + activeData[1].v;
-        document.getElementById('wb_date').innerText = "Date: " + new Date().toLocaleDateString('en-NG');
-        document.getElementById('wb_name').innerText = activeData[2].v;
-        document.getElementById('wb_phone').innerText = "PH: " + activeData[3].v;
-        document.getElementById('wb_service').innerText = activeData[4].v;
-        document.getElementById('wb_location').innerText = activeData[6] ? activeData[6].v : "DND Hub / Pickup point";
-
-        // Trigger native print dialog
         window.print();
     }
 </script>
