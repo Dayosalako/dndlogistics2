@@ -346,7 +346,7 @@
 
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
-  AOS.init({ duration: 900, once: true });
+   
   function secureAdminAccess() {
     const accessKey = prompt("System Authentication Required\nEnter Admin Key:");
     
@@ -413,53 +413,63 @@
     finally { fbBtn.innerHTML = "Send Message"; }
   });
 
-   // LIVE DATE & TIME
-function updateDateTime() {
-  const now = new Date();
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  };
-  document.getElementById("liveDateTime").innerHTML = now.toLocaleString("en-NG", options);
+   // --- 1. CLOCK LOGIC ---
+function updateClock() {
+    const clockElement = document.getElementById('nigeria-clock');
+    if (clockElement) {
+        const now = new Date();
+        const timeString = now.toLocaleString('en-NG', { 
+            timeZone: 'Africa/Lagos', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        });
+        clockElement.innerText = "Abuja Time: " + timeString;
+    }
 }
-setInterval(updateDateTime, 1000);
-updateDateTime();
+setInterval(updateClock, 1000);
+updateClock();
 
-// MOBILE MENU LOGIC
+// --- 2. MOBILE MENU LOGIC (STABILIZED) ---
 const menuBtn = document.getElementById('menu-btn');
 const closeBtn = document.getElementById('close-btn');
 const mobileMenu = document.getElementById('mobile-menu');
 
-// Use a function to toggle to ensure it overrides Tailwind
-menuBtn.onclick = () => {
-    mobileMenu.classList.remove('translate-x-full');
-    document.body.style.overflow = 'hidden'; // Prevent background scroll
-};
+// Use direct class manipulation to ensure Tailwind 'translate' is overridden
+if(menuBtn && mobileMenu) {
+    menuBtn.onclick = () => {
+        mobileMenu.classList.remove('translate-x-full');
+        document.body.style.overflow = 'hidden'; // Stop background scrolling
+    };
+}
 
-const closeMenu = () => {
-    mobileMenu.classList.add('translate-x-full');
-    document.body.style.overflow = ''; // Restore scroll
-};
+if(closeBtn) {
+    closeBtn.onclick = () => {
+        mobileMenu.classList.add('translate-x-full');
+        document.body.style.overflow = ''; // Restore scrolling
+    };
+}
 
-closeBtn.onclick = closeMenu;
-
-// Close menu when a link is clicked
-document.querySelectorAll('.mobile-link').forEach(link => {
-    link.onclick = closeMenu;
+// Close menu when any link inside it is clicked
+document.querySelectorAll('#mobile-menu a').forEach(link => {
+    link.onclick = () => {
+        mobileMenu.classList.add('translate-x-full');
+        document.body.style.overflow = '';
+    };
 });
 
-// REMOVED: liveDateTime error-causing script (ID does not exist in HTML)
-// If you want a live date, add <div id="liveDateTime"></div> to your footer.                                                                                
-  
+// --- 5. AOS ANIMATION INIT ---
+AOS.init({ 
+    duration: 1000, 
+    once: true,
+    offset: 120 
+});
    
 </script>
 
 </body>
 </html>
+
 
 
 
