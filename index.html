@@ -320,6 +320,22 @@
     res.innerText = "₦ " + ((d * 150) + (w * 350)).toLocaleString();
   }
 
+  function toggleAbout() {
+  const extra = document.getElementById('extra-about');
+  const btn = document.getElementById('aboutBtn');
+  const icon = document.getElementById('aboutIcon');
+  
+  if (extra.classList.contains('hidden')) {
+    extra.classList.remove('hidden');
+    btn.querySelector('span').innerText = "Show Less";
+    icon.style.transform = "rotate(180deg)";
+  } else {
+    extra.classList.add('hidden');
+    btn.querySelector('span').innerText = "Read Full Profile";
+    icon.style.transform = "rotate(0deg)";
+  }
+}
+
   async function trackPackage() {
     const input = document.getElementById('trackingInput').value.trim().toUpperCase();
     const statusDiv = document.getElementById('trackingStatus');
@@ -362,3 +378,4 @@
 </body>
 
 </html>
+
