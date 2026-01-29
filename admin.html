@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+    /* Prevent "flashing" of content before the password prompt */
+    body { opacity: 0; transition: opacity 0.5s ease; }
+    .authorized { opacity: 1 !important; }
+  </style>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DND HQ | Master Control</title>
@@ -106,7 +112,28 @@
     </main>
 
     <script>
-    
+    function checkAdminLock() {
+        const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
+        
+        // This must match the keys in your index.html
+        const authorizedAdmins = {
+            "Salako2020.": "Dayo salako",
+            "Baba-Tee2020": "Taiye",
+            "Boluwatife2020.": "Boluwatife"
+        };
+
+        if (authorizedAdmins[accessKey]) {
+            alert("Identity Verified: Welcome " + authorizedAdmins[accessKey]);
+            document.documentElement.classList.add('authorized');
+            document.body.classList.add('authorized');
+        } else {
+            alert("Access Denied: Invalid Credentials.");
+            window.location.href = "index.html"; // Kick them back to home
+        }
+    }
+
+    // Run the check as soon as the window loads
+    window.onload = checkAdminLock;
 
         function logout() { sessionStorage.removeItem("dnd_admin_auth"); window.location.reload(); }
 
@@ -193,4 +220,5 @@
     </script>
 </body>
 </html>
+
 
