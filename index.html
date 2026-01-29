@@ -76,7 +76,7 @@
   </div>
 </nav>
 
-<div id="mobile-menu" class="fixed inset-0 bg-blue-950 flex flex-col p-8 translate-x-full transition-transform duration-300 ease-in-out">
+<div id="mobile-menu" class="fixed inset-0 bg-blue-950 flex flex-col p-8 translate-x-full transition-transform duration-300 ease-in-out" style="z-index: 2000;">
     <div class="flex justify-between items-center mb-12">
         <div class="flex flex-col">
             <span class="font-black text-2xl text-white uppercase tracking-tighter">DND <span class="text-orange-500">GLOBAL</span></span>
@@ -88,25 +88,29 @@
     </div>
 
     <nav class="flex flex-col gap-6">
-        <a href="index.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4 hover:text-orange-500">Home</a>
-        <a href="haulage.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4 hover:text-orange-500">Haulage</a>
-        <a href="warehousing.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4 hover:text-orange-500">Warehousing</a>
-        <a href="car-hire.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4 hover:text-orange-500">Car Hire</a>
-        <a href="partnership.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4 hover:text-orange-500">Partnership</a>
+        <a href="index.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4">Home</a>
+        <a href="haulage.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4">Haulage</a>
+        <a href="warehousing.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4">Warehousing</a>
+        <a href="car-hire.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4">Car Hire</a>
+        <a href="partnership.html" class="text-xl font-bold text-white uppercase tracking-widest border-b border-white/10 pb-4">Partnership</a>
         
-        <a href="booking.html" class="mt-4 inline-block bg-orange-500 text-white text-center py-5 rounded-2xl font-black uppercase tracking-widest shadow-lg active:scale-95 transition-all">
+        <a href="booking.html" class="mt-4 inline-block bg-orange-500 text-white text-center py-5 rounded-2xl font-black uppercase tracking-widest shadow-lg">
             Book Now
         </a>
     </nav>
 
     <div class="mt-auto pt-10 border-t border-white/10">
-        <p class="text-white/50 text-[10px] font-bold uppercase tracking-widest mb-4">Quick Support</p>
-        <div class="flex gap-4">
-            <a href="tel:+2348146143628" class="text-white text-lg"><i class="fas fa-phone-alt"></i></a>
-            <a href="https://wa.me/2348146143628" class="text-white text-lg"><i class="fab fa-whatsapp"></i></a>
+        <div class="flex justify-between items-center">
+            <div class="flex gap-6">
+                <a href="tel:+2348146143628" class="text-white text-xl"><i class="fas fa-phone-alt"></i></a>
+                <a href="https://wa.me/2348146143628" class="text-white text-xl"><i class="fab fa-whatsapp"></i></a>
+            </div>
+            <a href="javascript:void(0)" onclick="secureAdminAccess()" class="text-white/30 text-[10px] font-black uppercase tracking-widest flex items-center">
+                <i class="fas fa-lock mr-2"></i> Admin
+            </a>
         </div>
     </div>
-</div>
+</div>  
 
 <header class="relative bg-cover bg-center text-white min-h-[90vh] flex items-center" style="background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000');">
   <div class="absolute inset-0 bg-blue-900/85 mix-blend-multiply"></div>
@@ -439,6 +443,7 @@
 
 </body>
 </html>
+
 
 
 
