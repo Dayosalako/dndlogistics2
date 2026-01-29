@@ -321,6 +321,11 @@
             <li><a href="warehousing.html" class="hover:text-white transition">Warehousing</a></li>
             <li><a href="booking.html" class="hover:text-white transition">Book Now</a></li>
             <li><a href="terms.html" class="hover:text-white transition">Privacy Policy</a></li>
+          <li>
+  <a href="javascript:void(0)" onclick="secureAdminAccess()" class="text-gray-500 hover:text-orange-500 transition-all text-[10px] font-black uppercase tracking-widest flex items-center">
+    <i class="fas fa-fingerprint mr-2 opacity-30"></i> Staff Portal
+  </a>
+</li>
         </ul>
       </div>
     </div>
@@ -335,7 +340,24 @@
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
   AOS.init({ duration: 900, once: true });
-  
+  function secureAdminAccess() {
+    const accessKey = prompt("System Authentication Required\nEnter Admin Key:");
+    
+    // Define your 3 Admin Logins here
+    const authorizedAdmins = {
+        "DND_Admin_Alpha": "Dayosalako",
+        "DND_Admin_Beta":  "Admin Two",
+        "DND_Admin_Gamma": "Admin Three"
+    };
+
+    if (authorizedAdmins[accessKey]) {
+        alert("Welcome, " + authorizedAdmins[accessKey]);
+        // Redirect to your obscurely named admin page
+        window.location.href = "admin.html"; 
+    } else if (accessKey !== null) {
+        alert("Access Denied: Unauthorized Key.");
+    }
+}
   function updateClock() {
     const now = new Date();
     const timeString = now.toLocaleString('en-NG', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -399,5 +421,6 @@
 
 </body>
 </html>
+
 
 
