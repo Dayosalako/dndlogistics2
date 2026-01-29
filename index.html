@@ -36,7 +36,7 @@
 <body class="bg-[#F8FAFC] text-slate-900 overflow-x-hidden">
 
 <div id="promo-modal" class="fixed inset-0 bg-blue-900/90 backdrop-blur-md items-center justify-center px-6">
-    <div class="bg-white max-w-lg w-full rounded-[3rem] overflow-hidden shadow-2xl relative animate-zoom-in">
+    <div class="bg-white max-w-lg w-full rounded-[3rem] overflow-hidden shadow-2xl relative">
         <button onclick="closePromo()" class="absolute top-6 right-6 text-slate-400 hover:text-blue-900"><i class="fas fa-times text-xl"></i></button>
         <div class="p-12 text-center">
             <div class="w-20 h-20 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
@@ -148,23 +148,8 @@
       </div>
       <h2 class="text-4xl md:text-5xl font-black mb-8 text-blue-900 uppercase tracking-tighter leading-none">Delivering <br><span class="text-orange-500">Peace of Mind</span></h2>
       
-      <div class="prose prose-slate max-w-none text-slate-600 font-medium leading-relaxed space-y-6">
-        <p>DND Global Logistics Ltd is a trusted logistics partner committed to delivering efficient, secure, and customer-focused logistics solutions across Nigeria. We understand that timely and reliable movement of goods is critical to business success, which is why we tailor our services to meet the unique needs of each client, whether individuals, NGOs, Companies SMEs, corporate organizations or large enterprises.</p>
-        
-        <p>With extensive nationwide inter-state coverage and strong intra-state operations in <b>Kebbi, Sokoto, Borno, Zamfara, and Abuja</b>, we are strategically positioned to move goods seamlessly across regions. Our operations are built to ensure speed, safety, and accuracy.</p>
-
-        <div id="extra-about" class="hidden space-y-6">
-          <p>Powered by a team of over 50 trained logistics professionals, DND Global Logistics offers a comprehensive suite of services, including fleet transportation, freight forwarding, haulage, courier and express delivery, warehousing, distribution, cargo handling, and dependable last-mile delivery.</p>
-          <p>Beyond transportation, we provide integrated supply-chain solutions designed to help clients reduce costs, improve efficiency, and gain better control over their operations. Our services cover inventory management, order fulfilment, storage solutions, and end-to-end coordination.</p>
-          <p>At DND, reliability is non-negotiable. Our well-maintained fleet, robust infrastructure, and strict adherence to regulatory and safety standards ensure every shipment is handled with care and professionalism.</p>
-        </div>
-      </div>
-
-      <button onclick="toggleAbout()" id="aboutBtn" class="mt-8 flex items-center gap-2 text-blue-900 font-black uppercase text-xs tracking-[0.2em] hover:text-orange-500 transition-all">
-        <span>Read Full Profile</span>
-        <i class="fas fa-chevron-down text-[10px] transition-transform" id="aboutIcon"></i>
-      </button>
-
+      <p class="text-slate-500 font-medium leading-relaxed mb-6">DND Global Logistics Ltd is a trusted logistics partner committed to delivering efficient, secure, and customer-focused logistics solutions across Nigeria.</p>
+      
       <div class="flex gap-4 mt-12">
           <div class="text-center bg-blue-50 p-6 rounded-3xl flex-1 border border-blue-100">
             <span class="block text-3xl font-black text-blue-900 uppercase">50+</span>
@@ -269,7 +254,7 @@
 <script>
   AOS.init({ duration: 800, once: true });
 
-  // SWIPER INITIALIZATION
+  // SWIPER
   new Swiper('.serviceSwiper', {
     slidesPerView: 1,
     spaceBetween: 30,
@@ -277,25 +262,9 @@
     breakpoints: { 768: { slidesPerView: 3 } }
   });
 
-  // PROMO MODAL LOGIC
+  // PROMO MODAL
   setTimeout(() => { document.getElementById('promo-modal').classList.add('active'); }, 5000);
   function closePromo() { document.getElementById('promo-modal').classList.remove('active'); }
-
-  // ABOUT US TOGGLE
-  function toggleAbout() {
-    const extra = document.getElementById('extra-about');
-    const btn = document.getElementById('aboutBtn');
-    const icon = document.getElementById('aboutIcon');
-    if (extra.classList.contains('hidden')) {
-      extra.classList.remove('hidden');
-      btn.querySelector('span').innerText = "Show Less";
-      icon.style.transform = "rotate(180deg)";
-    } else {
-      extra.classList.add('hidden');
-      btn.querySelector('span').innerText = "Read Full Profile";
-      icon.style.transform = "rotate(0deg)";
-    }
-  }
 
   // MOBILE MENU CONTROLS
   const menuBtn = document.getElementById('menu-btn');
@@ -309,7 +278,7 @@
       link.onclick = () => mobileMenu.classList.remove('mobile-menu-open');
   });
 
-  // TRACKING LOGIC (RESTORED)
+  // TRACKING LOGIC
   async function trackCargo() {
     const input = document.getElementById('trackInput').value.trim().toUpperCase();
     const btn = document.getElementById('trackBtn');
@@ -335,11 +304,11 @@
         } else {
             resultDiv.innerHTML = `<p class="mt-8 text-red-500 font-black text-center text-xs uppercase">Tracking ID Not Found</p>`;
         }
-    } catch(e) { alert("Network Error. Check connection."); }
+    } catch(e) { alert("Network Error."); }
     finally { btn.innerHTML = "Trace Now"; }
   }
 
-  // FEEDBACK LOGIC (RESTORED)
+  // FEEDBACK LOGIC
   const feedbackForm = document.getElementById('feedbackForm');
   feedbackForm.addEventListener('submit', async function(e) {
     e.preventDefault();
