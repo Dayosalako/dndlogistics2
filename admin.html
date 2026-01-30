@@ -129,6 +129,9 @@
     </main>
 
     <script>
+        // UPDATED MASTER SCRIPT URL
+        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbwyORD8ASwBhumzVUn7pw4S6oZv3bkaA_0BrU4RO4W_eZKmBYC4uLQRj5-VXg6QoaBifg/exec';
+
         function checkAdminLock() {
             const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
             const authorizedAdmins = {
@@ -183,9 +186,9 @@
             if (currentTab === 'Database') {
                 header.innerHTML = `<tr class="p-6"><th>ID</th><th>Sender</th><th>Status</th><th class="text-right p-6">Waybill</th></tr>`;
             } else if (currentTab === 'CarHire') {
-                header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Waybill</th></tr>`;
+                header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
             } else if (currentTab === 'drivers') {
-                header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Plate</th><th>Status</th><th class="text-right p-6">Tracking</th></tr>`;
+                header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Plate</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
             }
 
             allData.reverse().forEach((row, idx) => {
@@ -197,16 +200,30 @@
                 if (currentTab === 'Database') {
                     tr.innerHTML = `<td class="p-6 font-black text-blue-900">${c[0].v}</td><td class="p-6 font-bold">${c[3].v}</td><td class="p-6 text-xs uppercase font-black text-orange-500">${c[1].v}</td><td class="p-6 text-right"><button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button></td>`;
                 } else if (currentTab === 'CarHire') {
-                    tr.innerHTML = `<td class="p-6 font-black text-blue-900">${c[1].v}</td><td class="p-6 font-bold">${c[2].v}</td><td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td><td class="p-6 text-right"><button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button></td>`;
+                    tr.innerHTML = `
+                        <td class="p-6 font-black text-blue-900">${c[1].v}</td>
+                        <td class="p-6 font-bold">${c[2].v}</td>
+                        <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td>
+                        <td class="p-6 text-right flex justify-end gap-2">
+                            <button onclick="allocateDriver('${c[1].v}')" class="bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-orange-600">
+                                <i class="fas fa-user-plus"></i> ASSIGN
+                            </button>
+                            <button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs">
+                                <i class="fas fa-print"></i>
+                            </button>
+                        </td>`;
                 } else if (currentTab === 'drivers') {
                     const lat = c[5] ? c[5].v : 0;
                     const lng = c[6] ? c[6].v : 0;
                     const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
+                    const activeJob = c[7] ? c[7].v : 'NONE';
+                    
                     tr.innerHTML = `
                         <td class="p-6 font-black text-blue-900">${c[0].v}</td>
                         <td class="p-6 font-bold">${c[1].v}</td>
                         <td class="p-6 text-xs font-bold text-slate-500">${c[3].v}</td>
                         <td class="p-6"><span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">${c[4] ? c[4].v : 'OFFLINE'}</span></td>
+                        <td class="p-6"><span class="text-xs font-black ${activeJob === 'NONE' ? 'text-slate-300' : 'text-blue-600'}">${activeJob}</span></td>
                         <td class="p-6 text-right">
                             <a href="${mapLink}" target="_blank" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs hover:bg-orange-500 transition">
                                 <i class="fas fa-map-marker-alt"></i> TRACK
@@ -215,6 +232,24 @@
                 }
                 body.appendChild(tr);
             });
+        }
+
+        async function allocateDriver(hireId) {
+            const driverId = prompt("Enter Driver ID to assign to Job " + hireId);
+            if (!driverId) return;
+
+            const confirmBtn = confirm(`Assign ${hireId} to ${driverId.toUpperCase()}?`);
+            if(!confirmBtn) return;
+
+            try {
+                await fetch(`${MASTER_SCRIPT}?isAssign=true&DriverID=${driverId}&HireID=${hireId}`, {
+                    method: 'POST',
+                    mode: 'no-cors'
+                });
+                alert("Request Sent to Cloud. Refresh in 5 seconds to see update.");
+            } catch (e) {
+                alert("System Error during allocation.");
+            }
         }
 
         function printWaybillFromAdmin(idx) {
