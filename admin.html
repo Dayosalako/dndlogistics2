@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <style>
-    /* Prevent "flashing" of content before the password prompt */
-    body { opacity: 0; transition: opacity 0.5s ease; }
-    .authorized { opacity: 1 !important; }
-  </style>
+        /* Prevent "flashing" of content before the password prompt */
+        body { opacity: 0; transition: opacity 0.5s ease; }
+        .authorized { opacity: 1 !important; }
+    </style>
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,7 +17,7 @@
         body { background: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
         .sidebar-btn.active { background: #1e3a8a; color: white; border-left: 4px solid #f97316; }
         
-        /* WAYBILL PRINT STYLES (MATCHING BOOKING PAGE) */
+        /* WAYBILL PRINT STYLES */
         #waybill-area { display: none; }
         @media print {
             body * { visibility: hidden; }
@@ -70,21 +70,14 @@
             <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-CarHire" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn active">
                 <i class="fas fa-car-side"></i> Executive Hire
             </button>
+            <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-drivers" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn">
+                <i class="fas fa-satellite-dish"></i> Fleet Radar
+            </button>
             <button onclick="logout()" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-red-500 hover:bg-red-50 mt-10">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </nav>
     </aside>
-
-    <div class="hidden md:flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
-    <div class="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white text-xs">
-        <i class="fas fa-user-shield"></i>
-    </div>
-    <div>
-        <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none">Active Session</p>
-        <p id="adminDisplayName" class="text-sm font-bold text-blue-900">Authenticating...</p>
-    </div>
-    </div>
 
     <main class="flex-1 flex flex-col h-screen overflow-hidden">
         <header class="bg-white border-b border-slate-200 p-8 flex justify-between items-center">
@@ -95,11 +88,24 @@
                     <a href="https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/edit" target="_blank" class="text-[10px] font-black text-orange-600 hover:underline"><i class="fas fa-table mr-1"></i> HIRE SHEET</a>
                 </div>
             </div>
-            <div class="flex gap-3">
-                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search..." class="bg-slate-100 rounded-xl px-6 py-3 text-sm outline-none w-64 focus:ring-2 ring-orange-500">
-                <button onclick="syncData()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg shadow-orange-200">
-                    <i id="sync-icon" class="fas fa-sync-alt mr-2"></i> REFRESH
-                </button>
+
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
+                    <div class="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white text-xs">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none">Active Session</p>
+                        <p id="adminDisplayName" class="text-sm font-bold text-blue-900">Authenticating...</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search..." class="bg-slate-100 rounded-xl px-6 py-3 text-sm outline-none w-64 focus:ring-2 ring-orange-500">
+                    <button onclick="syncData()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg shadow-orange-200">
+                        <i id="sync-icon" class="fas fa-sync-alt mr-2"></i> REFRESH
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -109,6 +115,7 @@
                 <div class="flex gap-4">
                     <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">ITEM TRACKER</button>
                     <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HIRE TRACKER</button>
+                    <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">FLEET RADAR</button>
                 </div>
             </div>
 
@@ -122,41 +129,34 @@
     </main>
 
     <script>
-                        
-  function checkAdminLock() {
-    const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
-    
-    const authorizedAdmins = {
-        "Salako2020.": "Dayo salako",
-        "Baba-Tee2020": "Taiye",
-        "Boluwatife2020.": "Boluwatife"
-    };
+        function checkAdminLock() {
+            const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
+            const authorizedAdmins = {
+                "Salako2020.": "Dayo salako",
+                "Baba-Tee2020": "Taiye",
+                "Boluwatife2020.": "Boluwatife"
+            };
 
-    if (authorizedAdmins[accessKey]) {
-        // 1. Identify the admin
-        const adminName = authorizedAdmins[accessKey];
-        
-        // 2. Display the name in the header
-        document.getElementById('adminDisplayName').innerText = adminName;
-        
-        // 3. Show the page
-        document.documentElement.classList.add('authorized');
-        document.body.classList.add('authorized');
-        
-        console.log("Session started for: " + adminName);
-    } else {
-        alert("Access Denied: Invalid Credentials.");
-        window.location.href = "index.html";
-    }
-}
-        // --- 2. DATA HANDLING ---
+            if (authorizedAdmins[accessKey]) {
+                document.getElementById('adminDisplayName').innerText = authorizedAdmins[accessKey];
+                document.documentElement.classList.add('authorized');
+                document.body.classList.add('authorized');
+                syncData();
+            } else {
+                alert("Access Denied: Invalid Credentials.");
+                window.location.href = "index.html";
+            }
+        }
+
+        window.onload = checkAdminLock;
+
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         let currentTab = 'CarHire';
         let allData = [];
 
         async function syncData() {
             const icon = document.getElementById('sync-icon');
-            icon.classList.add('fa-spin');
+            if(icon) icon.classList.add('fa-spin');
             try {
                 const res = await fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`);
                 const text = await res.text();
@@ -164,13 +164,14 @@
                 allData = json.table.rows;
                 renderTable();
             } catch (e) { console.error(e); }
-            finally { icon.classList.remove('fa-spin'); }
+            finally { if(icon) icon.classList.remove('fa-spin'); }
         }
 
         function switchTab(tab, id) {
             currentTab = tab; currentSheetID = id;
             document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${tab}`).classList.add('active');
+            const btn = document.getElementById(`btn-${tab}`);
+            if(btn) btn.classList.add('active');
             syncData();
         }
 
@@ -181,8 +182,10 @@
 
             if (currentTab === 'Database') {
                 header.innerHTML = `<tr class="p-6"><th>ID</th><th>Sender</th><th>Status</th><th class="text-right p-6">Waybill</th></tr>`;
-            } else {
+            } else if (currentTab === 'CarHire') {
                 header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Waybill</th></tr>`;
+            } else if (currentTab === 'drivers') {
+                header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Plate</th><th>Status</th><th class="text-right p-6">Tracking</th></tr>`;
             }
 
             allData.reverse().forEach((row, idx) => {
@@ -193,31 +196,42 @@
                 
                 if (currentTab === 'Database') {
                     tr.innerHTML = `<td class="p-6 font-black text-blue-900">${c[0].v}</td><td class="p-6 font-bold">${c[3].v}</td><td class="p-6 text-xs uppercase font-black text-orange-500">${c[1].v}</td><td class="p-6 text-right"><button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button></td>`;
-                } else {
+                } else if (currentTab === 'CarHire') {
                     tr.innerHTML = `<td class="p-6 font-black text-blue-900">${c[1].v}</td><td class="p-6 font-bold">${c[2].v}</td><td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td><td class="p-6 text-right"><button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button></td>`;
+                } else if (currentTab === 'drivers') {
+                    const lat = c[5] ? c[5].v : 0;
+                    const lng = c[6] ? c[6].v : 0;
+                    const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
+                    tr.innerHTML = `
+                        <td class="p-6 font-black text-blue-900">${c[0].v}</td>
+                        <td class="p-6 font-bold">${c[1].v}</td>
+                        <td class="p-6 text-xs font-bold text-slate-500">${c[3].v}</td>
+                        <td class="p-6"><span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">${c[4] ? c[4].v : 'OFFLINE'}</span></td>
+                        <td class="p-6 text-right">
+                            <a href="${mapLink}" target="_blank" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs hover:bg-orange-500 transition">
+                                <i class="fas fa-map-marker-alt"></i> TRACK
+                            </a>
+                        </td>`;
                 }
                 body.appendChild(tr);
             });
         }
 
-        // --- 3. THE PRINT ENGINE (MATCHES BOOKING PAGE) ---
         function printWaybillFromAdmin(idx) {
             const row = allData[idx].c;
-            
             if (currentTab === 'Database') {
                 document.getElementById('wb_id').innerText = "TRACKING: " + row[0].v;
                 document.getElementById('wb_name').innerText = row[3].v;
                 document.getElementById('wb_contact').innerText = "Phone: " + (row[4] ? row[4].v : 'N/A');
                 document.getElementById('wb_route').innerText = `FROM: ${row[7].v} -> TO: ${row[8].v}`;
                 document.getElementById('wb_details').innerText = row[9] ? row[9].v : "No Item Description";
-            } else {
+            } else if (currentTab === 'CarHire') {
                 document.getElementById('wb_id').innerText = "HIRE ID: " + row[1].v;
                 document.getElementById('wb_name').innerText = row[2].v;
                 document.getElementById('wb_contact').innerText = "Phone: " + row[3].v;
                 document.getElementById('wb_route').innerText = `CAR TYPE: ${row[4].v} (${row[5].v} DAYS)`;
                 document.getElementById('wb_details').innerText = row[6] ? "Location: " + row[6].v : "Executive Fleet Service";
             }
-
             document.getElementById('wb_date').innerText = "Issued: " + new Date().toLocaleString();
             window.print();
         }
@@ -228,11 +242,7 @@
             for (let r of rows) { r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none"; }
         }
 
-        syncData();
+        function logout() { window.location.href = "index.html"; }
     </script>
 </body>
 </html>
-
-
-
-
