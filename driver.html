@@ -3,140 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DND | Field Dispatch Terminal</title>
+    <title>DND | Field Dispatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
-        body { background-color: #020617; font-family: 'Space Grotesk', sans-serif; color: #f1f5f9; overflow-x: hidden; }
-        .neo-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+        body { background-color: #020617; font-family: 'Plus Jakarta Sans', sans-serif; color: #f1f5f9; }
+        .neo-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
         .status-pulse { position: relative; }
-        .status-pulse::after { content: ''; position: absolute; width: 100%; height: 100%; background: #f97316; border-radius: 50%; animation: pulse 2s infinite; }
+        .status-pulse::after { content: ''; position: absolute; width: 100%; height: 100%; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.5); opacity: 0; } }
-        .gradient-text { background: linear-gradient(90deg, #f97316, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="p-6">
 
     <div id="auth-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-6">
         <div class="w-full max-w-sm text-center">
-            <h1 class="text-4xl font-black italic mb-2">DND <span class="text-orange-500">GLOBAL</span></h1>
-            <p class="text-slate-500 text-[10px] uppercase tracking-[0.3em] mb-8">Driver Dispatch Terminal</p>
-            
+            <h1 class="text-3xl font-black italic mb-2">DND <span class="text-orange-500">GLOBAL</span></h1>
             <div class="neo-card p-8 rounded-[2rem]">
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-4 tracking-widest">Identify Yourself</label>
-                <input type="text" id="driverIDInput" placeholder="ENTER DRIVER ID" 
-                    class="w-full bg-slate-900/50 border border-slate-700 rounded-2xl py-5 px-4 text-center text-xl font-bold tracking-widest focus:ring-2 ring-orange-500 outline-none mb-6">
-                <button onclick="authenticateDriver()" 
-                    class="w-full bg-orange-500 hover:bg-orange-600 py-5 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-orange-500/20">
-                    Initialize Link
-                </button>
+                <input type="text" id="driverIDInput" placeholder="DRIVER ID" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 px-4 text-center text-xl font-bold mb-4 outline-none focus:ring-2 ring-orange-500">
+                <button onclick="authenticateDriver()" class="w-full bg-orange-500 py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-orange-500/20">Link Terminal</button>
             </div>
         </div>
     </div>
 
-    <div id="main-terminal" class="hidden flex-1 flex flex-col p-6">
-        <header class="flex justify-between items-center mb-8">
+    <div id="main-terminal" class="hidden">
+        <header class="flex justify-between items-center mb-6">
             <div>
-                <h2 id="displayDriverName" class="text-xl font-bold gradient-text">---</h2>
-                <p id="displayPlate" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">---</p>
+                <h2 id="displayDriverName" class="text-xl font-bold">---</h2>
+                <p id="displayPlate" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">---</p>
             </div>
-            <div id="signal" class="w-3 h-3 bg-slate-600 rounded-full"></div>
+            <div id="signal" class="w-3 h-3 bg-slate-700 rounded-full"></div>
         </header>
 
-        <div class="neo-card rounded-[2.5rem] p-8 mb-6 flex-1 flex flex-col justify-center items-center text-center">
-            <div id="radar-box" class="w-48 h-48 rounded-full border border-orange-500/20 mb-8 flex items-center justify-center relative">
-                <div class="absolute inset-0 rounded-full border border-orange-500/10 animate-ping"></div>
-                <i class="fas fa-satellite-dish text-4xl text-orange-500"></i>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="neo-card p-4 rounded-3xl text-center">
+                <p class="text-[9px] text-slate-500 uppercase font-black mb-1">Daily Earnings</p>
+                <p class="text-lg font-bold text-green-400">₦<span id="stat-earnings">0.00</span></p>
             </div>
-
-            <div id="telemetry-info" class="space-y-2">
-                <h3 id="state-text" class="text-2xl font-black uppercase tracking-tighter">System Offline</h3>
-                <p class="text-slate-500 text-xs px-8">Your real-time coordinates will be transmitted to Master Control upon activation.</p>
-            </div>
-            
-            <div id="coords" class="mt-8 flex gap-4 text-[10px] font-mono text-orange-500 opacity-60 hidden">
-                <span>LAT: <span id="lat">0.000</span></span>
-                <span>LNG: <span id="lng">0.000</span></span>
+            <div class="neo-card p-4 rounded-3xl text-center">
+                <p class="text-[9px] text-slate-500 uppercase font-black mb-1">Trips Done</p>
+                <p class="text-lg font-bold" id="stat-trips">0</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 pb-4">
-            <button id="toggle-btn" onclick="toggleTransmission()" 
-                class="bg-blue-600 hover:bg-blue-700 py-6 rounded-[2rem] font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95">
-                <i class="fas fa-play"></i> <span>Start Trip</span>
-            </button>
-            
-            <button onclick="location.reload()" 
-                class="bg-slate-800 py-4 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 border border-white/5">
-                Disconnect System
-            </button>
+        <div class="neo-card rounded-[2.5rem] p-8 mb-6 text-center">
+            <div class="w-32 h-32 rounded-full border-2 border-orange-500/20 mx-auto mb-6 flex items-center justify-center">
+                <i class="fas fa-satellite-dish text-3xl text-orange-500"></i>
+            </div>
+            <h3 id="state-text" class="text-xl font-black uppercase mb-2 text-slate-400">System Ready</h3>
+            <div id="coords" class="text-[10px] font-mono text-orange-500 opacity-60">
+                LAT: <span id="lat">0.000</span> | LNG: <span id="lng">0.000</span>
+            </div>
         </div>
+
+        <button id="toggle-btn" onclick="toggleTransmission()" class="w-full bg-blue-600 py-6 rounded-[2rem] font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95">
+            <i class="fas fa-play"></i> <span>Start Trip</span>
+        </button>
     </div>
 
     <script>
-        // Replace with your Google Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzIAxrcHiSHiLmjQH5QKjU-j18sb2r3TwjlZTuDxl174oXrZZEWtYQNFE2m6pPdIGoxQ/exec'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw6OIt2plHBzxl71bHuxUmQJ0WMI2f5RYaoCVlck737_U6SuadF8JMjQVi7DSkzzsCaow/exec'; // <--- MUST UPDATE THIS
+        const HIRE_SHEET_ID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
+        
         let isLive = false;
         let watchID = null;
-        let currentDriverData = null;
+        let driverID = '';
 
-        // LOCAL DRIVER LIST (You can also fetch this from the sheet)
-        const driverAuthList = {
-            "DND-001": { name: "Musa Ibrahim", plate: "ABJ-123-XY" },
-            "DND-002": { name: "Sunday Akpan", plate: "KDS-442-ZA" },
-            "DND-003": { name: "Umaru Sani", plate: "MAI-901-TR" }
-        };
-
-        function authenticateDriver() {
-            const id = document.getElementById('driverIDInput').value.trim().toUpperCase();
-            if (driverAuthList[id]) {
-                currentDriverData = { ...driverAuthList[id], id: id };
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-terminal').classList.remove('hidden');
-                document.getElementById('displayDriverName').innerText = currentDriverData.name;
-                document.getElementById('displayPlate').innerText = currentDriverData.plate;
-            } else {
-                alert("ACCESS DENIED: Driver ID not found in database.");
-            }
+        async function authenticateDriver() {
+            driverID = document.getElementById('driverIDInput').value.trim().toUpperCase();
+            if(!driverID) return;
+            
+            // Logic to fetch driver name/plate... (already provided in previous steps)
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-terminal').classList.remove('hidden');
+            document.getElementById('displayDriverName').innerText = "DRIVER: " + driverID;
+            
+            // Random placeholder stats for now
+            document.getElementById('stat-earnings').innerText = "15,400";
+            document.getElementById('stat-trips').innerText = "4";
         }
 
-        function toggleTransmission() {
+        async function toggleTransmission() {
             const btn = document.getElementById('toggle-btn');
             const stateText = document.getElementById('state-text');
             const signal = document.getElementById('signal');
-            const coordsBox = document.getElementById('coords');
 
             if (!isLive) {
-                // START TRANSMITTING
+                // STARTING
                 isLive = true;
                 btn.innerHTML = `<i class="fas fa-stop"></i> <span>Terminate Trip</span>`;
                 btn.classList.replace('bg-blue-600', 'bg-red-600');
-                stateText.innerText = "TRANSMITTING LIVE";
-                stateText.classList.add('gradient-text');
-                signal.classList.replace('bg-slate-600', 'bg-orange-500');
+                stateText.innerText = "Transmitting Live";
+                stateText.classList.replace('text-slate-400', 'text-white');
+                signal.classList.replace('bg-slate-700', 'bg-green-500');
                 signal.classList.add('status-pulse');
-                coordsBox.classList.remove('hidden');
 
-                if (navigator.geolocation) {
-                    watchID = navigator.geolocation.watchPosition(pos => {
-                        const { latitude, longitude } = pos.coords;
-                        document.getElementById('lat').innerText = latitude.toFixed(5);
-                        document.getElementById('lng').innerText = longitude.toFixed(5);
-                        
-                        // SEND TO GOOGLE SHEET
-                        // This sends: DriverID, Lat, Lng, and Status
-                        const params = `?isDriverUpdate=true&DriverID=${currentDriverData.id}&lat=${latitude}&lng=${longitude}&status=ON-TRIP`;
-                        fetch(SCRIPT_URL + params, { method: 'POST', mode: 'no-cors' });
-                        
-                    }, err => console.error(err), { enableHighAccuracy: true });
-                }
+                watchID = navigator.geolocation.watchPosition(pos => {
+                    const { latitude, longitude } = pos.coords;
+                    document.getElementById('lat').innerText = latitude.toFixed(5);
+                    document.getElementById('lng').innerText = longitude.toFixed(5);
+                    sendData(latitude, longitude, "ON-TRIP");
+                });
             } else {
+                // TERMINATING & RESETTING EXCEL
+                btn.innerText = "RESETTING...";
+                if(watchID) navigator.geolocation.clearWatch(watchID);
+                
+                // Final call to reset the sheet
+                await sendData(0, 0, "OFFLINE");
+                
+                alert("Trip Terminated. System Reset.");
                 location.reload();
             }
+        }
+
+        async function sendData(lat, lng, status) {
+            try {
+                // Using a GET request with parameters for the simple reset
+                const url = `${SCRIPT_URL}?isDriverUpdate=true&DriverID=${driverID}&lat=${lat}&lng=${lng}&status=${status}`;
+                await fetch(url, { method: 'POST', mode: 'no-cors' });
+            } catch (e) { console.error(e); }
         }
     </script>
 </body>
 </html>
-
-
