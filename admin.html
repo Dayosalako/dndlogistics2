@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOCTYPE html>                    
+  
 <html lang="en">
 <head>
     <style>
@@ -129,155 +130,188 @@
     </main>
 
     <script>
-        // UPDATED MASTER SCRIPT URL
-        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbwyORD8ASwBhumzVUn7pw4S6oZv3bkaA_0BrU4RO4W_eZKmBYC4uLQRj5-VXg6QoaBifg/exec';
+        <script>
+    const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbwyORD8ASwBhumzVUn7pw4S6oZv3bkaA_0BrU4RO4W_eZKmBYC4uLQRj5-VXg6QoaBifg/exec';
+    let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
+    let currentTab = 'CarHire';
+    let allData = [];
+    let driversData = []; // Store driver info to check job status
 
-        function checkAdminLock() {
-            const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
-            const authorizedAdmins = {
-                "Salako2020.": "Dayo salako",
-                "Baba-Tee2020": "Taiye",
-                "Boluwatife2020.": "Boluwatife"
-            };
+    function checkAdminLock() {
+        const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
+        const authorizedAdmins = {
+            "Salako2020.": "Dayo salako",
+            "Baba-Tee2020": "Taiye",
+            "Boluwatife2020.": "Boluwatife"
+        };
 
-            if (authorizedAdmins[accessKey]) {
-                document.getElementById('adminDisplayName').innerText = authorizedAdmins[accessKey];
-                document.documentElement.classList.add('authorized');
-                document.body.classList.add('authorized');
-                syncData();
-            } else {
-                alert("Access Denied: Invalid Credentials.");
-                window.location.href = "index.html";
-            }
-        }
-
-        window.onload = checkAdminLock;
-
-        let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
-        let currentTab = 'CarHire';
-        let allData = [];
-
-        async function syncData() {
-            const icon = document.getElementById('sync-icon');
-            if(icon) icon.classList.add('fa-spin');
-            try {
-                const res = await fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`);
-                const text = await res.text();
-                const json = JSON.parse(text.substring(47).slice(0, -2));
-                allData = json.table.rows;
-                renderTable();
-            } catch (e) { console.error(e); }
-            finally { if(icon) icon.classList.remove('fa-spin'); }
-        }
-
-        function switchTab(tab, id) {
-            currentTab = tab; currentSheetID = id;
-            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            const btn = document.getElementById(`btn-${tab}`);
-            if(btn) btn.classList.add('active');
+        if (authorizedAdmins[accessKey]) {
+            document.getElementById('adminDisplayName').innerText = authorizedAdmins[accessKey];
+            document.documentElement.classList.add('authorized');
+            document.body.classList.add('authorized');
             syncData();
+        } else {
+            alert("Access Denied: Invalid Credentials.");
+            window.location.href = "index.html";
+        }
+    }
+
+    window.onload = checkAdminLock;
+
+    async function syncData() {
+        const icon = document.getElementById('sync-icon');
+        if(icon) icon.classList.add('fa-spin');
+        try {
+            // Fetch Current Tab Data
+            const res = await fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`);
+            const text = await res.text();
+            const json = JSON.parse(text.substring(47).slice(0, -2));
+            allData = json.table.rows;
+
+            // BACKGROUND FETCH: Get driver data to check which jobs are active
+            const dRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=drivers`);
+            const dText = await dRes.text();
+            const dJson = JSON.parse(dText.substring(47).slice(0, -2));
+            driversData = dJson.table.rows;
+
+            renderTable();
+        } catch (e) { console.error(e); }
+        finally { if(icon) icon.classList.remove('fa-spin'); }
+    }
+
+    function switchTab(tab, id) {
+        currentTab = tab; currentSheetID = id;
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById(`btn-${tab}`);
+        if(btn) btn.classList.add('active');
+        syncData();
+    }
+
+    function renderTable() {
+        const header = document.getElementById('tableHeader');
+        const body = document.getElementById('tableBody');
+        body.innerHTML = '';
+
+        if (currentTab === 'Database') {
+            header.innerHTML = `<tr class="p-6"><th>ID</th><th>Sender</th><th>Status</th><th class="text-right p-6">Waybill</th></tr>`;
+        } else if (currentTab === 'CarHire') {
+            header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
+        } else if (currentTab === 'drivers') {
+            header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Plate</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
         }
 
-        function renderTable() {
-            const header = document.getElementById('tableHeader');
-            const body = document.getElementById('tableBody');
-            body.innerHTML = '';
-
+        allData.reverse().forEach((row, idx) => {
+            const c = row.c;
+            if (!c || !c[0]) return;
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50 transition";
+            
             if (currentTab === 'Database') {
-                header.innerHTML = `<tr class="p-6"><th>ID</th><th>Sender</th><th>Status</th><th class="text-right p-6">Waybill</th></tr>`;
-            } else if (currentTab === 'CarHire') {
-                header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
-            } else if (currentTab === 'drivers') {
-                header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Plate</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
-            }
-
-            allData.reverse().forEach((row, idx) => {
-                const c = row.c;
-                if (!c || !c[0]) return;
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `<td class="p-6 font-black text-blue-900">${c[0].v}</td><td class="p-6 font-bold">${c[3].v}</td><td class="p-6 text-xs uppercase font-black text-orange-500">${c[1].v}</td><td class="p-6 text-right"><button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button></td>`;
+            } 
+            
+            else if (currentTab === 'CarHire') {
+                const hireId = c[1].v;
+                // Check if this hireId exists in the drivers' CurrentJob column (Column H / index 7)
+                const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v === hireId);
                 
-                if (currentTab === 'Database') {
-                    tr.innerHTML = `<td class="p-6 font-black text-blue-900">${c[0].v}</td><td class="p-6 font-bold">${c[3].v}</td><td class="p-6 text-xs uppercase font-black text-orange-500">${c[1].v}</td><td class="p-6 text-right"><button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button></td>`;
-                } else if (currentTab === 'CarHire') {
-                    tr.innerHTML = `
-                        <td class="p-6 font-black text-blue-900">${c[1].v}</td>
-                        <td class="p-6 font-bold">${c[2].v}</td>
-                        <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td>
-                        <td class="p-6 text-right flex justify-end gap-2">
-                            <button onclick="allocateDriver('${c[1].v}')" class="bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-orange-600">
-                                <i class="fas fa-user-plus"></i> ASSIGN
-                            </button>
-                            <button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs">
-                                <i class="fas fa-print"></i>
-                            </button>
-                        </td>`;
-                } else if (currentTab === 'drivers') {
-                    const lat = c[5] ? c[5].v : 0;
-                    const lng = c[6] ? c[6].v : 0;
-                    const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
-                    const activeJob = c[7] ? c[7].v : 'NONE';
-                    
-                    tr.innerHTML = `
-                        <td class="p-6 font-black text-blue-900">${c[0].v}</td>
-                        <td class="p-6 font-bold">${c[1].v}</td>
-                        <td class="p-6 text-xs font-bold text-slate-500">${c[3].v}</td>
-                        <td class="p-6"><span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">${c[4] ? c[4].v : 'OFFLINE'}</span></td>
-                        <td class="p-6"><span class="text-xs font-black ${activeJob === 'NONE' ? 'text-slate-300' : 'text-blue-600'}">${activeJob}</span></td>
-                        <td class="p-6 text-right">
-                            <a href="${mapLink}" target="_blank" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs hover:bg-orange-500 transition">
-                                <i class="fas fa-map-marker-alt"></i> TRACK
-                            </a>
-                        </td>`;
+                let actionButton = "";
+                if (assignedDriver) {
+                    // Job is active: Show COMPLETE button
+                    actionButton = `
+                        <button onclick="completeJob('${assignedDriver.c[0].v}', '${hireId}')" class="bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-green-700">
+                            <i class="fas fa-check-circle"></i> DONE
+                        </button>`;
+                } else {
+                    // Job is unassigned: Show ASSIGN button
+                    actionButton = `
+                        <button onclick="allocateDriver('${hireId}')" class="bg-orange-500 text-white px-3 py-2 rounded-lg text-xs font-bold hover:bg-orange-600">
+                            <i class="fas fa-user-plus"></i> ASSIGN
+                        </button>`;
                 }
-                body.appendChild(tr);
-            });
-        }
 
-        async function allocateDriver(hireId) {
-            const driverId = prompt("Enter Driver ID to assign to Job " + hireId);
-            if (!driverId) return;
-
-            const confirmBtn = confirm(`Assign ${hireId} to ${driverId.toUpperCase()}?`);
-            if(!confirmBtn) return;
-
-            try {
-                await fetch(`${MASTER_SCRIPT}?isAssign=true&DriverID=${driverId}&HireID=${hireId}`, {
-                    method: 'POST',
-                    mode: 'no-cors'
-                });
-                alert("Request Sent to Cloud. Refresh in 5 seconds to see update.");
-            } catch (e) {
-                alert("System Error during allocation.");
+                tr.innerHTML = `
+                    <td class="p-6 font-black text-blue-900">${hireId}</td>
+                    <td class="p-6 font-bold">${c[2].v}</td>
+                    <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td>
+                    <td class="p-6 text-right flex justify-end gap-2">
+                        ${actionButton}
+                        <button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs">
+                            <i class="fas fa-print"></i>
+                        </button>
+                    </td>`;
+            } 
+            
+            else if (currentTab === 'drivers') {
+                const lat = c[5] ? c[5].v : 0;
+                const lng = c[6] ? c[6].v : 0;
+                const mapLink = `https://www.google.com/maps?q=${lat},${lng}`;
+                const activeJob = c[7] ? c[7].v : 'NONE';
+                
+                tr.innerHTML = `
+                    <td class="p-6 font-black text-blue-900">${c[0].v}</td>
+                    <td class="p-6 font-bold">${c[1].v}</td>
+                    <td class="p-6 text-xs font-bold text-slate-500">${c[3].v}</td>
+                    <td class="p-6"><span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">${c[4] ? c[4].v : 'OFFLINE'}</span></td>
+                    <td class="p-6"><span class="text-xs font-black ${activeJob === 'NONE' ? 'text-slate-300' : 'text-blue-600'}">${activeJob}</span></td>
+                    <td class="p-6 text-right">
+                        <a href="${mapLink}" target="_blank" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs hover:bg-orange-500 transition">
+                            <i class="fas fa-map-marker-alt"></i> TRACK
+                        </a>
+                    </td>`;
             }
-        }
+            body.appendChild(tr);
+        });
+    }
 
-        function printWaybillFromAdmin(idx) {
-            const row = allData[idx].c;
-            if (currentTab === 'Database') {
-                document.getElementById('wb_id').innerText = "TRACKING: " + row[0].v;
-                document.getElementById('wb_name').innerText = row[3].v;
-                document.getElementById('wb_contact').innerText = "Phone: " + (row[4] ? row[4].v : 'N/A');
-                document.getElementById('wb_route').innerText = `FROM: ${row[7].v} -> TO: ${row[8].v}`;
-                document.getElementById('wb_details').innerText = row[9] ? row[9].v : "No Item Description";
-            } else if (currentTab === 'CarHire') {
-                document.getElementById('wb_id').innerText = "HIRE ID: " + row[1].v;
-                document.getElementById('wb_name').innerText = row[2].v;
-                document.getElementById('wb_contact').innerText = "Phone: " + row[3].v;
-                document.getElementById('wb_route').innerText = `CAR TYPE: ${row[4].v} (${row[5].v} DAYS)`;
-                document.getElementById('wb_details').innerText = row[6] ? "Location: " + row[6].v : "Executive Fleet Service";
-            }
-            document.getElementById('wb_date').innerText = "Issued: " + new Date().toLocaleString();
-            window.print();
-        }
+    async function allocateDriver(hireId) {
+        const driverId = prompt("Enter Driver ID to assign to Job " + hireId);
+        if (!driverId) return;
+        try {
+            await fetch(`${MASTER_SCRIPT}?isAssign=true&DriverID=${driverId}&HireID=${hireId}`, { method: 'POST', mode: 'no-cors' });
+            alert("Job Assigned. System refreshing...");
+            setTimeout(syncData, 2000);
+        } catch (e) { alert("Allocation Error"); }
+    }
 
-        function filterTable() {
-            const val = document.getElementById('searchInput').value.toUpperCase();
-            const rows = document.getElementById('tableBody').getElementsByTagName('tr');
-            for (let r of rows) { r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none"; }
-        }
+    async function completeJob(driverId, hireId) {
+        if(!confirm(`Mark Job ${hireId} as completed? This will free up Driver ${driverId}.`)) return;
+        try {
+            await fetch(`${MASTER_SCRIPT}?isCompleteJob=true&DriverID=${driverId}`, { method: 'POST', mode: 'no-cors' });
+            alert("Job Marked Done.");
+            setTimeout(syncData, 2000);
+        } catch (e) { alert("Completion Error"); }
+    }
 
-        function logout() { window.location.href = "index.html"; }
+    function printWaybillFromAdmin(idx) {
+        const row = allData[idx].c;
+        if (currentTab === 'Database') {
+            document.getElementById('wb_id').innerText = "TRACKING: " + row[0].v;
+            document.getElementById('wb_name').innerText = row[3].v;
+            document.getElementById('wb_contact').innerText = "Phone: " + (row[4] ? row[4].v : 'N/A');
+            document.getElementById('wb_route').innerText = `FROM: ${row[7].v} -> TO: ${row[8].v}`;
+            document.getElementById('wb_details').innerText = row[9] ? row[9].v : "No Item Description";
+        } else if (currentTab === 'CarHire') {
+            document.getElementById('wb_id').innerText = "HIRE ID: " + row[1].v;
+            document.getElementById('wb_name').innerText = row[2].v;
+            document.getElementById('wb_contact').innerText = "Phone: " + row[3].v;
+            document.getElementById('wb_route').innerText = `CAR TYPE: ${row[4].v} (${row[5].v} DAYS)`;
+            document.getElementById('wb_details').innerText = row[6] ? "Location: " + row[6].v : "Executive Fleet Service";
+        }
+        document.getElementById('wb_date').innerText = "Issued: " + new Date().toLocaleString();
+        window.print();
+    }
+
+    function filterTable() {
+        const val = document.getElementById('searchInput').value.toUpperCase();
+        const rows = document.getElementById('tableBody').getElementsByTagName('tr');
+        for (let r of rows) { r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none"; }
+    }
+
+    function logout() { window.location.href = "index.html"; }
+</script>
+  
     </script>
 </body>
 </html>
+
