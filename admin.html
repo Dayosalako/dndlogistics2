@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>
-        /* Prevent "flashing" of content before the password prompt */
-        body { opacity: 0; transition: opacity 0.5s ease; }
-        .authorized { opacity: 1 !important; }
-    </style>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DND HQ | Master Control</title>
@@ -15,9 +9,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { background: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
+        
+        /* Initial state: Hide content until authorized */
+        body { background: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; margin: 0; }
+        #master-content { display: none; }
+        .authorized #master-content { display: flex !important; }
+        .authorized #admin-lock-screen { display: none !important; }
+
         .sidebar-btn.active { background: #1e3a8a; color: white; border-left: 4px solid #f97316; }
         
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         /* WAYBILL PRINT STYLES */
         #waybill-area { display: none; }
         @media print {
@@ -27,132 +33,161 @@
         }
     </style>
 </head>
-<body class="flex min-h-screen">
+<body class="min-h-screen">
 
-    <div id="waybill-area" class="p-8 bg-white border-2 border-dashed border-blue-900 rounded-lg">
-        <div class="flex justify-between items-start border-b-2 border-blue-900 pb-4 mb-6">
-            <div>
-                <h1 class="text-3xl font-black text-blue-900 uppercase">DND GLOBAL</h1>
-                <p class="text-xs font-bold tracking-widest text-orange-500 uppercase">Logistics & Executive Hire</p>
+    <div id="admin-lock-screen" class="fixed inset-0 z-[100] bg-slate-950 flex items-center justify-center p-6">
+        <div class="w-full max-w-md text-center">
+            <div class="mb-8">
+                <div class="w-20 h-20 bg-orange-500 rounded-3xl mx-auto flex items-center justify-center shadow-2xl shadow-orange-500/20 mb-4 rotate-3">
+                    <i class="fas fa-shield-halved text-3xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-black text-white italic">DND <span class="text-orange-500">MASTER</span></h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-2">Restricted Command Center</p>
             </div>
-            <div class="text-right">
-                <p id="wb_id" class="text-xl font-black text-blue-900"></p>
-                <p id="wb_date" class="text-xs font-bold text-slate-500"></p>
+
+            <div class="glass-panel p-8 rounded-[2.5rem] shadow-2xl">
+                <p class="text-slate-500 text-xs font-bold mb-6 uppercase">Identity Verification Required</p>
+                <div class="space-y-4">
+                    <div class="relative">
+                        <i class="fas fa-key absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="password" id="adminPassInput" placeholder="Enter Admin Key" 
+                               class="w-full bg-slate-100 border-none rounded-2xl py-5 pl-14 pr-6 font-bold text-blue-900 outline-none focus:ring-2 ring-orange-500 transition-all">
+                    </div>
+                    <button onclick="verifyAdmin()" class="w-full bg-blue-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-800 transition active:scale-95 shadow-xl shadow-blue-900/20">
+                        Access Terminal
+                    </button>
+                </div>
             </div>
-        </div>
-        <div class="grid grid-cols-2 gap-8 mb-8">
-            <div class="bg-slate-50 p-4 rounded-lg">
-                <h3 class="text-[10px] font-black text-blue-900 uppercase mb-2 border-b border-blue-200">Client / Sender Details</h3>
-                <p id="wb_name" class="font-bold text-sm"></p>
-                <p id="wb_contact" class="text-xs text-slate-600"></p>
-            </div>
-            <div class="bg-slate-50 p-4 rounded-lg">
-                <h3 class="text-[10px] font-black text-blue-900 uppercase mb-2 border-b border-blue-200">Logistics / Route</h3>
-                <p id="wb_route" class="text-xs font-bold"></p>
-            </div>
-        </div>
-        <div class="border-2 border-blue-900 p-4 rounded-lg">
-            <h3 class="text-[10px] font-black text-blue-900 uppercase mb-2">Item Description / Vehicle Details</h3>
-            <p id="wb_details" class="text-sm font-semibold italic text-slate-700"></p>
-        </div>
-        <div class="mt-12 text-center border-t pt-4">
-            <p class="text-[9px] font-bold text-slate-400 uppercase">This is an electronically generated document from DND Master Control</p>
         </div>
     </div>
 
-    <aside class="w-72 bg-white border-r border-slate-200 p-6 flex flex-col hidden lg:flex">
-        <div class="mb-10">
-            <h1 class="text-2xl font-black text-blue-900 italic">DND <span class="text-orange-500">GLOBAL</span></h1>
-        </div>
-        <nav class="space-y-2 flex-1">
-            <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" id="btn-Database" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn">
-                <i class="fas fa-box"></i> Item Logistics
-            </button>
-            <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-CarHire" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn active">
-                <i class="fas fa-car-side"></i> Executive Hire
-            </button>
-            <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-drivers" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn">
-                <i class="fas fa-satellite-dish"></i> Fleet Radar
-            </button>
-            <button onclick="logout()" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-red-500 hover:bg-red-50 mt-10">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </nav>
-    </aside>
-
-    <main class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="bg-white border-b border-slate-200 p-8 flex justify-between items-center">
-            <div>
-                <h2 id="viewTitle" class="text-2xl font-black text-blue-900 uppercase">Master Control</h2>
-                <div class="flex gap-4 mt-2">
-                    <a href="https://docs.google.com/spreadsheets/d/1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I/edit" target="_blank" class="text-[10px] font-black text-blue-600 hover:underline"><i class="fas fa-table mr-1"></i> ITEM SHEET</a>
-                    <a href="https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/edit" target="_blank" class="text-[10px] font-black text-orange-600 hover:underline"><i class="fas fa-table mr-1"></i> HIRE SHEET</a>
+    <div id="master-content" class="min-h-screen w-full">
+        
+        <div id="waybill-area" class="p-8 bg-white border-2 border-dashed border-blue-900 rounded-lg">
+            <div class="flex justify-between items-start border-b-2 border-blue-900 pb-4 mb-6">
+                <div>
+                    <h1 class="text-3xl font-black text-blue-900 uppercase">DND GLOBAL</h1>
+                    <p class="text-xs font-bold tracking-widest text-orange-500 uppercase">Logistics & Executive Hire</p>
+                </div>
+                <div class="text-right">
+                    <p id="wb_id" class="text-xl font-black text-blue-900"></p>
+                    <p id="wb_date" class="text-xs font-bold text-slate-500"></p>
                 </div>
             </div>
-
-            <div class="flex items-center gap-6">
-                <div class="hidden md:flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
-                    <div class="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white text-xs">
-                        <i class="fas fa-user-shield"></i>
-                    </div>
-                    <div>
-                        <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none">Active Session</p>
-                        <p id="adminDisplayName" class="text-sm font-bold text-blue-900">Authenticating...</p>
-                    </div>
+            <div class="grid grid-cols-2 gap-8 mb-8">
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <h3 class="text-[10px] font-black text-blue-900 uppercase mb-2 border-b border-blue-200">Client / Sender Details</h3>
+                    <p id="wb_name" class="font-bold text-sm"></p>
+                    <p id="wb_contact" class="text-xs text-slate-600"></p>
                 </div>
-
-                <div class="flex gap-3">
-                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search..." class="bg-slate-100 rounded-xl px-6 py-3 text-sm outline-none w-64 focus:ring-2 ring-orange-500">
-                    <button onclick="syncData()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg shadow-orange-200">
-                        <i id="sync-icon" class="fas fa-sync-alt mr-2"></i> REFRESH
-                    </button>
+                <div class="bg-slate-50 p-4 rounded-lg">
+                    <h3 class="text-[10px] font-black text-blue-900 uppercase mb-2 border-b border-blue-200">Logistics / Route</h3>
+                    <p id="wb_route" class="text-xs font-bold"></p>
                 </div>
             </div>
-        </header>
-
-        <div class="p-8 pb-0 overflow-y-auto">
-            <div id="revenueSection" class="hidden mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                        <h3 class="text-[10px] font-black text-slate-400 uppercase mb-2">Gross Revenue</h3>
-                        <p id="totalRevDisplay" class="text-2xl font-black text-blue-900">₦0.00</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-                        <h3 class="text-[10px] font-black text-red-400 uppercase mb-2">Driver Expenses</h3>
-                        <p id="totalExpDisplay" class="text-2xl font-black text-red-600">₦0.00</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-[2rem] border border-orange-200 shadow-sm bg-orange-50">
-                        <h3 class="text-[10px] font-black text-orange-500 uppercase mb-2">Net Profit</h3>
-                        <p id="netProfitDisplay" class="text-2xl font-black text-orange-600">₦0.00</p>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 mt-6 h-48">
-                    <canvas id="revenueChart"></canvas>
-                </div>
+            <div class="border-2 border-blue-900 p-4 rounded-lg">
+                <h3 class="text-[10px] font-black text-blue-900 uppercase mb-2">Item Description / Vehicle Details</h3>
+                <p id="wb_details" class="text-sm font-semibold italic text-slate-700"></p>
             </div>
-
-            <div class="mb-8 border-b-2 border-slate-100 pb-6">
-                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Module Selection</h3>
-                <div class="flex flex-wrap gap-4 items-center">
-                    <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">ITEM TRACKER</button>
-                    <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HIRE TRACKER</button>
-                    <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">FLEET RADAR</button>
-                    <button onclick="switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HISTORY LOG</button>
-                    
-                    <button id="exportBtn" onclick="exportHistoryToCSV()" class="hidden bg-emerald-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
-                        <i class="fas fa-file-export mr-2"></i> EXPORT CSV
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm">
-                <table class="w-full text-left">
-                    <thead id="tableHeader" class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b"></thead>
-                    <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
-                </table>
+            <div class="mt-12 text-center border-t pt-4">
+                <p class="text-[9px] font-bold text-slate-400 uppercase">This is an electronically generated document from DND Master Control</p>
             </div>
         </div>
-    </main>
+
+        <aside class="w-72 bg-white border-r border-slate-200 p-6 flex flex-col hidden lg:flex">
+            <div class="mb-10">
+                <h1 class="text-2xl font-black text-blue-900 italic">DND <span class="text-orange-500">GLOBAL</span></h1>
+            </div>
+            <nav class="space-y-2 flex-1">
+                <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" id="btn-Database" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn">
+                    <i class="fas fa-box"></i> Item Logistics
+                </button>
+                <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-CarHire" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn active">
+                    <i class="fas fa-car-side"></i> Executive Hire
+                </button>
+                <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" id="btn-drivers" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-slate-500 hover:bg-slate-50 sidebar-btn">
+                    <i class="fas fa-satellite-dish"></i> Fleet Radar
+                </button>
+                <button onclick="logout()" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-red-500 hover:bg-red-50 mt-10">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col h-screen overflow-hidden">
+            <header class="bg-white border-b border-slate-200 p-8 flex justify-between items-center">
+                <div>
+                    <h2 id="viewTitle" class="text-2xl font-black text-blue-900 uppercase">Master Control</h2>
+                    <div class="flex gap-4 mt-2">
+                        <a href="https://docs.google.com/spreadsheets/d/1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I/edit" target="_blank" class="text-[10px] font-black text-blue-600 hover:underline"><i class="fas fa-table mr-1"></i> ITEM SHEET</a>
+                        <a href="https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/edit" target="_blank" class="text-[10px] font-black text-orange-600 hover:underline"><i class="fas fa-table mr-1"></i> HIRE SHEET</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-6">
+                    <div class="hidden md:flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
+                        <div class="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white text-xs">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none">Active Session</p>
+                            <p id="adminDisplayName" class="text-sm font-bold text-blue-900">Authenticating...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search..." class="bg-slate-100 rounded-xl px-6 py-3 text-sm outline-none w-64 focus:ring-2 ring-orange-500">
+                        <button onclick="syncData()" class="bg-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition shadow-lg shadow-orange-200">
+                            <i id="sync-icon" class="fas fa-sync-alt mr-2"></i> REFRESH
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-8 pb-0 overflow-y-auto">
+                <div id="revenueSection" class="hidden mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <h3 class="text-[10px] font-black text-slate-400 uppercase mb-2">Gross Revenue</h3>
+                            <p id="totalRevDisplay" class="text-2xl font-black text-blue-900">₦0.00</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                            <h3 class="text-[10px] font-black text-red-400 uppercase mb-2">Driver Expenses</h3>
+                            <p id="totalExpDisplay" class="text-2xl font-black text-red-600">₦0.00</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-[2rem] border border-orange-200 shadow-sm bg-orange-50">
+                            <h3 class="text-[10px] font-black text-orange-500 uppercase mb-2">Net Profit</h3>
+                            <p id="netProfitDisplay" class="text-2xl font-black text-orange-600">₦0.00</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 mt-6 h-48">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="mb-8 border-b-2 border-slate-100 pb-6">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Module Selection</h3>
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">ITEM TRACKER</button>
+                        <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HIRE TRACKER</button>
+                        <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">FLEET RADAR</button>
+                        <button onclick="switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HISTORY LOG</button>
+                        
+                        <button id="exportBtn" onclick="exportHistoryToCSV()" class="hidden bg-emerald-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                            <i class="fas fa-file-export mr-2"></i> EXPORT CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm mb-12">
+                    <table class="w-full text-left">
+                        <thead id="tableHeader" class="bg-slate-50 text-[10px] font-black uppercase text-slate-400 border-b"></thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script>
         const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbyw1VYoAaKjJwaPtJzvlcsfo0R-FZSnoDgG5MpqR8kaRYJrN7nd9rHH9kN12pQnZmsUOA/exec';
@@ -163,8 +198,9 @@
         let historyData = [];
         let revenueChart = null;
 
-        function checkAdminLock() {
-            const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
+        // AUTHENTICATION
+        function verifyAdmin() {
+            const accessKey = document.getElementById('adminPassInput').value;
             const authorizedAdmins = {
                 "Salako2020.": "Dayo salako",
                 "Baba-Tee2020": "Taiye",
@@ -173,16 +209,16 @@
 
             if (authorizedAdmins[accessKey]) {
                 document.getElementById('adminDisplayName').innerText = authorizedAdmins[accessKey];
-                document.documentElement.classList.add('authorized');
                 document.body.classList.add('authorized');
                 syncData();
             } else {
                 alert("Access Denied: Invalid Credentials.");
-                window.location.href = "index.html";
+                document.getElementById('adminPassInput').value = "";
             }
         }
 
-        window.onload = checkAdminLock;
+        // Allow 'Enter' key login
+        document.getElementById('adminPassInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdmin(); });
 
         async function syncData() {
             const icon = document.getElementById('sync-icon');
@@ -326,10 +362,8 @@
 
             historyData.forEach(row => {
                 if (!row.c) return;
-                // Assuming Rev in Col F (index 5) and Expense in Col G (index 6)
                 const rev = row.c[5] ? parseFloat(row.c[5].v) || 0 : 0;
                 const exp = row.c[6] ? parseFloat(row.c[6].v) || 0 : 0;
-                
                 totalRevenue += rev;
                 totalExpense += exp;
 
@@ -417,7 +451,7 @@
             }
         }
 
-        function logout() { window.location.href = "index.html"; }
+        function logout() { location.reload(); }
 
         function exportHistoryToCSV() {
             if (currentTab !== 'History') return;
