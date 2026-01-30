@@ -14,6 +14,10 @@
         .status-pulse::after { content: ''; position: absolute; width: 100%; height: 100%; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; top:0; left:0; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(2.5); opacity: 0; } }
         .active-job-glow { box-shadow: 0 0 20px rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.3); }
+        
+        /* New Professional State: Disabled Button */
+        .btn-locked { background: #1e293b !important; color: #64748b !important; cursor: not-allowed; opacity: 0.7; border: 1px dashed #334155; }
+        .dispatch-ready { border: 1px solid #22c55e !important; color: #22c55e !important; }
     </style>
 </head>
 <body class="p-6">
@@ -33,7 +37,10 @@
         <header class="flex justify-between items-center mb-6">
             <div>
                 <h2 id="displayDriverName" class="text-xl font-bold text-orange-500 italic">...</h2>
-                <p id="displayPlate" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Verifying Vehicle...</p>
+                <div class="flex items-center gap-2">
+                    <p id="displayPlate" class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Verifying Vehicle...</p>
+                    <span id="dispatch-status-badge" class="text-[8px] px-2 py-0.5 rounded-full border border-slate-700 text-slate-500 font-black">STANDBY</span>
+                </div>
             </div>
             <div id="signal" class="w-3 h-3 bg-slate-700 rounded-full transition-colors duration-500"></div>
         </header>
@@ -44,7 +51,9 @@
                     <p class="text-[9px] text-orange-500 font-black uppercase">Current Assignment</p>
                     <p id="current-job-id" class="text-lg font-black text-white">#---</p>
                 </div>
-                <i class="fas fa-truck-fast text-orange-500"></i>
+                <div class="bg-orange-500/10 p-3 rounded-2xl">
+                    <i class="fas fa-truck-fast text-orange-500"></i>
+                </div>
             </div>
         </div>
 
@@ -70,17 +79,19 @@
         </div>
 
         <button id="toggle-btn" onclick="toggleTransmission()" class="w-full bg-blue-600 py-6 rounded-[2rem] font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all active:scale-95 shadow-xl shadow-blue-900/20">
-            <i class="fas fa-play"></i> <span>Go Online</span>
+            <i class="fas fa-lock mr-2"></i> <span>Awaiting Order</span>
         </button>
+        
+        <p id="lock-notice" class="text-center text-[10px] text-slate-500 font-bold uppercase mt-4 tracking-tighter">Transmission locked until job is assigned by HQ</p>
     </div>
 
     <script>
-        // Replace with your UPDATED script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyw1VYoAaKjJwaPtJzvlcsfo0R-FZSnoDgG5MpqR8kaRYJrN7nd9rHH9kN12pQnZmsUOA/exec';
         const SHEET_ID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         
         let isLive = false;
         let updateInterval = null;
+        let pollInterval = null; // New Polling Interval
         let driverID = '';
         let currentActiveJob = 'NONE';
 
@@ -102,19 +113,13 @@
 
                 if (driverRow) {
                     driverID = inputId;
-                    currentActiveJob = driverRow.c[7] ? driverRow.c[7].v : 'NONE';
-                    
-                    document.getElementById('displayDriverName').innerText = driverRow.c[1].v;
-                    document.getElementById('displayPlate').innerText = driverRow.c[3] ? driverRow.c[3].v : "Vehicle N/A";
-                    
-                    // Show job banner if assigned
-                    if(currentActiveJob !== 'NONE' && currentActiveJob !== '') {
-                        document.getElementById('job-banner').classList.remove('hidden');
-                        document.getElementById('current-job-id').innerText = "#" + currentActiveJob;
-                    }
+                    processDriverState(driverRow);
 
                     document.getElementById('auth-screen').classList.add('hidden');
                     document.getElementById('main-terminal').classList.remove('hidden');
+                    
+                    // Start Background Polling for Job updates
+                    startBackgroundPolling();
                 } else {
                     alert("ID not found.");
                     authBtn.innerText = "Link Terminal";
@@ -126,7 +131,62 @@
             }
         }
 
+        // Professional State Handler
+        function processDriverState(row) {
+            currentActiveJob = row.c[7] ? row.c[7].v : 'NONE';
+            document.getElementById('displayDriverName').innerText = row.c[1].v;
+            document.getElementById('displayPlate').innerText = row.c[3] ? row.c[3].v : "Vehicle N/A";
+            
+            const btn = document.getElementById('toggle-btn');
+            const banner = document.getElementById('job-banner');
+            const notice = document.getElementById('lock-notice');
+            const badge = document.getElementById('dispatch-status-badge');
+
+            if(currentActiveJob !== 'NONE' && currentActiveJob !== '') {
+                // ASSIGNED STATE
+                banner.classList.remove('hidden');
+                document.getElementById('current-job-id').innerText = "#" + currentActiveJob;
+                badge.innerText = "DISPATCHED";
+                badge.classList.add('dispatch-ready');
+                
+                if (!isLive) {
+                    btn.classList.remove('btn-locked');
+                    btn.innerHTML = `<i class="fas fa-play"></i> <span>Go Online</span>`;
+                    btn.disabled = false;
+                    notice.innerText = "Ready for departure. Engage terminal.";
+                }
+            } else {
+                // UNASSIGNED STATE
+                banner.classList.add('hidden');
+                badge.innerText = "STANDBY";
+                badge.classList.remove('dispatch-ready');
+                
+                if (!isLive) {
+                    btn.classList.add('btn-locked');
+                    btn.innerHTML = `<i class="fas fa-lock mr-2"></i> <span>Awaiting Order</span>`;
+                    btn.disabled = true;
+                    notice.innerText = "Transmission locked until job is assigned by HQ";
+                }
+            }
+        }
+
+        function startBackgroundPolling() {
+            // Check for new jobs every 30 seconds
+            pollInterval = setInterval(async () => {
+                if(isLive) return; // Don't poll while driving to save data
+                try {
+                    const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=drivers`);
+                    const text = await res.text();
+                    const json = JSON.parse(text.substring(47).slice(0, -2));
+                    const driverRow = json.table.rows.find(r => r.c[0] && r.c[0].v.toString().toUpperCase() === driverID);
+                    if(driverRow) processDriverState(driverRow);
+                } catch (e) { console.log("Polling error..."); }
+            }, 30000);
+        }
+
         function toggleTransmission() {
+            if(currentActiveJob === 'NONE' || currentActiveJob === '') return;
+
             const btn = document.getElementById('toggle-btn');
             const stateText = document.getElementById('state-text');
             const signal = document.getElementById('signal');
@@ -135,8 +195,7 @@
 
             if (!isLive) {
                 isLive = true;
-                // If they have a job, UI says "ON TRIP", else "AVAILABLE"
-                const currentStatus = (currentActiveJob !== 'NONE') ? "ON-DUTY" : "AVAILABLE";
+                const currentStatus = "ON-DUTY";
                 
                 btn.innerHTML = `<i class="fas fa-check-double"></i> <span>Complete Job</span>`;
                 btn.classList.replace('bg-blue-600', 'bg-green-600');
@@ -177,13 +236,11 @@
 
             if(updateInterval) clearInterval(updateInterval);
             
-            // Critical: Get final location to save to History
             navigator.geolocation.getCurrentPosition(async pos => {
                 await sendToSheet(pos.coords.latitude, pos.coords.longitude, "COMPLETED", true);
                 alert("Job Successfully Logged.");
                 location.reload();
             }, async () => {
-                // Fallback if GPS fails during termination
                 await sendToSheet(0, 0, "COMPLETED", true);
                 location.reload();
             });
@@ -191,20 +248,15 @@
 
         async function sendToSheet(lat, lng, status, isFinish) {
             try {
-                // isFinish = true triggers ROUTE 5 (Job Completion/History)
-                // isFinish = false triggers ROUTE 1 (Standard GPS update)
                 let url = `${SCRIPT_URL}?DriverID=${driverID}&lat=${lat}&lng=${lng}&status=${status}`;
-                
                 if(isFinish) {
                     url += `&isCompleteJob=true`;
                 } else {
                     url += `&isDriverUpdate=true`;
                 }
-
                 await fetch(url, { method: 'POST', mode: 'no-cors' });
             } catch (e) { console.error("Sync Error"); }
         }
     </script>
 </body>
 </html>
-
