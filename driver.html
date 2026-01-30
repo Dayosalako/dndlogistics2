@@ -16,6 +16,7 @@
         .active-job-glow { box-shadow: 0 0 20px rgba(249, 115, 22, 0.2); border: 1px solid rgba(249, 115, 22, 0.3); }
         .btn-locked { background: #1e293b !important; color: #64748b !important; cursor: not-allowed; opacity: 0.7; border: 1px dashed #334155; }
         .dispatch-ready { border: 1px solid #22c55e !important; color: #22c55e !important; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body class="p-6">
@@ -24,7 +25,7 @@
         <div class="w-full max-w-sm">
             <h1 class="text-3xl font-black italic mb-2 tracking-tighter">DND <span class="text-orange-500">GLOBAL</span></h1>
             <p class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-8">Logistics Management System</p>
-            <div class="neo-card p-8 rounded-[2rem]">
+            <div class="neo-card p-8 rounded-[2.5rem]">
                 <div class="space-y-4">
                     <input type="text" id="driverIDInput" placeholder="DRIVER ID" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 px-4 text-center text-xl font-bold outline-none focus:ring-2 ring-orange-500 text-white uppercase">
                     <input type="password" id="driverPassInput" placeholder="PASSWORD" class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 px-4 text-center text-xl font-bold outline-none focus:ring-2 ring-orange-500 text-white">
@@ -92,8 +93,8 @@
     </div>
 
     <script>
+        // Use your existing Deployment URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyw1VYoAaKjJwaPtJzvlcsfo0R-FZSnoDgG5MpqR8kaRYJrN7nd9rHH9kN12pQnZmsUOA/exec';
-        const SHEET_ID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         
         let isLive = false;
         let updateInterval = null;
@@ -112,59 +113,39 @@
             authBtn.disabled = true;
 
             try {
-                const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=drivers`);
-                const text = await res.text();
-                const json = JSON.parse(text.substring(47).slice(0, -2));
-                const rows = json.table.rows;
+                // New Secure Protocol: Sending credentials to server for verification
+                const response = await fetch(`${SCRIPT_URL}?action=login&key=${inputId}&pass=${inputPass}&type=driver`);
+                const result = await response.json();
 
-                // ID in Column A (0) | Password in Column I (8)
-                const driverRow = rows.find(r => 
-                    r.c[0] && r.c[0].v.toString().toUpperCase() === inputId && 
-                    r.c[8] && r.c[8].v.toString() === inputPass
-                );
-
-                if (driverRow) {
+                if (result.success) {
                     driverID = inputId;
-                    processDriverState(driverRow);
+                    
+                    // Setup UI with data returned from server
+                    document.getElementById('displayDriverName').innerText = result.name;
+                    document.getElementById('displayPlate').innerText = result.vehicle || "Vehicle N/A";
+                    currentActiveJob = result.activeJob || 'NONE';
+                    
+                    // Refresh UI State
+                    updateUIState();
+                    
+                    // Switch Screens
                     document.getElementById('auth-screen').classList.add('hidden');
                     document.getElementById('main-terminal').classList.remove('hidden');
                     startBackgroundPolling();
                 } else {
-                    alert("Authentication Denied. Check ID/Password.");
+                    alert("Authentication Denied: " + (result.error || "Check Credentials"));
                     authBtn.innerText = "Link Terminal";
                     authBtn.disabled = false;
                 }
             } catch (e) {
-                alert("Network error. Try again.");
+                console.error(e);
+                alert("Connection failed. Check your internet.");
+                authBtn.innerText = "Link Terminal";
                 authBtn.disabled = false;
             }
         }
 
-        function logout() {
-            if(isLive) {
-                if(!confirm("Active transmission detected. Logging out will disconnect your GPS link. Continue?")) return;
-            }
-            
-            // Cleanup
-            if(updateInterval) clearInterval(updateInterval);
-            if(pollInterval) clearInterval(pollInterval);
-            
-            isLive = false;
-            driverID = '';
-            
-            // UI Reset
-            document.getElementById('driverPassInput').value = '';
-            document.getElementById('authBtn').innerText = "Link Terminal";
-            document.getElementById('authBtn').disabled = false;
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('main-terminal').classList.add('hidden');
-        }
-
-        function processDriverState(row) {
-            currentActiveJob = row.c[7] ? row.c[7].v : 'NONE';
-            document.getElementById('displayDriverName').innerText = row.c[1].v;
-            document.getElementById('displayPlate').innerText = row.c[3] ? row.c[3].v : "Vehicle N/A";
-            
+        function updateUIState() {
             const btn = document.getElementById('toggle-btn');
             const banner = document.getElementById('job-banner');
             const notice = document.getElementById('lock-notice');
@@ -197,16 +178,18 @@
         }
 
         function startBackgroundPolling() {
+            // Regularly check for new jobs/updates via the secure script
             pollInterval = setInterval(async () => {
                 if(isLive || !driverID) return;
                 try {
-                    const res = await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=drivers`);
-                    const text = await res.text();
-                    const json = JSON.parse(text.substring(47).slice(0, -2));
-                    const driverRow = json.table.rows.find(r => r.c[0] && r.c[0].v.toString().toUpperCase() === driverID);
-                    if(driverRow) processDriverState(driverRow);
+                    const res = await fetch(`${SCRIPT_URL}?action=login&key=${driverID}&type=driver`);
+                    const result = await res.json();
+                    if(result.success) {
+                        currentActiveJob = result.activeJob || 'NONE';
+                        updateUIState();
+                    }
                 } catch (e) { console.log("Polling..."); }
-            }, 30000);
+            }, 30000); // Check every 30 seconds
         }
 
         function toggleTransmission() {
@@ -271,6 +254,11 @@
                 url += isFinish ? `&isCompleteJob=true` : `&isDriverUpdate=true`;
                 await fetch(url, { method: 'POST', mode: 'no-cors' });
             } catch (e) { console.error("Sync Error"); }
+        }
+
+        function logout() {
+            if(isLive && !confirm("Active transmission detected. Logout?")) return;
+            location.reload();
         }
     </script>
 </body>
