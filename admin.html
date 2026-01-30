@@ -119,7 +119,7 @@
                     <h2 id="viewTitle" class="text-2xl font-black text-blue-900 uppercase">Master Control</h2>
                     <div class="flex gap-4 mt-2">
                         <a href="https://docs.google.com/spreadsheets/d/1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I/edit" target="_blank" class="text-[10px] font-black text-blue-600 hover:underline"><i class="fas fa-table mr-1"></i> ITEM SHEET</a>
-                        <a href="https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/edit" target="_blank" class="text-[10px] font-black text-orange-600 hover:underline"><i class="fas fa-table mr-1"></i> HIRE SHEET</a>
+                        <a href="https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/edit" target="_blank" class="text-[10px] font-black text-orange-600 hover:underline"><i class="fas fa-table mr-1"></i> HIRE/DRIVER SHEET</a>
                     </div>
                 </div>
 
@@ -159,9 +159,6 @@
                             <p id="netProfitDisplay" class="text-2xl font-black text-orange-600">₦0.00</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 mt-6 h-48">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
                 </div>
 
                 <div class="mb-8 border-b-2 border-slate-100 pb-6">
@@ -189,31 +186,26 @@
     </div>
 
     <script>
+        // Replace with your actual Apps Script Web App URL
         const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxBqU-yWF2S9ltyKNmrZzP0nXl45gfMhD3X1q1SWfulkmlxPXkq7Tm5Hm6YiXtYi9KMKg/exec';
+        
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         let currentTab = 'CarHire';
         let allData = [];
         let driversData = [];
         let historyData = [];
-        let revenueChart = null;
 
-        // AUTHENTICATION (UPGRADED TO SERVER-SIDE)
+        // ADMIN LOGIN
         async function verifyAdmin() {
             const loginBtn = document.getElementById('loginBtn');
             const accessKey = document.getElementById('adminPassInput').value;
+            if (!accessKey) return alert("Please enter your access key.");
             
-            if (!accessKey) {
-                alert("Please enter your access key.");
-                return;
-            }
-
-            // Visual feedback
             loginBtn.innerText = "VERIFYING...";
             loginBtn.disabled = true;
 
             try {
-                // Fetch auth result from the Apps Script "login" action
-                const response = await fetch(`${MASTER_SCRIPT}?action=login&key=${encodeURIComponent(accessKey)}`);
+                const response = await fetch(`${MASTER_SCRIPT}?action=login&key=${encodeURIComponent(accessKey)}&type=admin`);
                 const result = await response.json();
 
                 if (result.success) {
@@ -222,11 +214,9 @@
                     syncData();
                 } else {
                     alert("Access Denied: Invalid Credentials.");
-                    document.getElementById('adminPassInput').value = "";
                 }
             } catch (e) {
-                console.error("Auth Error:", e);
-                alert("Authentication Server Error. Check your Script URL.");
+                alert("Auth Server Error. Check Script URL.");
             } finally {
                 loginBtn.innerText = "Access Terminal";
                 loginBtn.disabled = false;
@@ -235,43 +225,44 @@
 
         document.getElementById('adminPassInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdmin(); });
 
+        // SYNC DATA FROM SHEETS
         async function syncData() {
-            // Security: Don't fetch data if not authorized
             if (!document.body.classList.contains('authorized')) return;
-
             const icon = document.getElementById('sync-icon');
             if(icon) icon.classList.add('fa-spin');
+            
             try {
-                const res = await fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`);
-                const text = await res.text();
-                const json = JSON.parse(text.substring(47).slice(0, -2));
-                allData = json.table.rows;
-
+                // Fetch Drivers (Cross-Ref)
                 const dRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=drivers`);
                 const dText = await dRes.text();
-                const dJson = JSON.parse(dText.substring(47).slice(0, -2));
-                driversData = dJson.table.rows;
+                driversData = JSON.parse(dText.substring(47).slice(0, -2)).table.rows;
 
+                // Fetch History (Cross-Ref)
                 const hRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=History`);
                 const hText = await hRes.text();
-                const hJson = JSON.parse(hText.substring(47).slice(0, -2));
-                historyData = hJson.table.rows;
+                historyData = JSON.parse(hText.substring(47).slice(0, -2)).table.rows;
+
+                // Fetch Current Active Tab
+                const res = await fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`);
+                const text = await res.text();
+                allData = JSON.parse(text.substring(47).slice(0, -2)).table.rows;
 
                 renderTable();
                 if(currentTab === 'History') updateRevenueDashboard();
-            } catch (e) { console.error("Sync Error:", e); }
-            finally { if(icon) icon.classList.remove('fa-spin'); }
+            } catch (e) { 
+                console.error("Sync Error:", e); 
+            } finally { 
+                if(icon) icon.classList.remove('fa-spin'); 
+            }
         }
 
+        // TAB SWITCHER
         function switchTab(tab, id) {
             currentTab = tab; 
             currentSheetID = id;
             document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
             const btn = document.getElementById(`btn-${tab}`);
             if(btn) btn.classList.add('active');
-            
-            const searchInput = document.getElementById('searchInput');
-            searchInput.placeholder = (tab === 'History') ? "Search Driver or Hire ID..." : "Search live data...";
             
             const exportBtn = document.getElementById('exportBtn');
             const revSec = document.getElementById('revenueSection');
@@ -286,19 +277,21 @@
             syncData();
         }
 
+        // TABLE RENDERER
         function renderTable() {
             const header = document.getElementById('tableHeader');
             const body = document.getElementById('tableBody');
             body.innerHTML = '';
 
+            // Set Headers
             if (currentTab === 'CarHire') {
-                header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
+                header.innerHTML = `<tr><th class="p-6">Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
             } else if (currentTab === 'drivers') {
-                header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
+                header.innerHTML = `<tr><th class="p-6">Driver ID</th><th>Name</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
             } else if (currentTab === 'History') {
-                header.innerHTML = `<tr class="p-6"><th>Completed Date</th><th>Driver ID</th><th>Hire ID</th><th class="text-right p-6">Status</th></tr>`;
+                header.innerHTML = `<tr><th class="p-6">Completed Date</th><th>Driver ID</th><th>Hire ID</th><th class="text-right p-6">Status</th></tr>`;
             } else if (currentTab === 'Database') {
-                header.innerHTML = `<tr class="p-6"><th>ID</th><th>Date</th><th>Customer</th><th>Route</th><th class="text-right p-6">Action</th></tr>`;
+                header.innerHTML = `<tr><th class="p-6">ID</th><th>Date</th><th>Customer</th><th>Route</th><th class="text-right p-6">Action</th></tr>`;
             }
 
             allData.slice().reverse().forEach((row, idx) => {
@@ -308,11 +301,11 @@
                 tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
 
                 if (currentTab === 'CarHire') {
-                    const hireId = c[1].v;
-                    const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v == hireId);
+                    const hireId = c[1] ? c[1].v : "N/A";
                     const isArchived = historyData.some(h => h.c[2] && h.c[2].v == hireId);
+                    const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v == hireId);
+                    
                     let actionBtn = "";
-
                     if (isArchived) {
                         actionBtn = `<button onclick="jumpToHistory('${hireId}')" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black uppercase"><i class="fas fa-history mr-1"></i> Proof</button>`;
                     } else if (assignedDriver) {
@@ -323,8 +316,8 @@
 
                     tr.innerHTML = `
                         <td class="p-6 font-black text-blue-900">${hireId}</td>
-                        <td class="p-6 font-bold text-slate-700">${c[2].v}</td>
-                        <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td>
+                        <td class="p-6 font-bold text-slate-700">${c[2] ? c[2].v : 'N/A'}</td>
+                        <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4] ? c[4].v : 'N/A'}</td>
                         <td class="p-6 text-right flex justify-end gap-2 items-center">
                             ${actionBtn}
                             <button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
@@ -336,7 +329,6 @@
                     const lng = c[6] ? parseFloat(c[6].v) : 0;
                     const activeJob = c[7] ? c[7].v : 'NONE';
                     const hasNoSignal = (lat === 0 || isNaN(lat));
-
                     tr.innerHTML = `
                         <td class="p-6 font-black text-blue-900">${c[0].v}</td>
                         <td class="p-6 font-bold text-slate-700">${c[1].v}</td>
@@ -347,100 +339,108 @@
                         </td>`;
                 }
                 else if (currentTab === 'History') {
-                    const finalLoc = c[4] ? c[4].v : "";
-                    const hasLocation = (finalLoc && finalLoc.includes(','));
                     tr.innerHTML = `
                         <td class="p-6 text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</td>
                         <td class="p-6 font-black text-slate-700">${c[1].v}</td>
                         <td class="p-6 font-black text-blue-700 uppercase">${c[2].v}</td>
                         <td class="p-6 text-right">
-                            ${hasLocation ? `<a href="https://www.google.com/maps?q=${finalLoc}" target="_blank" class="text-blue-600 text-[10px] font-black uppercase"><i class="fas fa-map-pin mr-1"></i> View Drop</a>` : `<span class="text-slate-300 text-[10px]">No GPS</span>`}
+                            <span class="text-green-600 text-[10px] font-black uppercase"><i class="fas fa-check-circle mr-1"></i> LOGGED</span>
                         </td>`;
                 }
                 else if (currentTab === 'Database') {
-                    const trackingId = c[0].v;
+                    const trackId = c[0].v;
                     tr.innerHTML = `
-                        <td class="p-6 font-black text-blue-900">${trackingId}</td>
+                        <td class="p-6 font-black text-blue-900">${trackId}</td>
                         <td class="p-6 font-bold text-slate-500 text-xs">${c[1].v}</td>
                         <td class="p-6 font-bold text-slate-700">${c[3].v}</td>
                         <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[7].v} -> ${c[8].v}</td>
                         <td class="p-6 text-right flex justify-end gap-2">
                             <button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
-                            <button onclick="deleteEntry('${trackingId}', 'Database')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs"><i class="fas fa-trash-alt"></i></button>
+                            <button onclick="deleteEntry('${trackId}', 'Database')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs"><i class="fas fa-trash-alt"></i></button>
                         </td>`;
                 }
                 body.appendChild(tr);
             });
         }
 
-        function updateRevenueDashboard() {
-            let totalRevenue = 0;
-            let totalExpense = 0;
-            const monthlyStats = {};
-
-            historyData.forEach(row => {
-                if (!row.c) return;
-                const rev = row.c[5] ? parseFloat(row.c[5].v) || 0 : 0;
-                const exp = row.c[6] ? parseFloat(row.c[6].v) || 0 : 0;
-                totalRevenue += rev;
-                totalExpense += exp;
-
-                const date = row.c[0].f || "Unknown";
-                const month = date.split('/')[0];
-                monthlyStats[month] = (monthlyStats[month] || 0) + (rev - exp);
-            });
-
-            document.getElementById('totalRevDisplay').innerText = `₦${totalRevenue.toLocaleString()}`;
-            document.getElementById('totalExpDisplay').innerText = `₦${totalExpense.toLocaleString()}`;
-            document.getElementById('netProfitDisplay').innerText = `₦${(totalRevenue - totalExpense).toLocaleString()}`;
-
-            const ctx = document.getElementById('revenueChart').getContext('2d');
-            if (revenueChart) revenueChart.destroy();
-            revenueChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Object.keys(monthlyStats).map(m => "Month " + m),
-                    datasets: [{
-                        label: 'Net Profit',
-                        data: Object.values(monthlyStats),
-                        borderColor: '#f97316',
-                        tension: 0.4,
-                        fill: true,
-                        backgroundColor: 'rgba(249, 115, 22, 0.05)'
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
-        }
-
+        // ASSIGN DRIVER COMMAND
         async function allocateDriver(hireId) {
             const driverId = prompt("Enter Driver ID to assign to Job " + hireId);
             if (!driverId) return;
             try {
                 await fetch(`${MASTER_SCRIPT}?isAssign=true&DriverID=${driverId}&HireID=${hireId}`, { method: 'POST', mode: 'no-cors' });
-                alert("Job Assigned.");
-                setTimeout(syncData, 2000);
-            } catch (e) { alert("Error"); }
+                alert("Assignment Command Sent.");
+                setTimeout(syncData, 1500);
+            } catch (e) { alert("Command Failed"); }
         }
 
+        // COMPLETE JOB COMMAND
         async function completeJob(driverId, hireId) {
             if(!confirm(`Mark Job ${hireId} as completed?`)) return;
             try {
                 await fetch(`${MASTER_SCRIPT}?isCompleteJob=true&DriverID=${driverId}`, { method: 'POST', mode: 'no-cors' });
-                alert("Job Completed.");
-                setTimeout(syncData, 2000);
-            } catch (e) { alert("Error"); }
+                alert("Job Completed & Logged.");
+                setTimeout(syncData, 1500);
+            } catch (e) { alert("Command Failed"); }
         }
 
-        async function deleteEntry(id, sheetName) {
-            if (!confirm(`Permanently delete ${id}?`) || !confirm("Final Warning: Proceed?")) return;
+        // DELETE RECORD COMMAND
+        async function deleteEntry(id, sheet) {
+            if(!confirm(`Permanently delete ${id} from ${sheet}?`)) return;
             try {
-                await fetch(`${MASTER_SCRIPT}?isDelete=true&id=${id}&sheet=${sheetName}`, { method: 'POST', mode: 'no-cors' });
-                alert("Delete request sent.");
-                setTimeout(syncData, 2000);
-            } catch (e) { alert("Error"); }
+                await fetch(`${MASTER_SCRIPT}?isDelete=true&id=${id}&sheet=${sheet}`, { method: 'POST', mode: 'no-cors' });
+                alert("Deleted successfully.");
+                setTimeout(syncData, 1500);
+            } catch (e) { alert("Error deleting"); }
         }
 
+        // CSV EXPORTER
+        function exportHistoryToCSV() {
+            if (historyData.length === 0) return alert("No history data to export.");
+            let csv = "Timestamp,Driver ID,Hire ID,Status,Final Location\n";
+            historyData.forEach(row => {
+                if (row.c) {
+                    const line = [
+                        row.c[0] ? (row.c[0].f || row.c[0].v) : "",
+                        row.c[1] ? row.c[1].v : "",
+                        row.c[2] ? row.c[2].v : "",
+                        "COMPLETED",
+                        row.c[4] ? row.c[4].v : "N/A"
+                    ].map(v => `"${v}"`).join(",");
+                    csv += line + "\n";
+                }
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", `DND_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            link.click();
+        }
+
+        // REVENUE CALCULATION
+        function updateRevenueDashboard() {
+            let totalRevenue = 0;
+            let totalExpense = 0;
+            historyData.forEach(row => {
+                if (!row.c) return;
+                totalRevenue += (row.c[5] ? parseFloat(row.c[5].v) || 0 : 0);
+                totalExpense += (row.c[6] ? parseFloat(row.c[6].v) || 0 : 0);
+            });
+            document.getElementById('totalRevDisplay').innerText = `₦${totalRevenue.toLocaleString()}`;
+            document.getElementById('totalExpDisplay').innerText = `₦${totalExpense.toLocaleString()}`;
+            document.getElementById('netProfitDisplay').innerText = `₦${(totalRevenue - totalExpense).toLocaleString()}`;
+        }
+
+        // SEARCH FILTER
+        function filterTable() {
+            const val = document.getElementById('searchInput').value.toUpperCase();
+            const rows = document.getElementById('tableBody').getElementsByTagName('tr');
+            for (let r of rows) {
+                r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none";
+            }
+        }
+
+        // PRINT WAYBILL
         function printWaybillFromAdmin(idx) {
             const row = allData[idx].c;
             if (currentTab === 'Database') {
@@ -460,41 +460,13 @@
             window.print();
         }
 
-        function filterTable() {
-            const val = document.getElementById('searchInput').value.toUpperCase();
-            const rows = document.getElementById('tableBody').getElementsByTagName('tr');
-            for (let r of rows) {
-                const content = r.innerText.toUpperCase();
-                r.style.display = content.includes(val) ? "" : "none";
-            }
+        function jumpToHistory(hireId) {
+            switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0');
+            document.getElementById('searchInput').value = hireId;
+            setTimeout(filterTable, 500);
         }
 
         function logout() { location.reload(); }
-
-        function exportHistoryToCSV() {
-            if (currentTab !== 'History') return;
-            let csvContent = "data:text/csv;charset=utf-8,Timestamp,Driver ID,Hire ID,Status,Location\r\n";
-            allData.forEach(row => {
-                if (row.c) {
-                    const rowData = [row.c[0].f || row.c[0].v, row.c[1].v, row.c[2].v, "COMPLETED", row.c[4] ? row.c[4].v : "N/A"].map(v => `"${v}"`).join(",");
-                    csvContent += rowData + "\r\n";
-                }
-            });
-            const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", `DND_Export_${new Date().toLocaleDateString()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function jumpToHistory(hireId) {
-            switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0');
-            const input = document.getElementById('searchInput');
-            input.value = hireId;
-            setTimeout(filterTable, 500);
-        }
     </script>
 </body>
 </html>
-
