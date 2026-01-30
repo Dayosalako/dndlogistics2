@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOCTYPE html>                
+  
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -189,13 +190,17 @@
     </div>
 
     <script>
-        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxBqU-yWF2S9ltyKNmrZzP0nXl45gfMhD3X1q1SWfulkmlxPXkq7Tm5Hm6YiXtYi9KMKg/exec';
+        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxTbs0d_wjoc6BgKeWZGDCrn6yiRAq_7XuvEhGkteO1KIqGoOljgobgS2c-K_QKvY0HrA/exec';
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         let currentTab = 'CarHire';
         let allData = [];
         let driversData = [];
         let historyData = [];
         let revenueChart = null;
+
+        // New Selection Variables
+        let selectedRows = new Set();
+        let isSelectionMode = false;
 
         async function verifyAdmin() {
             const loginBtn = document.getElementById('loginBtn');
@@ -232,17 +237,14 @@
             if(icon) icon.classList.add('fa-spin');
             
             try {
-                // Fetch Drivers first to handle cross-referencing accurately
                 const dRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=drivers`);
                 const dText = await dRes.text();
                 driversData = JSON.parse(dText.substring(47).slice(0, -2)).table.rows;
 
-                // Fetch History to check completions
                 const hRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=History`);
                 const hText = await hRes.text();
                 historyData = JSON.parse(hText.substring(47).slice(0, -2)).table.rows;
 
-                // Fetch Main Tab Data
                 const res = await fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`);
                 const text = await res.text();
                 allData = JSON.parse(text.substring(47).slice(0, -2)).table.rows;
@@ -259,6 +261,7 @@
         function switchTab(tab, id) {
             currentTab = tab; 
             currentSheetID = id;
+            selectedRows.clear(); // Clear selections when changing tabs
             document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
             const btn = document.getElementById(`btn-${tab}`);
             if(btn) btn.classList.add('active');
@@ -274,6 +277,17 @@
                 revSec.classList.add('hidden');
             }
             syncData();
+        }
+
+        function toggleRowSelection(rowId, element) {
+            if (currentTab !== 'History') return;
+            if (selectedRows.has(rowId)) {
+                selectedRows.delete(rowId);
+                element.classList.remove('bg-orange-50', 'border-l-4', 'border-orange-500');
+            } else {
+                selectedRows.add(rowId);
+                element.classList.add('bg-orange-50', 'border-l-4', 'border-orange-500');
+            }
         }
 
         function renderTable() {
@@ -299,9 +313,7 @@
 
                 if (currentTab === 'CarHire') {
                     const hireId = c[1] ? c[1].v : "N/A";
-                    // Cross-check: Is this ID in History?
                     const isArchived = historyData.some(h => h.c[2] && h.c[2].v == hireId);
-                    // Cross-check: Is a driver currently holding this ID?
                     const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v == hireId);
                     
                     let actionBtn = "";
@@ -334,15 +346,19 @@
                         <td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black ${hasNoSignal ? 'bg-slate-100 text-slate-400' : 'bg-green-100 text-green-600'}">${hasNoSignal ? 'OFFLINE' : 'LIVE'}</span></td>
                         <td class="p-6 font-black text-blue-600 text-xs">${activeJob}</td>
                         <td class="p-6 text-right">
-                            ${hasNoSignal ? `<button disabled class="bg-slate-100 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-map-marker-slash mr-1"></i> NO SIGNAL</button>` : `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-location-arrow mr-1"></i> TRACK</a>`}
+                            ${hasNoSignal ? `<button disabled class="bg-slate-100 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-map-marker-slash mr-1"></i> NO SIGNAL</button>` : `<a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-location-arrow mr-1"></i> TRACK</a>`}
                         </td>`;
                 }
                 else if (currentTab === 'History') {
-                    const finalLoc = c[4] ? c[4].v : "";
+                    const hireId = c[2].v;
+                    tr.onclick = () => toggleRowSelection(hireId, tr);
+                    tr.style.cursor = 'pointer';
+                    tr.title = "Click to select for export";
+                    
                     tr.innerHTML = `
                         <td class="p-6 text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</td>
                         <td class="p-6 font-black text-slate-700">${c[1].v}</td>
-                        <td class="p-6 font-black text-blue-700 uppercase">${c[2].v}</td>
+                        <td class="p-6 font-black text-blue-700 uppercase">${hireId}</td>
                         <td class="p-6 text-right">
                             <span class="text-green-600 text-[10px] font-black uppercase"><i class="fas fa-check-circle mr-1"></i> LOGGED</span>
                         </td>`;
@@ -367,10 +383,9 @@
             const driverId = prompt("Enter Driver ID to assign to Job " + hireId);
             if (!driverId) return;
             try {
-                // Post to Apps Script
                 await fetch(`${MASTER_SCRIPT}?isAssign=true&DriverID=${driverId}&HireID=${hireId}`, { method: 'POST', mode: 'no-cors' });
                 alert("Assignment Command Sent. Refreshing...");
-                setTimeout(syncData, 1500); // Wait for Google Sheet to update before re-syncing
+                setTimeout(syncData, 1500);
             } catch (e) { alert("Command Failed"); }
         }
 
@@ -396,7 +411,14 @@
             if (historyData.length === 0) return alert("No history data to export.");
             
             let csv = "Timestamp,Driver ID,Hire ID,Status,GPS Location\n";
-            historyData.forEach(row => {
+            let dataToExport = historyData;
+
+            // If selection exists, filter the export
+            if (selectedRows.size > 0) {
+                dataToExport = historyData.filter(row => row.c && selectedRows.has(row.c[2].v));
+            }
+
+            dataToExport.forEach(row => {
                 if (row.c) {
                     const line = [
                         row.c[0] ? (row.c[0].f || row.c[0].v) : "",
@@ -413,11 +435,15 @@
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", `DND_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute("download", `DND_Report_Selection_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+            // Clear selection after export and refresh
+            selectedRows.clear();
+            syncData();
         }
 
         function printWaybillFromAdmin(idx) {
