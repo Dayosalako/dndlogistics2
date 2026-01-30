@@ -116,6 +116,7 @@
                     <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">ITEM TRACKER</button>
                     <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HIRE TRACKER</button>
                     <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">FLEET RADAR</button>
+                    <button onclick="switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HISTORY LOG</button>
                 </div>
             </div>
 
@@ -129,7 +130,7 @@
     </main>
 
     <script>
-        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxY0mOmR4QYgdLoWOqLRhYPhA6gQ2vbHi0dWaYJa32dSqTZZwZaJGnFpoa3snm7ORC3SA/exec';
+        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxnXvx9cu5U2d95lf4XuL0vhyGkd-EGdJDva--c_O7FImh0E0c0uTevI1dYzF-K7CsVaQ/exec';
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         let currentTab = 'CarHire';
         let allData = [];
@@ -178,48 +179,23 @@
         }
 
         function switchTab(tab, id) {
-            currentTab = tab; 
-            currentSheetID = id;
-            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            const btn = document.getElementById(`btn-${tab}`);
-            if(btn) btn.classList.add('active');
-            syncData();
-        }
+    currentTab = tab; 
+    currentSheetID = id;
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+    const btn = document.getElementById(`btn-${tab}`);
+    if(btn) btn.classList.add('active');
+    
+    // Update the search placeholder dynamically                    
+                      
+  
+    const searchInput = document.getElementById('searchInput');
+    if(tab === 'History') searchInput.placeholder = "Search Driver or Hire ID...";
+    else searchInput.placeholder = "Search live data...";
 
-        function renderTable() {
-    const header = document.getElementById('tableHeader');
-    const body = document.getElementById('tableBody');
-    body.innerHTML = '';
+    syncData();
+}
 
-    if (currentTab === 'CarHire') {
-        header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
-    } else if (currentTab === 'drivers') {
-        header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
-    }
-
-    allData.reverse().forEach((row, idx) => {
-        const c = row.c;
-        if (!c || !c[0]) return;
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
         
-        if (currentTab === 'CarHire') {
-            const hireId = c[1].v;
-            // Search if any driver is currently holding this Hire ID
-            const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v == hireId);
-            
-            let actionBtn = "";
-            if (assignedDriver) {
-                // If a driver has it, show DONE button
-                actionBtn = `<button onclick="completeJob('${assignedDriver.c[0].v}', '${hireId}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md hover:bg-green-700">
-                                <i class="fas fa-check-double mr-1"></i> DONE
-                             </button>`;
-            } else {
-                // If no driver has it, show ASSIGN button
-                actionBtn = `<button onclick="allocateDriver('${hireId}')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md hover:bg-orange-600">
-                                <i class="fas fa-user-plus mr-1"></i> ASSIGN
-                             </button>`;
-            }
 
             tr.innerHTML = `
                 <td class="p-6 font-black text-blue-900">${hireId}</td>
@@ -238,30 +214,104 @@
             const activeJob = c[7] ? c[7].v : 'NONE';
             // Check if coordinates are 0 or empty
             const hasNoSignal = (lat === 0 || isNaN(lat));
+            function renderTable() {
+    const header = document.getElementById('tableHeader');
+    const body = document.getElementById('tableBody');
+    body.innerHTML = '';
+
+    // Set Headers based on Tab
+    if (currentTab === 'CarHire') {
+        header.innerHTML = `<tr class="p-6"><th>Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
+    } else if (currentTab === 'drivers') {
+        header.innerHTML = `<tr class="p-6"><th>Driver ID</th><th>Name</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
+    } else if (currentTab === 'History') {
+        header.innerHTML = `<tr class="p-6"><th>Completed Date</th><th>Driver ID</th><th>Hire ID</th><th class="text-right p-6">Status</th></tr>`;
+    }
+
+    allData.reverse().forEach((row, idx) => {
+        const c = row.c;
+        if (!c || !c[0]) return;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        
+        // --- CAR HIRE TAB ---
+        if (currentTab === 'CarHire') {
+            const hireId = c[1].v;
+            const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v == hireId);
             
+            let actionBtn = "";
+            if (assignedDriver) {
+                actionBtn = `<button onclick="completeJob('${assignedDriver.c[0].v}', '${hireId}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md hover:bg-green-700">
+                                <i class="fas fa-check-double mr-1"></i> DONE
+                             </button>`;
+            } else {
+                actionBtn = `<button onclick="allocateDriver('${hireId}')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md hover:bg-orange-600">
+                                <i class="fas fa-user-plus mr-1"></i> ASSIGN
+                             </button>`;
+            }
+
             tr.innerHTML = `
-    <td class="p-6 font-black text-blue-900">${c[0].v}</td>
-    <td class="p-6 font-bold text-slate-700">${c[1].v}</td>
-    <td class="p-6">
-        <span class="px-3 py-1 rounded-full text-[10px] font-black ${hasNoSignal ? 'bg-slate-100 text-slate-400' : 'bg-green-100 text-green-600'}">
-            ${hasNoSignal ? 'OFFLINE' : 'LIVE'}
-        </span>
-    </td>
-    <td class="p-6 font-black text-blue-600 text-xs">${activeJob}</td>
-    <td class="p-6 text-right">
-        ${hasNoSignal ? 
-            `<button disabled class="bg-slate-100 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black cursor-not-allowed">
-                <i class="fas fa-map-marker-slash mr-1"></i> NO SIGNAL
-            </button>` : 
-            `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-md hover:bg-orange-500 transition">
-                <i class="fas fa-location-arrow mr-1"></i> TRACK LIVE
-            </a>`
+                <td class="p-6 font-black text-blue-900">${hireId}</td>
+                <td class="p-6 font-bold text-slate-700">${c[2].v}</td>
+                <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td>
+                <td class="p-6 text-right flex justify-end gap-2">
+                    ${actionBtn}
+                    <button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
+                </td>`;
+        } 
+
+        // --- DRIVERS TAB ---
+        else if (currentTab === 'drivers') {
+            const lat = c[5] ? parseFloat(c[5].v) : 0;
+            const lng = c[6] ? parseFloat(c[6].v) : 0;
+            const activeJob = c[7] ? c[7].v : 'NONE';
+            const hasNoSignal = (lat === 0 || isNaN(lat));
+
+            tr.innerHTML = `
+                <td class="p-6 font-black text-blue-900">${c[0].v}</td>
+                <td class="p-6 font-bold text-slate-700">${c[1].v}</td>
+                <td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black ${hasNoSignal ? 'bg-slate-100 text-slate-400' : 'bg-green-100 text-green-600'}">${hasNoSignal ? 'OFFLINE' : 'LIVE'}</span></td>
+                <td class="p-6 font-black text-blue-600 text-xs">${activeJob}</td>
+                <td class="p-6 text-right">
+                    ${hasNoSignal ? 
+                        `<button disabled class="bg-slate-100 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black cursor-not-allowed"><i class="fas fa-map-marker-slash mr-1"></i> NO SIGNAL</button>` : 
+                        `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-md hover:bg-orange-500 transition"><i class="fas fa-location-arrow mr-1"></i> TRACK LIVE</a>`
+                    }
+                </td>`;
         }
-    </td>`;
-        }
-        body.appendChild(tr);
-    });
-}
+
+        // --- HISTORY TAB ---
+        else if (currentTab === 'History') {
+            const finalLoc = c[4] ? c[4].v : "";
+            const hasLocation = (finalLoc && finalLoc !== "No GPS Signal");
+
+            tr.className = "bg-slate-50/50 hover:bg-blue-50 transition border-b border-slate-200";
+            tr.innerHTML = `
+                <td class="p-6">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-calendar-check text-slate-400 text-xs"></i>
+                        <span class="text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</span>
+                    </div>
+                </td>
+                <td class="p-6 font-black text-slate-700">${c[1].v}</td>
+                <td class="p-6">
+                    <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-[10px] font-black border border-blue-100 uppercase">
+                        ${c[2].v}
+                    </span>
+                </td>
+                <td class="p-6 text-right">
+                    ${hasLocation ? 
+                        `<a href="https://www.google.com/maps?q=${finalLoc}" target="_blank" class="text-blue-600 hover:text-orange-500 transition text-[10px] font-black uppercase">
+                            <i class="fas fa-map-pin mr-1"></i> View Drop-off
+                        </a>` : 
+                        `<span class="text-slate-300 text-[10px] font-black uppercase">No GPS Data</span>`
+                    }
+                </td>
+            `;
+        }                                                   
+  
+  
+  
        async function allocateDriver(hireId) {
             const driverId = prompt("Enter Driver ID to assign to Job " + hireId);
             if (!driverId) return;
@@ -301,13 +351,25 @@
         }
 
         function filterTable() {
-            const val = document.getElementById('searchInput').value.toUpperCase();
-            const rows = document.getElementById('tableBody').getElementsByTagName('tr');
-            for (let r of rows) { r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none"; }
+    const val = document.getElementById('searchInput').value.toUpperCase();
+    const rows = document.getElementById('tableBody').getElementsByTagName('tr');
+    
+    for (let r of rows) {
+        // This checks every cell in the row for your search term
+        const content = r.innerText.toUpperCase();
+        if (content.includes(val)) {
+            r.style.display = "";
+            // Highlight effect for the search term
+            r.style.backgroundColor = val !== "" ? "#fff7ed" : ""; 
+        } else {
+            r.style.display = "none";
         }
+    }
+}
 
         function logout() { window.location.href = "index.html"; }
     </script>
 </body>
 </html>
+
 
