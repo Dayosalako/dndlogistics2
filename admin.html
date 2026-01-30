@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -195,27 +195,36 @@
         let allData = [];
         let driversData = [];
         let historyData = [];
+        let revenueChart = null;
 
         async function verifyAdmin() {
             const loginBtn = document.getElementById('loginBtn');
             const accessKey = document.getElementById('adminPassInput').value;
             if (!accessKey) return alert("Please enter your access key.");
+            
             loginBtn.innerText = "VERIFYING...";
             loginBtn.disabled = true;
 
             try {
                 const response = await fetch(`${MASTER_SCRIPT}?action=login&key=${encodeURIComponent(accessKey)}&type=admin`);
                 const result = await response.json();
+
                 if (result.success) {
                     document.getElementById('adminDisplayName').innerText = result.name;
                     document.body.classList.add('authorized');
                     syncData();
                 } else {
-                    alert("Access Denied.");
+                    alert("Access Denied: Invalid Credentials.");
                 }
-            } catch (e) { alert("Auth Error."); }
-            finally { loginBtn.innerText = "Access Terminal"; loginBtn.disabled = false; }
+            } catch (e) {
+                alert("Auth Server Error. Check Script URL.");
+            } finally {
+                loginBtn.innerText = "Access Terminal";
+                loginBtn.disabled = false;
+            }
         }
+
+        document.getElementById('adminPassInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdmin(); });
 
         async function syncData() {
             if (!document.body.classList.contains('authorized')) return;
@@ -223,29 +232,47 @@
             if(icon) icon.classList.add('fa-spin');
             
             try {
-                const [dRes, hRes, tRes] = await Promise.all([
-                    fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=drivers`),
-                    fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=History`),
-                    fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`)
-                ]);
+                // Fetch Drivers first to handle cross-referencing accurately
+                const dRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=drivers`);
+                const dText = await dRes.text();
+                driversData = JSON.parse(dText.substring(47).slice(0, -2)).table.rows;
 
-                driversData = JSON.parse((await dRes.text()).substring(47).slice(0,-2)).table.rows;
-                historyData = JSON.parse((await hRes.text()).substring(47).slice(0,-2)).table.rows;
-                allData = JSON.parse((await tRes.text()).substring(47).slice(0,-2)).table.rows;
+                // Fetch History to check completions
+                const hRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=History`);
+                const hText = await hRes.text();
+                historyData = JSON.parse(hText.substring(47).slice(0, -2)).table.rows;
+
+                // Fetch Main Tab Data
+                const res = await fetch(`https://docs.google.com/spreadsheets/d/${currentSheetID}/gviz/tq?tqx=out:json&sheet=${currentTab}`);
+                const text = await res.text();
+                allData = JSON.parse(text.substring(47).slice(0, -2)).table.rows;
 
                 renderTable();
                 if(currentTab === 'History') updateRevenueDashboard();
-            } catch (e) { console.error(e); }
-            if(icon) icon.classList.remove('fa-spin');
+            } catch (e) { 
+                console.error("Sync Error:", e); 
+            } finally { 
+                if(icon) icon.classList.remove('fa-spin'); 
+            }
         }
 
         function switchTab(tab, id) {
-            currentTab = tab; currentSheetID = id;
+            currentTab = tab; 
+            currentSheetID = id;
             document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-            if(document.getElementById(`btn-${tab}`)) document.getElementById(`btn-${tab}`).classList.add('active');
+            const btn = document.getElementById(`btn-${tab}`);
+            if(btn) btn.classList.add('active');
             
-            document.getElementById('exportBtn').classList.toggle('hidden', tab !== 'History');
-            document.getElementById('revenueSection').classList.toggle('hidden', tab !== 'History');
+            const exportBtn = document.getElementById('exportBtn');
+            const revSec = document.getElementById('revenueSection');
+
+            if(tab === 'History') {
+                exportBtn.classList.remove('hidden');
+                revSec.classList.remove('hidden');
+            } else {
+                exportBtn.classList.add('hidden');
+                revSec.classList.add('hidden');
+            }
             syncData();
         }
 
@@ -254,72 +281,143 @@
             const body = document.getElementById('tableBody');
             body.innerHTML = '';
 
-            // CORRECTED HEADERS
-            if (currentTab === 'Database') {
-                header.innerHTML = `<tr><th class="p-6">ID</th><th>Date</th><th>Customer</th><th>Route</th><th class="text-right p-6">Action</th></tr>`;
-            } else if (currentTab === 'CarHire') {
+            if (currentTab === 'CarHire') {
                 header.innerHTML = `<tr><th class="p-6">Hire ID</th><th>Customer</th><th>Vehicle</th><th class="text-right p-6">Management</th></tr>`;
             } else if (currentTab === 'drivers') {
                 header.innerHTML = `<tr><th class="p-6">Driver ID</th><th>Name</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
             } else if (currentTab === 'History') {
                 header.innerHTML = `<tr><th class="p-6">Completed Date</th><th>Driver ID</th><th>Hire ID</th><th class="text-right p-6">Status</th></tr>`;
+            } else if (currentTab === 'Database') {
+                header.innerHTML = `<tr><th class="p-6">ID</th><th>Date</th><th>Customer</th><th>Route</th><th class="text-right p-6">Action</th></tr>`;
             }
 
             allData.slice().reverse().forEach((row, idx) => {
-                const c = row.c; if (!c || !c[0]) return;
+                const c = row.c;
+                if (!c || !c[0]) return;
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
 
                 if (currentTab === 'CarHire') {
-                    const hId = c[1]?.v;
-                    const isArchived = historyData.some(h => h.c[2]?.v == hId);
-                    const assignedDriver = driversData.find(d => d.c[7]?.v == hId);
+                    const hireId = c[1] ? c[1].v : "N/A";
+                    // Cross-check: Is this ID in History?
+                    const isArchived = historyData.some(h => h.c[2] && h.c[2].v == hireId);
+                    // Cross-check: Is a driver currently holding this ID?
+                    const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v == hireId);
                     
-                    let actionBtn = isArchived ? `<button onclick="jumpToHistory('${hId}')" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Proof</button>` : 
-                                   assignedDriver ? `<button onclick="completeJob('${assignedDriver.c[0].v}', '${hId}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md">DONE</button>` :
-                                   `<button onclick="allocateDriver('${hId}')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md">ASSIGN</button>`;
+                    let actionBtn = "";
+                    if (isArchived) {
+                        actionBtn = `<button onclick="jumpToHistory('${hireId}')" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black uppercase"><i class="fas fa-history mr-1"></i> Proof</button>`;
+                    } else if (assignedDriver) {
+                        actionBtn = `<button onclick="completeJob('${assignedDriver.c[0].v}', '${hireId}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md"><i class="fas fa-check-double mr-1"></i> DONE</button>`;
+                    } else {
+                        actionBtn = `<button onclick="allocateDriver('${hireId}')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md"><i class="fas fa-user-plus mr-1"></i> ASSIGN</button>`;
+                    }
 
-                    tr.innerHTML = `<td class="p-6 font-black text-blue-900">${hId}</td><td class="p-6 font-bold text-slate-700">${c[2]?.v}</td><td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4]?.v}</td><td class="p-6 text-right flex justify-end gap-2 items-center">${actionBtn}<button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button><button onclick="deleteEntry('${hId}', 'CarHire')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs"><i class="fas fa-trash-alt"></i></button></td>`;
+                    tr.innerHTML = `
+                        <td class="p-6 font-black text-blue-900">${hireId}</td>
+                        <td class="p-6 font-bold text-slate-700">${c[2] ? c[2].v : 'N/A'}</td>
+                        <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4] ? c[4].v : 'N/A'}</td>
+                        <td class="p-6 text-right flex justify-end gap-2 items-center">
+                            ${actionBtn}
+                            <button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
+                            <button onclick="deleteEntry('${hireId}', 'CarHire')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
+                        </td>`;
                 } 
-                else if (currentTab === 'Database') {
-                    const trackId = c[0].v;
-                    tr.innerHTML = `<td class="p-6 font-black text-blue-900">${trackId}</td><td class="p-6 font-bold text-slate-500 text-xs">${c[1].v}</td><td class="p-6 font-bold text-slate-700">${c[3].v}</td><td class="p-6 text-xs font-black text-slate-400 uppercase">${c[7].v} -> ${c[8].v}</td><td class="p-6 text-right flex justify-end gap-2"><button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button><button onclick="deleteEntry('${trackId}', 'Database')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs"><i class="fas fa-trash-alt"></i></button></td>`;
-                }
                 else if (currentTab === 'drivers') {
-                    const lat = c[5]?.v || 0; const lng = c[6]?.v || 0;
-                    tr.innerHTML = `<td class="p-6 font-black text-blue-900">${c[0].v}</td><td class="p-6 font-bold text-slate-700">${c[1].v}</td><td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black ${lat != 0 ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-400'}">${lat != 0 ? 'LIVE' : 'OFFLINE'}</span></td><td class="p-6 font-black text-blue-600 text-xs">${c[7]?.v || 'NONE'}</td><td class="p-6 text-right">${lat != 0 ? `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black">TRACK</a>` : 'NO SIGNAL'}</td>`;
+                    const lat = c[5] ? parseFloat(c[5].v) : 0;
+                    const lng = c[6] ? parseFloat(c[6].v) : 0;
+                    const activeJob = c[7] ? c[7].v : 'NONE';
+                    const hasNoSignal = (lat === 0 || isNaN(lat));
+                    tr.innerHTML = `
+                        <td class="p-6 font-black text-blue-900">${c[0].v}</td>
+                        <td class="p-6 font-bold text-slate-700">${c[1].v}</td>
+                        <td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black ${hasNoSignal ? 'bg-slate-100 text-slate-400' : 'bg-green-100 text-green-600'}">${hasNoSignal ? 'OFFLINE' : 'LIVE'}</span></td>
+                        <td class="p-6 font-black text-blue-600 text-xs">${activeJob}</td>
+                        <td class="p-6 text-right">
+                            ${hasNoSignal ? `<button disabled class="bg-slate-100 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-map-marker-slash mr-1"></i> NO SIGNAL</button>` : `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-location-arrow mr-1"></i> TRACK</a>`}
+                        </td>`;
                 }
                 else if (currentTab === 'History') {
-                    tr.innerHTML = `<td class="p-6 text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</td><td class="p-6 font-black text-slate-700">${c[1].v}</td><td class="p-6 font-black text-blue-700 uppercase">${c[2].v}</td><td class="p-6 text-right"><span class="text-green-600 text-[10px] font-black uppercase">LOGGED</span></td>`;
+                    const finalLoc = c[4] ? c[4].v : "";
+                    tr.innerHTML = `
+                        <td class="p-6 text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</td>
+                        <td class="p-6 font-black text-slate-700">${c[1].v}</td>
+                        <td class="p-6 font-black text-blue-700 uppercase">${c[2].v}</td>
+                        <td class="p-6 text-right">
+                            <span class="text-green-600 text-[10px] font-black uppercase"><i class="fas fa-check-circle mr-1"></i> LOGGED</span>
+                        </td>`;
+                }
+                else if (currentTab === 'Database') {
+                    const trackId = c[0].v;
+                    tr.innerHTML = `
+                        <td class="p-6 font-black text-blue-900">${trackId}</td>
+                        <td class="p-6 font-bold text-slate-500 text-xs">${c[1].v}</td>
+                        <td class="p-6 font-bold text-slate-700">${c[3].v}</td>
+                        <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[7].v} -> ${c[8].v}</td>
+                        <td class="p-6 text-right flex justify-end gap-2">
+                            <button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
+                            <button onclick="deleteEntry('${trackId}', 'Database')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs"><i class="fas fa-trash-alt"></i></button>
+                        </td>`;
                 }
                 body.appendChild(tr);
             });
         }
 
-        // --- FIXED ASSIGN & DELETE LOGIC (VIA URL PARAMS) ---
         async function allocateDriver(hireId) {
-            const drvId = prompt("Enter Driver ID:");
-            if (!drvId) return;
-            const url = `${MASTER_SCRIPT}?isAssign=true&DriverID=${encodeURIComponent(drvId)}&HireID=${encodeURIComponent(hireId)}`;
-            new Image().src = url; // Silent trigger
-            alert("Assigning...");
-            setTimeout(syncData, 2000);
+            const driverId = prompt("Enter Driver ID to assign to Job " + hireId);
+            if (!driverId) return;
+            try {
+                // Post to Apps Script
+                await fetch(`${MASTER_SCRIPT}?isAssign=true&DriverID=${driverId}&HireID=${hireId}`, { method: 'POST', mode: 'no-cors' });
+                alert("Assignment Command Sent. Refreshing...");
+                setTimeout(syncData, 1500); // Wait for Google Sheet to update before re-syncing
+            } catch (e) { alert("Command Failed"); }
         }
 
-        async function completeJob(drvId, hId) {
-            if(!confirm("Mark as Done?")) return;
-            const url = `${MASTER_SCRIPT}?isCompleteJob=true&DriverID=${encodeURIComponent(drvId)}`;
-            new Image().src = url;
-            alert("Logging...");
-            setTimeout(syncData, 2000);
+        async function completeJob(driverId, hireId) {
+            if(!confirm(`Mark Job ${hireId} as completed? This logs it to History.`)) return;
+            try {
+                await fetch(`${MASTER_SCRIPT}?isCompleteJob=true&DriverID=${driverId}`, { method: 'POST', mode: 'no-cors' });
+                alert("Completion Logged.");
+                setTimeout(syncData, 1500);
+            } catch (e) { alert("Command Failed"); }
         }
 
         async function deleteEntry(id, sheet) {
-            if(!confirm(`Delete ${id}?`)) return;
-            const url = `${MASTER_SCRIPT}?isDelete=true&id=${encodeURIComponent(id)}&sheet=${encodeURIComponent(sheet)}`;
-            new Image().src = url;
-            alert("Deleting...");
-            setTimeout(syncData, 2000);
+            if(!confirm(`Permanently delete ${id} from ${sheet}?`)) return;
+            try {
+                await fetch(`${MASTER_SCRIPT}?isDelete=true&id=${id}&sheet=${sheet}`, { method: 'POST', mode: 'no-cors' });
+                alert("Delete request sent.");
+                setTimeout(syncData, 1500);
+            } catch (e) { alert("Error"); }
+        }
+
+        function exportHistoryToCSV() {
+            if (historyData.length === 0) return alert("No history data to export.");
+            
+            let csv = "Timestamp,Driver ID,Hire ID,Status,GPS Location\n";
+            historyData.forEach(row => {
+                if (row.c) {
+                    const line = [
+                        row.c[0] ? (row.c[0].f || row.c[0].v) : "",
+                        row.c[1] ? row.c[1].v : "",
+                        row.c[2] ? row.c[2].v : "",
+                        "COMPLETED",
+                        row.c[4] ? row.c[4].v : "N/A"
+                    ].map(v => `"${v}"`).join(",");
+                    csv += line + "\n";
+                }
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `DND_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function printWaybillFromAdmin(idx) {
@@ -329,13 +427,13 @@
                 document.getElementById('wb_name').innerText = row[3].v;
                 document.getElementById('wb_contact').innerText = "Phone: " + (row[4] ? row[4].v : 'N/A');
                 document.getElementById('wb_route').innerText = `FROM: ${row[7].v} -> TO: ${row[8].v}`;
-                document.getElementById('wb_details').innerText = row[9] ? row[9].v : "Item Logistics";
-            } else {
-                document.getElementById('wb_id').innerText = "HIRE: " + row[1].v;
+                document.getElementById('wb_details').innerText = row[9] ? row[9].v : "Item Logistics Service";
+            } else if (currentTab === 'CarHire') {
+                document.getElementById('wb_id').innerText = "HIRE ID: " + row[1].v;
                 document.getElementById('wb_name').innerText = row[2].v;
                 document.getElementById('wb_contact').innerText = "Phone: " + row[3].v;
-                document.getElementById('wb_route').innerText = `${row[4].v} (${row[5].v} Days)`;
-                document.getElementById('wb_details').innerText = row[6] ? "Location: " + row[6].v : "Executive Fleet";
+                document.getElementById('wb_route').innerText = `CAR TYPE: ${row[4].v} (${row[5].v} DAYS)`;
+                document.getElementById('wb_details').innerText = row[6] ? "Location: " + row[6].v : "Executive Fleet Service";
             }
             document.getElementById('wb_date').innerText = "Issued: " + new Date().toLocaleString();
             window.print();
@@ -344,21 +442,40 @@
         function filterTable() {
             const val = document.getElementById('searchInput').value.toUpperCase();
             const rows = document.getElementById('tableBody').getElementsByTagName('tr');
-            for (let r of rows) r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none";
+            for (let r of rows) {
+                r.style.display = r.innerText.toUpperCase().includes(val) ? "" : "none";
+            }
         }
 
-        function exportHistoryToCSV() {
-            let csv = "Date,Driver,HireID,Status\n";
-            historyData.forEach(r => { if(r.c) csv += `"${r.c[0].v}","${r.c[1].v}","${r.c[2].v}","COMPLETED"\n`; });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "DND_Report.csv";
-            link.click();
+        function jumpToHistory(hireId) {
+            switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0');
+            document.getElementById('searchInput').value = hireId;
+            setTimeout(filterTable, 500);
         }
 
-        function jumpToHistory(hId) { switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0'); }
+        function updateRevenueDashboard() {
+            let totalRevenue = 0;
+            let totalExpense = 0;
+            const monthlyStats = {};
+
+            historyData.forEach(row => {
+                if (!row.c) return;
+                const rev = row.c[5] ? parseFloat(row.c[5].v) || 0 : 0;
+                const exp = row.c[6] ? parseFloat(row.c[6].v) || 0 : 0;
+                totalRevenue += rev;
+                totalExpense += exp;
+                const date = row.c[0].f || "Unknown";
+                const month = date.split('/')[0];
+                monthlyStats[month] = (monthlyStats[month] || 0) + (rev - exp);
+            });
+
+            document.getElementById('totalRevDisplay').innerText = `₦${totalRevenue.toLocaleString()}`;
+            document.getElementById('totalExpDisplay').innerText = `₦${totalExpense.toLocaleString()}`;
+            document.getElementById('netProfitDisplay').innerText = `₦${(totalRevenue - totalExpense).toLocaleString()}`;
+        }
+
         function logout() { location.reload(); }
     </script>
 </body>
 </html>
+
