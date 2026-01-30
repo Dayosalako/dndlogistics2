@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DND HQ | Master Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
@@ -110,13 +111,37 @@
         </header>
 
         <div class="p-8 pb-0 overflow-y-auto">
+            <div id="revenueSection" class="hidden mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                        <h3 class="text-[10px] font-black text-slate-400 uppercase mb-2">Gross Revenue</h3>
+                        <p id="totalRevDisplay" class="text-2xl font-black text-blue-900">₦0.00</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                        <h3 class="text-[10px] font-black text-red-400 uppercase mb-2">Driver Expenses</h3>
+                        <p id="totalExpDisplay" class="text-2xl font-black text-red-600">₦0.00</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-[2rem] border border-orange-200 shadow-sm bg-orange-50">
+                        <h3 class="text-[10px] font-black text-orange-500 uppercase mb-2">Net Profit</h3>
+                        <p id="netProfitDisplay" class="text-2xl font-black text-orange-600">₦0.00</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 mt-6 h-48">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
             <div class="mb-8 border-b-2 border-slate-100 pb-6">
                 <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Module Selection</h3>
-                <div class="flex gap-4">
+                <div class="flex flex-wrap gap-4 items-center">
                     <button onclick="switchTab('Database', '1EkIYrBFcskSwS6PhMhj6dKCXHok8NfWanUb0lUqmM8I')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">ITEM TRACKER</button>
                     <button onclick="switchTab('CarHire', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HIRE TRACKER</button>
                     <button onclick="switchTab('drivers', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">FLEET RADAR</button>
                     <button onclick="switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0')" class="bg-white px-6 py-4 rounded-2xl border border-slate-200 font-black text-blue-900 hover:border-orange-500 transition">HISTORY LOG</button>
+                    
+                    <button id="exportBtn" onclick="exportHistoryToCSV()" class="hidden bg-emerald-600 text-white px-6 py-4 rounded-2xl font-black hover:bg-emerald-700 transition shadow-lg shadow-emerald-200">
+                        <i class="fas fa-file-export mr-2"></i> EXPORT CSV
+                    </button>
                 </div>
             </div>
 
@@ -130,11 +155,13 @@
     </main>
 
     <script>
-        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxnXvx9cu5U2d95lf4XuL0vhyGkd-EGdJDva--c_O7FImh0E0c0uTevI1dYzF-K7CsVaQ/exec';
+        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbyw1VYoAaKjJwaPtJzvlcsfo0R-FZSnoDgG5MpqR8kaRYJrN7nd9rHH9kN12pQnZmsUOA/exec';
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         let currentTab = 'CarHire';
         let allData = [];
         let driversData = [];
+        let historyData = [];
+        let revenueChart = null;
 
         function checkAdminLock() {
             const accessKey = prompt("Restricted Area: System Authentication Required\nEnter Admin Key:");
@@ -171,7 +198,13 @@
                 const dJson = JSON.parse(dText.substring(47).slice(0, -2));
                 driversData = dJson.table.rows;
 
+                const hRes = await fetch(`https://docs.google.com/spreadsheets/d/1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0/gviz/tq?tqx=out:json&sheet=History`);
+                const hText = await hRes.text();
+                const hJson = JSON.parse(hText.substring(47).slice(0, -2));
+                historyData = hJson.table.rows;
+
                 renderTable();
+                if(currentTab === 'History') updateRevenueDashboard();
             } catch (e) { console.error("Sync Error:", e); }
             finally { if(icon) icon.classList.remove('fa-spin'); }
         }
@@ -184,9 +217,18 @@
             if(btn) btn.classList.add('active');
             
             const searchInput = document.getElementById('searchInput');
-            if(tab === 'History') searchInput.placeholder = "Search Driver or Hire ID...";
-            else searchInput.placeholder = "Search live data...";
+            searchInput.placeholder = (tab === 'History') ? "Search Driver or Hire ID..." : "Search live data...";
+            
+            const exportBtn = document.getElementById('exportBtn');
+            const revSec = document.getElementById('revenueSection');
 
+            if(tab === 'History') {
+                exportBtn.classList.remove('hidden');
+                revSec.classList.remove('hidden');
+            } else {
+                exportBtn.classList.add('hidden');
+                revSec.classList.add('hidden');
+            }
             syncData();
         }
 
@@ -205,26 +247,34 @@
                 header.innerHTML = `<tr class="p-6"><th>ID</th><th>Date</th><th>Customer</th><th>Route</th><th class="text-right p-6">Action</th></tr>`;
             }
 
-            allData.reverse().forEach((row, idx) => {
+            allData.slice().reverse().forEach((row, idx) => {
                 const c = row.c;
                 if (!c || !c[0]) return;
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                
+
                 if (currentTab === 'CarHire') {
                     const hireId = c[1].v;
                     const assignedDriver = driversData.find(d => d.c[7] && d.c[7].v == hireId);
-                    let actionBtn = assignedDriver ? 
-                        `<button onclick="completeJob('${assignedDriver.c[0].v}', '${hireId}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md hover:bg-green-700"><i class="fas fa-check-double mr-1"></i> DONE</button>` : 
-                        `<button onclick="allocateDriver('${hireId}')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md hover:bg-orange-600"><i class="fas fa-user-plus mr-1"></i> ASSIGN</button>`;
+                    const isArchived = historyData.some(h => h.c[2] && h.c[2].v == hireId);
+                    let actionBtn = "";
+
+                    if (isArchived) {
+                        actionBtn = `<button onclick="jumpToHistory('${hireId}')" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black uppercase"><i class="fas fa-history mr-1"></i> Proof</button>`;
+                    } else if (assignedDriver) {
+                        actionBtn = `<button onclick="completeJob('${assignedDriver.c[0].v}', '${hireId}')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md"><i class="fas fa-check-double mr-1"></i> DONE</button>`;
+                    } else {
+                        actionBtn = `<button onclick="allocateDriver('${hireId}')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md"><i class="fas fa-user-plus mr-1"></i> ASSIGN</button>`;
+                    }
 
                     tr.innerHTML = `
                         <td class="p-6 font-black text-blue-900">${hireId}</td>
                         <td class="p-6 font-bold text-slate-700">${c[2].v}</td>
                         <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[4].v}</td>
-                        <td class="p-6 text-right flex justify-end gap-2">
+                        <td class="p-6 text-right flex justify-end gap-2 items-center">
                             ${actionBtn}
-                            <button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
+                            <button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
+                            <button onclick="deleteEntry('${hireId}', 'CarHire')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash-alt"></i></button>
                         </td>`;
                 } 
                 else if (currentTab === 'drivers') {
@@ -239,31 +289,75 @@
                         <td class="p-6"><span class="px-3 py-1 rounded-full text-[10px] font-black ${hasNoSignal ? 'bg-slate-100 text-slate-400' : 'bg-green-100 text-green-600'}">${hasNoSignal ? 'OFFLINE' : 'LIVE'}</span></td>
                         <td class="p-6 font-black text-blue-600 text-xs">${activeJob}</td>
                         <td class="p-6 text-right">
-                            ${hasNoSignal ? 
-                                `<button disabled class="bg-slate-100 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black cursor-not-allowed"><i class="fas fa-map-marker-slash mr-1"></i> NO SIGNAL</button>` : 
-                                `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black shadow-md hover:bg-orange-500 transition"><i class="fas fa-location-arrow mr-1"></i> TRACK LIVE</a>`
-                            }
+                            ${hasNoSignal ? `<button disabled class="bg-slate-100 text-slate-300 px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-map-marker-slash mr-1"></i> NO SIGNAL</button>` : `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-[10px] font-black"><i class="fas fa-location-arrow mr-1"></i> TRACK</a>`}
                         </td>`;
                 }
                 else if (currentTab === 'History') {
                     const finalLoc = c[4] ? c[4].v : "";
-                    const hasLocation = (finalLoc && finalLoc !== "No GPS Signal");
-                    tr.className = "bg-slate-50/50 hover:bg-blue-50 transition border-b border-slate-200";
+                    const hasLocation = (finalLoc && finalLoc.includes(','));
                     tr.innerHTML = `
-                        <td class="p-6"><span class="text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</span></td>
+                        <td class="p-6 text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</td>
                         <td class="p-6 font-black text-slate-700">${c[1].v}</td>
-                        <td class="p-6"><span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-[10px] font-black border border-blue-100 uppercase">${c[2].v}</span></td>
-                        <td class="p-6 text-right">${hasLocation ? `<a href="https://www.google.com/maps?q=${finalLoc}" target="_blank" class="text-blue-600 hover:text-orange-500 transition text-[10px] font-black uppercase"><i class="fas fa-map-pin mr-1"></i> View Drop-off</a>` : `<span class="text-slate-300 text-[10px] font-black uppercase">No GPS Data</span>`}</td>`;
+                        <td class="p-6 font-black text-blue-700 uppercase">${c[2].v}</td>
+                        <td class="p-6 text-right">
+                            ${hasLocation ? `<a href="https://www.google.com/maps?q=${finalLoc}" target="_blank" class="text-blue-600 text-[10px] font-black uppercase"><i class="fas fa-map-pin mr-1"></i> View Drop</a>` : `<span class="text-slate-300 text-[10px]">No GPS</span>`}
+                        </td>`;
                 }
                 else if (currentTab === 'Database') {
+                    const trackingId = c[0].v;
                     tr.innerHTML = `
-                        <td class="p-6 font-black text-blue-900">${c[0].v}</td>
-                        <td class="p-6 text-xs font-bold text-slate-500">${c[1].f || c[1].v}</td>
+                        <td class="p-6 font-black text-blue-900">${trackingId}</td>
+                        <td class="p-6 font-bold text-slate-500 text-xs">${c[1].v}</td>
                         <td class="p-6 font-bold text-slate-700">${c[3].v}</td>
                         <td class="p-6 text-xs font-black text-slate-400 uppercase">${c[7].v} -> ${c[8].v}</td>
-                        <td class="p-6 text-right"><button onclick="printWaybillFromAdmin(${idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button></td>`;
+                        <td class="p-6 text-right flex justify-end gap-2">
+                            <button onclick="printWaybillFromAdmin(${allData.length - 1 - idx})" class="bg-blue-900 text-white px-3 py-2 rounded-lg text-xs"><i class="fas fa-print"></i></button>
+                            <button onclick="deleteEntry('${trackingId}', 'Database')" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs"><i class="fas fa-trash-alt"></i></button>
+                        </td>`;
                 }
                 body.appendChild(tr);
+            });
+        }
+
+        function updateRevenueDashboard() {
+            let totalRevenue = 0;
+            let totalExpense = 0;
+            const monthlyStats = {};
+
+            historyData.forEach(row => {
+                if (!row.c) return;
+                // Assuming Rev in Col F (index 5) and Expense in Col G (index 6)
+                const rev = row.c[5] ? parseFloat(row.c[5].v) || 0 : 0;
+                const exp = row.c[6] ? parseFloat(row.c[6].v) || 0 : 0;
+                
+                totalRevenue += rev;
+                totalExpense += exp;
+
+                const date = row.c[0].f || "Unknown";
+                const month = date.split('/')[0];
+                monthlyStats[month] = (monthlyStats[month] || 0) + (rev - exp);
+            });
+
+            document.getElementById('totalRevDisplay').innerText = `₦${totalRevenue.toLocaleString()}`;
+            document.getElementById('totalExpDisplay').innerText = `₦${totalExpense.toLocaleString()}`;
+            document.getElementById('netProfitDisplay').innerText = `₦${(totalRevenue - totalExpense).toLocaleString()}`;
+
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            if (revenueChart) revenueChart.destroy();
+            revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(monthlyStats).map(m => "Month " + m),
+                    datasets: [{
+                        label: 'Net Profit',
+                        data: Object.values(monthlyStats),
+                        borderColor: '#f97316',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(249, 115, 22, 0.05)'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
         }
 
@@ -272,9 +366,9 @@
             if (!driverId) return;
             try {
                 await fetch(`${MASTER_SCRIPT}?isAssign=true&DriverID=${driverId}&HireID=${hireId}`, { method: 'POST', mode: 'no-cors' });
-                alert("Job Assigned. System refreshing...");
+                alert("Job Assigned.");
                 setTimeout(syncData, 2000);
-            } catch (e) { alert("Allocation Error"); }
+            } catch (e) { alert("Error"); }
         }
 
         async function completeJob(driverId, hireId) {
@@ -283,7 +377,16 @@
                 await fetch(`${MASTER_SCRIPT}?isCompleteJob=true&DriverID=${driverId}`, { method: 'POST', mode: 'no-cors' });
                 alert("Job Completed.");
                 setTimeout(syncData, 2000);
-            } catch (e) { alert("Completion Error"); }
+            } catch (e) { alert("Error"); }
+        }
+
+        async function deleteEntry(id, sheetName) {
+            if (!confirm(`Permanently delete ${id}?`) || !confirm("Final Warning: Proceed?")) return;
+            try {
+                await fetch(`${MASTER_SCRIPT}?isDelete=true&id=${id}&sheet=${sheetName}`, { method: 'POST', mode: 'no-cors' });
+                alert("Delete request sent.");
+                setTimeout(syncData, 2000);
+            } catch (e) { alert("Error"); }
         }
 
         function printWaybillFromAdmin(idx) {
@@ -293,7 +396,7 @@
                 document.getElementById('wb_name').innerText = row[3].v;
                 document.getElementById('wb_contact').innerText = "Phone: " + (row[4] ? row[4].v : 'N/A');
                 document.getElementById('wb_route').innerText = `FROM: ${row[7].v} -> TO: ${row[8].v}`;
-                document.getElementById('wb_details').innerText = row[9] ? row[9].v : "No Item Description";
+                document.getElementById('wb_details').innerText = row[9] ? row[9].v : "Item Logistics Service";
             } else if (currentTab === 'CarHire') {
                 document.getElementById('wb_id').innerText = "HIRE ID: " + row[1].v;
                 document.getElementById('wb_name').innerText = row[2].v;
@@ -311,11 +414,34 @@
             for (let r of rows) {
                 const content = r.innerText.toUpperCase();
                 r.style.display = content.includes(val) ? "" : "none";
-                r.style.backgroundColor = (val !== "" && content.includes(val)) ? "#fff7ed" : ""; 
             }
         }
 
         function logout() { window.location.href = "index.html"; }
+
+        function exportHistoryToCSV() {
+            if (currentTab !== 'History') return;
+            let csvContent = "data:text/csv;charset=utf-8,Timestamp,Driver ID,Hire ID,Status,Location\r\n";
+            allData.forEach(row => {
+                if (row.c) {
+                    const rowData = [row.c[0].f || row.c[0].v, row.c[1].v, row.c[2].v, "COMPLETED", row.c[4] ? row.c[4].v : "N/A"].map(v => `"${v}"`).join(",");
+                    csvContent += rowData + "\r\n";
+                }
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", `DND_Export_${new Date().toLocaleDateString()}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function jumpToHistory(hireId) {
+            switchTab('History', '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0');
+            const input = document.getElementById('searchInput');
+            input.value = hireId;
+            setTimeout(filterTable, 500);
+        }
     </script>
 </body>
 </html>
