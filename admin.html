@@ -1,4 +1,7 @@
-<!DOCTYPE html>                
+<!DOCTYPE html>                                                                            
+  
+  
+  
   
 <html lang="en">
 <head>
@@ -382,7 +385,8 @@
         }
 
         async function deleteEntry(id, sheet) {
-            if(!confirm(`Permanently delete ${id} from ${sheet}?`)) return;
+            if(!confirm(`Permanently delete ${id} from                     
+  ${sheet}?`)) return;
             try {
                 await fetch(`${MASTER_SCRIPT}?isDelete=true&id=${id}&sheet=${sheet}`, { method: 'POST', mode: 'no-cors' });
                 alert("Delete request sent.");
@@ -472,3 +476,4 @@
     </script>
 </body>
 </html>
+
