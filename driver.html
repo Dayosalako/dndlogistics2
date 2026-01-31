@@ -300,17 +300,22 @@
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${targetLat},${targetLng}&travelmode=driving`, '_blank');
 }
 
-        async function completeTrip() {
+     async function completeTrip() {
             if(!confirm("Finalize and close assignment?")) return;
             const btn = document.getElementById('toggle-btn');
             btn.innerText = "LOGGING..."; btn.disabled = true;
             if(updateInterval) clearInterval(updateInterval);
             
             navigator.geolocation.getCurrentPosition(async pos => {
+                // Send current pos, but script will reset it to 0 after logging
                 await sendToSheet(pos.coords.latitude, pos.coords.longitude, "COMPLETED", true);
-                alert("Trip Logged & Report Generated.");
+                alert("Trip Logged. Station standby.");
                 location.reload();
-            }, async () => { await sendToSheet(0, 0, "COMPLETED", true); location.reload(); });
+            }, async () => { 
+                // Fallback if GPS is off
+                await sendToSheet(0, 0, "COMPLETED", true); 
+                location.reload(); 
+            });
         }
 
         async function sendToSheet(lat, lng, status, isFinish) {
@@ -325,6 +330,7 @@
     </script>
 </body>
 </html>
+
 
 
 
