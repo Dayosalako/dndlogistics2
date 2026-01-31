@@ -1,8 +1,4 @@
 <!DOCTYPE html>                                                                            
-  
-  
-  
-  
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -193,7 +189,7 @@
     </div>
 
     <script>
-        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxrQw8e8V_Kl0317scTOzz6dYaK5pxf28rRnA90AI1Tr-w2ptSpyFeMxG6qpc-VXqew-w/exec';
+        const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbygpvkOcbo0Owhw3MdVwHxTiP_rdu6EAs9WiIeoSKjCiEoXeLhDLM-acudGombllJSadg/exec';
         
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
         let currentTab = 'CarHire';
@@ -375,14 +371,26 @@
             } catch (e) { alert("Command Failed"); }
         }
 
+      
         async function completeJob(driverId, hireId) {
-            if(!confirm(`Mark Job ${hireId} as completed? This logs it to History.`)) return;
-            try {
-                await fetch(`${MASTER_SCRIPT}?isCompleteJob=true&DriverID=${driverId}`, { method: 'POST', mode: 'no-cors' });
-                alert("Completion Logged.");
-                setTimeout(syncData, 1500);
-            } catch (e) { alert("Command Failed"); }
-        }
+    if(!confirm(`Mark Job ${hireId} as completed? This logs it to History.`)) return;
+    
+    try {
+        // We explicitly add lat=0 and lng=0 to the URL to tell the sheet to reset
+        const url = `${MASTER_SCRIPT}?isCompleteJob=true&DriverID=${driverId}&lat=0&lng=0`;
+        
+        await fetch(url, { method: 'POST', mode: 'no-cors' });
+        
+        alert("Completion Logged. GPS Resetting...");
+        
+        // Stop any active GPS tracking intervals immediately
+        if(typeof updateInterval !== 'undefined') clearInterval(updateInterval);
+        
+        setTimeout(syncData, 1500);
+    } catch (e) { 
+        alert("Command Failed"); 
+    }
+}
 
         async function deleteEntry(id, sheet) {
             if(!confirm(`Permanently delete ${id} from                     
@@ -476,4 +484,5 @@
     </script>
 </body>
 </html>
+
 
