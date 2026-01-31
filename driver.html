@@ -284,8 +284,9 @@
 
         function openNavigation() {
             if (!targetLat) return alert("No destination coordinates.");
-            window.open(https://www.google.com/search?q=https://www.google.com/maps/dir/%3Fapi%3D1%26destination%3D${targetLat},${targetLng}&travelmode=driving, '_blank');
-                        }
+            window.open(\                    
+  https://www.google.com/maps/dir/?api=1&destination=${targetLat},${targetLng}&travelmode=driving`, '_blank');`
+                }
 
         async function completeTrip() {
             if(!confirm("Finalize and close assignment?")) return;
@@ -312,6 +313,7 @@
     </script>
 </body>
 </html>
+
 
 
 
