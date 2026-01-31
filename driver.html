@@ -142,38 +142,48 @@
         let targetLat = null, targetLng = null;
 
         async function authenticateDriver() {
-            const inputId = document.getElementById('driverIDInput').value.trim().toUpperCase();
-            const inputPass = document.getElementById('driverPassInput').value.trim();
-            if(!inputId || !inputPass) return alert("Enter credentials");
+    const inputId = document.getElementById('driverIDInput').value.trim().toUpperCase();
+    const inputPass = document.getElementById('driverPassInput').value.trim();
+    
+    if(!inputId || !inputPass) {
+        alert("Please enter both ID and Password");
+        return;
+    }
+    
+    const authBtn = document.getElementById('authBtn');
+    authBtn.innerText = "VERIFYING...";
+    authBtn.disabled = true;
+
+    // Construct the URL with correct parameters expected by your Apps Script
+    const url = `${SCRIPT_URL}?action=login&key=${encodeURIComponent(inputId)}&pass=${encodeURIComponent(inputPass)}&type=driver`;
+
+    try {
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result.success) {
+            driverID = inputId;
+            document.getElementById('displayDriverName').innerText = result.name;
+            document.getElementById('displayPlate').innerText = result.vehicle || "N/A";
+            currentActiveJob = result.activeJob || 'NONE';
             
-            const authBtn = document.getElementById('authBtn');
-            authBtn.innerText = "VERIFYING...";
-            authBtn.disabled = true;
-
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=login&key=${inputId}&pass=${inputPass}&type=driver`);
-                const result = await response.json();
-
-                if (result.success) {
-                    driverID = inputId;
-                    document.getElementById('displayDriverName').innerText = result.name;
-                    document.getElementById('displayPlate').innerText = result.vehicle || "N/A";
-                    currentActiveJob = result.activeJob || 'NONE';
-                    
-                    updateUIState(result);
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    document.getElementById('main-terminal').classList.remove('hidden');
-                    initMap();
-                    startBackgroundPolling();
-                } else {
-                    alert("Denied: " + result.error);
-                    authBtn.innerText = "Link Terminal"; authBtn.disabled = false;
-                }
-            } catch (e) {
-                alert("Connection failed.");
-                authBtn.innerText = "Link Terminal"; authBtn.disabled = false;
-            }
+            updateUIState(result);
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-terminal').classList.remove('hidden');
+            initMap();
+            startBackgroundPolling();
+        } else {
+            alert("Login Failed: " + (result.error || "Unknown Error"));
+            authBtn.innerText = "Link Terminal"; 
+            authBtn.disabled = false;
         }
+    } catch (e) {
+        console.error("Auth Error:", e);
+        alert("Connection Error. Check your internet or Script URL.");
+        authBtn.innerText = "Link Terminal"; 
+        authBtn.disabled = false;
+    }
+}
 
         function initMap() {
             if (map) return;
@@ -284,9 +294,8 @@
 
         function openNavigation() {
             if (!targetLat) return alert("No destination coordinates.");
-            window.open(\                    
-  https://www.google.com/maps/dir/?api=1&destination=${targetLat},${targetLng}&travelmode=driving`, '_blank');`
-                }
+            window.open(https://www.google.com/search?q=http://maps.google.com/%3Fq%3D${targetLat},${targetLng}&travelmode=driving, '_blank');
+            }
 
         async function completeTrip() {
             if(!confirm("Finalize and close assignment?")) return;
@@ -313,6 +322,7 @@
     </script>
 </body>
 </html>
+
 
 
 
