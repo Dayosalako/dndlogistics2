@@ -141,12 +141,13 @@
         let map, driverMarker, customerMarker;
         let targetLat = null, targetLng = null;
 
-        async function authenticateDriver() {
+       async function authenticateDriver() {
+    console.log("Login attempt started...");
     const inputId = document.getElementById('driverIDInput').value.trim().toUpperCase();
     const inputPass = document.getElementById('driverPassInput').value.trim();
     
     if(!inputId || !inputPass) {
-        alert("Please enter both ID and Password");
+        alert("Please enter ID and Password");
         return;
     }
     
@@ -154,12 +155,14 @@
     authBtn.innerText = "VERIFYING...";
     authBtn.disabled = true;
 
-    // Construct the URL with correct parameters expected by your Apps Script
+    // Build the URL carefully
     const url = `${SCRIPT_URL}?action=login&key=${encodeURIComponent(inputId)}&pass=${encodeURIComponent(inputPass)}&type=driver`;
+    console.log("Fetching from:", url);
 
     try {
         const response = await fetch(url);
         const result = await response.json();
+        console.log("Server Response:", result);
 
         if (result.success) {
             driverID = inputId;
@@ -173,18 +176,17 @@
             initMap();
             startBackgroundPolling();
         } else {
-            alert("Login Failed: " + (result.error || "Unknown Error"));
+            alert("Access Denied: " + result.error);
             authBtn.innerText = "Link Terminal"; 
             authBtn.disabled = false;
         }
     } catch (e) {
-        console.error("Auth Error:", e);
-        alert("Connection Error. Check your internet or Script URL.");
+        console.error("Connection Error:", e);
+        alert("System Error: Could not reach the server. Check your SCRIPT_URL.");
         authBtn.innerText = "Link Terminal"; 
         authBtn.disabled = false;
     }
 }
-
         function initMap() {
             if (map) return;
             map = L.map('map', { zoomControl: false }).setView([0, 0], 13);
@@ -293,9 +295,10 @@
         }
 
         function openNavigation() {
-            if (!targetLat) return alert("No destination coordinates.");
-            window.open(https://www.google.com/search?q=http://maps.google.com/%3Fq%3D${targetLat},${targetLng}&travelmode=driving, '_blank');
-            }
+    if (!targetLat) return alert("No destination coordinates.");
+    // Fix: Using standard template literals correctly
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${targetLat},${targetLng}&travelmode=driving`, '_blank');
+}
 
         async function completeTrip() {
             if(!confirm("Finalize and close assignment?")) return;
@@ -322,6 +325,7 @@
     </script>
 </body>
 </html>
+
 
 
 
