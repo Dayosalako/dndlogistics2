@@ -1,4 +1,5 @@
 <!DOCTYPE html>                
+  
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -189,7 +190,6 @@
     </div>
 
     <script>
-        // PASTE YOUR NEW SCRIPT URL HERE
         const MASTER_SCRIPT = 'https://script.google.com/macros/s/AKfycbxrQw8e8V_Kl0317scTOzz6dYaK5pxf28rRnA90AI1Tr-w2ptSpyFeMxG6qpc-VXqew-w/exec';
         
         let currentSheetID = '1Q36QdZCbUw9LH1zScGH_-P9k5xnhOapKqcAsAvBSMI0';
@@ -198,7 +198,6 @@
         let driversData = [];
         let historyData = [];
 
-        // UPDATED VERIFY ADMIN FOR MULTIPLE USERS
         async function verifyAdmin() {
             const loginBtn = document.getElementById('loginBtn');
             const user = document.getElementById('adminUser').value.trim();
@@ -210,7 +209,6 @@
             loginBtn.disabled = true;
 
             try {
-                // Sending 'key' as username and 'pass' as password to match Backend v4.0
                 const response = await fetch(`${MASTER_SCRIPT}?action=login&key=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}&type=admin`);
                 const result = await response.json();
 
@@ -229,7 +227,6 @@
             }
         }
 
-        // Allow Enter key on password field
         document.getElementById('adminPassInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') verifyAdmin(); });
 
         async function syncData() {
@@ -289,7 +286,7 @@
             } else if (currentTab === 'drivers') {
                 header.innerHTML = `<tr><th class="p-6">Driver ID</th><th>Name</th><th>Status</th><th>Active Job</th><th class="text-right p-6">Tracking</th></tr>`;
             } else if (currentTab === 'History') {
-                header.innerHTML = `<tr><th class="p-6">Completed Date</th><th>Driver ID</th><th>Hire ID</th><th class="text-right p-6">Status</th></tr>`;
+                header.innerHTML = `<tr><th class="p-6"><input type="checkbox" onclick="toggleSelectAll(this)"></th><th>Completed Date</th><th>Driver ID</th><th>Hire ID</th><th class="text-right p-6">Status</th></tr>`;
             } else if (currentTab === 'Database') {
                 header.innerHTML = `<tr><th class="p-6">ID</th><th>Date</th><th>Customer</th><th>Route</th><th class="text-right p-6">Action</th></tr>`;
             }
@@ -339,10 +336,12 @@
                         </td>`;
                 }
                 else if (currentTab === 'History') {
+                    const hireId = c[2] ? c[2].v : 'N/A';
                     tr.innerHTML = `
+                        <td class="p-6"><input type="checkbox" class="log-checkbox" data-idx="${allData.length - 1 - idx}"></td>
                         <td class="p-6 text-xs text-slate-500 font-bold">${c[0].f || c[0].v}</td>
                         <td class="p-6 font-black text-slate-700">${c[1].v}</td>
-                        <td class="p-6 font-black text-blue-700 uppercase">${c[2].v}</td>
+                        <td class="p-6 font-black text-blue-700 uppercase">${hireId}</td>
                         <td class="p-6 text-right">
                             <span class="text-green-600 text-[10px] font-black uppercase"><i class="fas fa-check-circle mr-1"></i> LOGGED</span>
                         </td>`;
@@ -391,25 +390,35 @@
             } catch (e) { alert("Error"); }
         }
 
+        function toggleSelectAll(source) {
+            const checkboxes = document.querySelectorAll('.log-checkbox');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        }
+
         function exportHistoryToCSV() {
-            if (historyData.length === 0) return alert("No history data to export.");
+            const selectedCheckboxes = document.querySelectorAll('.log-checkbox:checked');
+            if (selectedCheckboxes.length === 0) return alert("Please select logs to export.");
+
             let csv = "Timestamp,Driver ID,Hire ID,Status,GPS Location\n";
-            historyData.forEach(row => {
-                if (row.c) {
+            selectedCheckboxes.forEach(cb => {
+                const index = cb.getAttribute('data-idx');
+                const row = allData[index].c;
+                if (row) {
                     const line = [
-                        row.c[0] ? (row.c[0].f || row.c[0].v) : "",
-                        row.c[1] ? row.c[1].v : "",
-                        row.c[2] ? row.c[2].v : "",
+                        row[0] ? (row[0].f || row[0].v) : "",
+                        row[1] ? row[1].v : "",
+                        row[2] ? row[2].v : "",
                         "COMPLETED",
-                        row.c[4] ? row.c[4].v : "N/A"
-                    ].map(v => `"${v}"`).join(",");
+                        row[4] ? row[4].v : "N/A"
+                    ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(",");
                     csv += line + "\n";
                 }
             });
+
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.setAttribute("href", URL.createObjectURL(blob));
-            link.setAttribute("download", `DND_Logistics_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute("download", `DND_Export_${new Date().toISOString().split('T')[0]}.csv`);
             link.click();
         }
 
@@ -463,4 +472,3 @@
     </script>
 </body>
 </html>
-
