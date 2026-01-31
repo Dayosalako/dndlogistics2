@@ -6,6 +6,8 @@
     <title>DND | Field Dispatch</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
         body { background-color: #020617; font-family: 'Plus Jakarta Sans', sans-serif; color: #f1f5f9; overflow-x: hidden; }
@@ -17,6 +19,7 @@
         .btn-locked { background: #1e293b !important; color: #64748b !important; cursor: not-allowed; opacity: 0.7; border: 1px dashed #334155; }
         .dispatch-ready { border: 1px solid #22c55e !important; color: #22c55e !important; }
         .hidden { display: none !important; }
+        #map { height: 200px; width: 100%; border-radius: 1.5rem; margin-top: 1rem; border: 1px solid rgba(255,255,255,0.1); z-index: 10; }
     </style>
 </head>
 <body class="p-6">
@@ -52,8 +55,8 @@
             <div id="signal" class="w-3 h-3 bg-slate-700 rounded-full transition-colors duration-500"></div>
         </header>
 
-        <div id="job-banner" class="neo-card rounded-3xl p-4 mb-6 hidden active-job-glow">
-            <div class="flex items-center justify-between">
+        <div id="job-banner" class="neo-card rounded-3xl p-5 mb-6 hidden active-job-glow">
+            <div class="flex items-start justify-between mb-4">
                 <div>
                     <p class="text-[9px] text-orange-500 font-black uppercase">Current Assignment</p>
                     <p id="current-job-id" class="text-lg font-black text-white">#---</p>
@@ -62,6 +65,32 @@
                     <i class="fas fa-truck-fast text-orange-500"></i>
                 </div>
             </div>
+
+            <div class="space-y-3 border-t border-white/5 pt-4">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-user text-slate-500 text-xs"></i>
+                    <div>
+                        <p class="text-[8px] uppercase text-slate-500 font-bold">Customer</p>
+                        <p id="cust-name" class="text-sm font-bold text-slate-200">---</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-phone text-slate-500 text-xs"></i>
+                    <div>
+                        <p class="text-[8px] uppercase text-slate-500 font-bold">Contact</p>
+                        <a id="cust-phone-link" href="#" class="text-sm font-bold text-orange-500 underline decoration-dotted">---</a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-location-dot text-slate-500 text-xs"></i>
+                    <div>
+                        <p class="text-[8px] uppercase text-slate-500 font-bold">Delivery Point</p>
+                        <p id="cust-address" class="text-xs font-medium text-slate-400">---</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="map"></div>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-6">
@@ -93,7 +122,6 @@
     </div>
 
     <script>
-        // Use your existing Deployment URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBqU-yWF2S9ltyKNmrZzP0nXl45gfMhD3X1q1SWfulkmlxPXkq7Tm5Hm6YiXtYi9KMKg/exec';
         
         let isLive = false;
@@ -101,6 +129,9 @@
         let pollInterval = null; 
         let driverID = '';
         let currentActiveJob = 'NONE';
+        
+        // Map Variables
+        let map, driverMarker, customerMarker;
 
         async function authenticateDriver() {
             const inputId = document.getElementById('driverIDInput').value.trim().toUpperCase();
@@ -113,24 +144,21 @@
             authBtn.disabled = true;
 
             try {
-                // New Secure Protocol: Sending credentials to server for verification
                 const response = await fetch(`${SCRIPT_URL}?action=login&key=${inputId}&pass=${inputPass}&type=driver`);
                 const result = await response.json();
 
                 if (result.success) {
                     driverID = inputId;
-                    
-                    // Setup UI with data returned from server
                     document.getElementById('displayDriverName').innerText = result.name;
                     document.getElementById('displayPlate').innerText = result.vehicle || "Vehicle N/A";
                     currentActiveJob = result.activeJob || 'NONE';
                     
-                    // Refresh UI State
-                    updateUIState();
+                    // Update UI and map info
+                    updateUIState(result);
                     
-                    // Switch Screens
                     document.getElementById('auth-screen').classList.add('hidden');
                     document.getElementById('main-terminal').classList.remove('hidden');
+                    initMap(); // Initialize Map
                     startBackgroundPolling();
                 } else {
                     alert("Authentication Denied: " + (result.error || "Check Credentials"));
@@ -145,7 +173,33 @@
             }
         }
 
-        function updateUIState() {
+        function initMap() {
+            if (map) return;
+            // Default center
+            map = L.map('map', { zoomControl: false }).setView([0, 0], 13);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            const carIcon = L.divIcon({
+                html: '<i class="fas fa-car-side text-orange-500 text-xl"></i>',
+                className: 'custom-div-icon',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            const homeIcon = L.divIcon({
+                html: '<i class="fas fa-house-chimney text-blue-500 text-xl"></i>',
+                className: 'custom-div-icon',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            driverMarker = L.marker([0, 0], { icon: carIcon }).addTo(map);
+            customerMarker = L.marker([0, 0], { icon: homeIcon }).addTo(map);
+        }
+
+        function updateUIState(data = {}) {
             const btn = document.getElementById('toggle-btn');
             const banner = document.getElementById('job-banner');
             const notice = document.getElementById('lock-notice');
@@ -154,6 +208,18 @@
             if(currentActiveJob !== 'NONE' && currentActiveJob !== '') {
                 banner.classList.remove('hidden');
                 document.getElementById('current-job-id').innerText = "#" + currentActiveJob;
+                
+                // Set Customer Details
+                document.getElementById('cust-name').innerText = data.customerName || "Valued Client";
+                document.getElementById('cust-phone-link').innerText = data.customerPhone || "N/A";
+                document.getElementById('cust-phone-link').href = `tel:${data.customerPhone}`;
+                document.getElementById('cust-address').innerText = data.deliveryAddress || "Address On File";
+                
+                // Set Customer Marker if coordinates exist in data
+                if(data.custLat && data.custLng && customerMarker) {
+                    customerMarker.setLatLng([data.custLat, data.custLng]);
+                }
+
                 badge.innerText = "DISPATCHED";
                 badge.classList.add('dispatch-ready');
                 
@@ -163,6 +229,10 @@
                     btn.disabled = false;
                     notice.innerText = "Ready for departure. Engage terminal.";
                 }
+                
+                // Resize map to ensure it renders correctly after being unhidden
+                setTimeout(() => { if(map) map.invalidateSize(); }, 200);
+
             } else {
                 banner.classList.add('hidden');
                 badge.innerText = "STANDBY";
@@ -178,7 +248,6 @@
         }
 
         function startBackgroundPolling() {
-            // Regularly check for new jobs/updates via the secure script
             pollInterval = setInterval(async () => {
                 if(isLive || !driverID) return;
                 try {
@@ -186,10 +255,10 @@
                     const result = await res.json();
                     if(result.success) {
                         currentActiveJob = result.activeJob || 'NONE';
-                        updateUIState();
+                        updateUIState(result);
                     }
                 } catch (e) { console.log("Polling..."); }
-            }, 30000); // Check every 30 seconds
+            }, 30000); 
         }
 
         function toggleTransmission() {
@@ -227,6 +296,16 @@
                 const lng = pos.coords.longitude;
                 document.getElementById('lat').innerText = lat.toFixed(4);
                 document.getElementById('lng').innerText = lng.toFixed(4);
+                
+                // Update Marker on Map
+                if(driverMarker) {
+                    const newPos = [lat, lng];
+                    driverMarker.setLatLng(newPos);
+                    // Adjust view to show both points
+                    const group = new L.featureGroup([driverMarker, customerMarker]);
+                    map.fitBounds(group.getBounds().pad(0.2));
+                }
+
                 sendToSheet(lat, lng, "ON-DUTY", false);
             }, null, { enableHighAccuracy: true });
         }
@@ -263,4 +342,3 @@
     </script>
 </body>
 </html>
-
